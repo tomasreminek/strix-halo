@@ -1,0 +1,7 @@
+.DS_Store
+*.gguf
+*.safetensors
+*.bin
+*.tar.gz
+.env
+*.log
