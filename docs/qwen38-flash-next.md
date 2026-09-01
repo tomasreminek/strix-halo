@@ -20,8 +20,8 @@ Device (bundle ICD): `RADV STRIX_HALO | fp16: dot2 | int dot: 1 | fp4: 0`. Backe
 | llama-bench `pp16384` d0 | 325.35 ± 1.59 | **373.13 ± 1.01** | **+14.7%** |
 | llama-bench `tg64` d0 | 29.97 ± 0.03 | **30.09 ± 0.04** | wash |
 | llama-bench `tg64 @ d16384` | — | 24.54 ± 0.09 | new |
-| llama-server EN/CS 64 tok | decode **30.09 / 30.06** | not re-run | — |
-| tool call `get_time` | `finish=tool_calls` **PASS** | not re-run | — |
+| llama-server EN/CS | decode **30.09 / 30.06** (8k, 2026-08-30) | **128k 2026-09-01: EN 29.42 / CS 29.51** | wash |
+| tool call `get_time` | `finish=tool_calls` **PASS** | **PASS** (128k) | — |
 
 v0.7.3 identity: portable Vulkan, llama.cpp **`df1671a03` (b10654)**. Author claim on a 64 GB box (`-ncmoe 8`, UD-Q3_K_XL) was +20% gen at 32k depth / +30% pp at 16k depth / flat at depth 0. On this 124 GiB box, full GPU (`-ncmoe 0`), AP-IQ4_XS: **decode at empty context did not move; long-prompt prefill did.**
 
