@@ -21,7 +21,7 @@ Living dashboard (same numbers, plus video clips):
 
 | Workload | Winner | Decode / wall | Recipe |
 |---|---|---|---|
-| **Chat / lite worker** | Qwen3.8-Flash-Next AP-IQ4_XS + Nathanw v0.7.2 Vulkan | **30.0 t/s** tg64 · pp512 **428 t/s** | [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md) |
+| **Chat / lite worker** | Qwen3.8-Flash-Next AP-IQ4_XS + Nathanw **v0.7.3** Vulkan | **30.1 t/s** tg64 · pp16k **373 t/s** (+15% vs 0.7.2) | [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md) |
 | **GLM-5.3-Flash (320B MoE)** | aj9o9 AJ-IQ2_XXS + Unsloth MIX **ROCm gfx1151** | **14.63 t/s** decode · **128k KV / 64k Hermes window** | [docs/glm-53-flash.md](docs/glm-53-flash.md) |
 | **Full agent 27B** | Qwen3.8-27B ROCmFP4 FAST + MTP `n-max=2` | Czech **20.2 t/s** (73% acc) · no-draft **14.2 t/s** | [docs/qwen38-27b.md](docs/qwen38-27b.md) |
 | **MiniMax H3 Czech video** | FP8 + Qwen3-VL 32B + Euler/simple 8–11 | 3s T2V **~11 min** · human 8/10 | [docs/minimax-h3.md](docs/minimax-h3.md) |
