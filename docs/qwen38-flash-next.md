@@ -81,11 +81,17 @@ stat -c%s "$MODELS/Qwen38-Flash-Next-AP/AP-IQ4_XS/Qwen3.8-Flash-Next-AP-IQ4_XS.g
 | apepojken qwen4exp-spec-mtp | — | abort | IQ4 MUL_MAT_VEC. Reddit ~50 t/s was **UD-Q3_K_XL** |
 | julianmb/haloq38flash | — | 56 t/s MTP @ 8k; **19–27 @ 128k** | slower than 30 t/s here at 128k |
 
-## Queued (not measured) — OrcaRouter uncensored Q4_K_M + MTP
+## Queued (not measured) — Orca Uncensored Q4_K_M + MTP · Nathanw v0.7.3
 
-Community claim on **same silicon**, different OS/runtime. **Hypothesis, not a Hilbert result.**
+**In test 2026-09-01 on this box. Hilbert columns empty until `llama-server` print_timing exists.**
 
-- Weights: `orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF` **Q4_K_M** (HF tree: **3 shards**, 119,150,722,944 B ≈ 111 GiB). Their write-up is **113.55 GiB / 4 shards** after grafting a Q8_0 MTP head (PR 27836 converter, source rev `fdf5fe3`). Stock HF **does not** ship that 4th shard.
-- Runtime they used: `myhacsint/llama.cpp` `production/strix-halo-qwen4exp-b10669` (b10669 / `3287a6e9d`), Fedora 44, Mesa 26.1.7. **Do not change Pop!_OS.**
-- Claimed: short ctx pp512 485 / MTP decode **52.2 t/s code** (91% accept); 65k → 349 pp / **36.3** decode.
-- That 52 t/s is **code + MTP + Q4_K_M**, not our AP-IQ4_XS 30 t/s empty-context tg64.
+Community claim, same silicon, different OS/runtime. We replicate on **Pop!_OS + Nathanw v0.7.3**, not Fedora, not their b10685 tree.
+
+Their latest (build **10685** `bbc7d566e0`): Unsloth UD-IQ4_XS uses a **shared Q8_0 MTP sidecar beside the unchanged 3 shards** (no graft). Orca Uncensored Q4_K_M on their box still uses **integrated** MTP (4th shard grafted from `orcarouter/Qwen3.8-Flash-Next-Uncensored` rev `fdf5fe3`).
+
+| arm (their numbers) | pp512 short | MTP decode short | @65k decode | Hilbert |
+|---|---:|---:|---:|---|
+| Orca Q4_K_M + integrated MTP | 527.3 | 49.56 t/s | 40.41 | downloading |
+| Unsloth UD-IQ4_XS + sidecar | 550.0 | 43.59 t/s | 35.98 | not started |
+
+**Our first arm:** v0.7.3 + stock HF Q4_K_M (3 shards, 119,150,722,944 B) + sidecar `mtp-Qwen3.8-Flash-Next-Q8_0.gguf`. `--spec-type draft-mtp`; `--spec-draft-adaptive` is **not** in 0.7.3. If load fails, that is the result — then b10685 without changing the OS.
