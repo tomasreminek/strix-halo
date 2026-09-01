@@ -81,17 +81,19 @@ stat -c%s "$MODELS/Qwen38-Flash-Next-AP/AP-IQ4_XS/Qwen3.8-Flash-Next-AP-IQ4_XS.g
 | apepojken qwen4exp-spec-mtp | — | abort | IQ4 MUL_MAT_VEC. Reddit ~50 t/s was **UD-Q3_K_XL** |
 | julianmb/haloq38flash | — | 56 t/s MTP @ 8k; **19–27 @ 128k** | slower than 30 t/s here at 128k |
 
-## Queued (not measured) — Orca Uncensored Q4_K_M + MTP · Nathanw v0.7.3
+## Measured 2026-09-01 — Orca Uncensored Q4_K_M + MTP sidecar · Nathanw v0.7.3
 
-**In test 2026-09-01 on this box. Hilbert columns empty until `llama-server` print_timing exists.**
+**Hilbert `llama-server` `print_timing` / JSON `timings.*`. Not llama-bench. Not their Fedora/b10685 table.**
 
-Community claim, same silicon, different OS/runtime. We replicate on **Pop!_OS + Nathanw v0.7.3**, not Fedora, not their b10685 tree.
+Stock HF 3 shards (111 GiB) + EasiiX `mtp-Qwen3.8-Flash-Next-Q8_0.gguf`. Nathanw v0.7.3 `df1671a03` b10654. Port `:18090`, 1 slot, `-c 65536`. Sidecar loaded. Telegram default unchanged. Pop!_OS unchanged.
 
-Their latest (build **10685** `bbc7d566e0`): Unsloth UD-IQ4_XS uses a **shared Q8_0 MTP sidecar beside the unchanged 3 shards** (no graft). Orca Uncensored Q4_K_M on their box still uses **integrated** MTP (4th shard grafted from `orcarouter/Qwen3.8-Flash-Next-Uncensored` rev `fdf5fe3`).
+Flags: `-ngl 999 -fa 1 -c 65536 -b 2048 -ub 2048 --cache-type-k q8_0 --cache-type-v q8_0 --load-mode mmap --tensor-read-lazy auto --no-host --no-repack --spec-type draft-mtp -md … --spec-draft-n-min 0 --spec-draft-n-max 7 --spec-draft-p-min 0.75 --reasoning off`
 
-| arm (their numbers) | pp512 short | MTP decode short | @65k decode | Hilbert |
-|---|---:|---:|---:|---|
-| Orca Q4_K_M + integrated MTP | 527.3 | 49.56 t/s | 40.41 | downloading |
-| Unsloth UD-IQ4_XS + sidecar | 550.0 | 43.59 t/s | 35.98 | not started |
+| workload | prompt_n | pp t/s | gen | decode t/s | draft acc |
+|---|---:|---:|---:|---:|---:|
+| EN unique code ×3 | 80 | 132.8 first | 512 | **58.3–58.7** | 95% |
+| EN code + 2k filler | 2124 | 378.9 | 512 | 60.3 | 99% |
+| Czech prose ×2 | 752 | 432.5 first | 256 | **30.4–30.7** | 70% |
+| EN @ ~26k ctx | 26467 | 405.8 | 256 | 41.3 | 87% |
 
-**Our first arm:** v0.7.3 + stock HF Q4_K_M (3 shards, 119,150,722,944 B) + sidecar `mtp-Qwen3.8-Flash-Next-Q8_0.gguf`. `--spec-type draft-mtp`; `--spec-draft-adaptive` is **not** in 0.7.3. If load fails, that is the result — then b10685 without changing the OS.
+Czech ≈ AP-IQ4_XS 30 t/s (MTP mean draft 2.4). Code is the MTP win. 65k decode not measured. Community 49.6/43.6 remain **their** numbers.

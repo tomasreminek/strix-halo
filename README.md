@@ -26,9 +26,9 @@ Living dashboard (same numbers, plus video clips):
 | **Full agent 27B** | Qwen3.8-27B ROCmFP4 FAST + MTP `n-max=2` | Czech **20.2 t/s** (73% acc) · no-draft **14.2 t/s** | [docs/qwen38-27b.md](docs/qwen38-27b.md) |
 | **MiniMax H3 Czech video** | FP8 + Qwen3-VL 32B + Euler/simple 8–11 | 3s T2V **~11 min** · human 8/10 | [docs/minimax-h3.md](docs/minimax-h3.md) |
 
-## In test (2026-09-01)
+## Measured (2026-09-01) — Orca + MTP sidecar
 
-Orca Uncensored Q4_K_M + MTP sidecar on **Nathanw v0.7.3**. Community 49 t/s is **not** a Hilbert number yet — see [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md#queued-not-measured--orca-uncensored-q4_k_m--mtp--nathanw-v073).
+Nathanw v0.7.3 + Orca Q4_K_M 3-shard + EasiiX sidecar: EN code **58.5 t/s** (95% acc), Czech **30.5 t/s** (70% acc). Not Telegram default. Details: [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md#measured-2026-09-01--orca-uncensored-q4_k_m--mtp-sidecar--nathanw-v073).
 
 ## Do not mix tables
 
