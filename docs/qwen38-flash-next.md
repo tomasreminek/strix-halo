@@ -97,3 +97,19 @@ Flags: `-ngl 999 -fa 1 -c 65536 -b 2048 -ub 2048 --cache-type-k q8_0 --cache-typ
 | EN @ ~26k ctx | 26467 | 405.8 | 256 | 41.3 | 87% |
 
 Czech ≈ AP-IQ4_XS 30 t/s (MTP mean draft 2.4). Code is the MTP win. 65k decode not measured. Community 49.6/43.6 remain **their** numbers.
+
+## Measured 2026-09-02 — Unsloth MIX b10715 ROCm gfx1151 + Orca + shared MTP
+
+**Same Orca Q4_K_M 3-shard weights.** Runtime `unslothai/llama.cpp` `b10715-mix-86bd2d3` `linux-x64-rocm-gfx1151`. Device `ROCm0` 8060S. `:18090`, `-c 8192`. Telegram default unchanged. Pop!_OS unchanged.
+
+EasiiX self-contained Q8_0 sidecar **rejected** (`blk.48.nextn.hc_head_norm.weight` missing). Unsloth `MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf` **2,786,568,256 B** loaded and drafted.
+
+Vendor Unsloth MTP guide (greedy, NVIDIA B200, `UD-Q4_K_XL`): 83.2 → 138.8 t/s (1.67×). **Not a Hilbert number.**
+
+| workload | prompt_n | pp t/s | gen | decode t/s | draft acc | mean draft |
+|---|---:|---:|---:|---:|---:|---:|
+| Czech prose | 42 | 98.6 | 138 | **25.60** | 63.8% | 2.33 |
+| EN unique code | 37 | 102.8 | 512 | **42.37** | 83.4% | 5.18 |
+
+`llama-server print_timing`. `--spec-type draft-mtp --spec-draft-n-max 7`. ROCm0 has no TOP_K sampler op (warning). Decode **lost** vs Nathanw Vulkan + EasiiX (Czech 30.4 → 25.6; EN code 58 → 42). Keep Nathanw as the Orca path. Do not mix into the AP-IQ4 30 t/s table.
+

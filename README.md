@@ -30,6 +30,10 @@ Living dashboard (same numbers, plus video clips):
 
 Nathanw v0.7.3 + Orca Q4_K_M 3-shard + EasiiX sidecar: EN code **58.5 t/s** (95% acc), Czech **30.5 t/s** (70% acc). Not Telegram default. Details: [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md#measured-2026-09-01--orca-uncensored-q4_k_m--mtp-sidecar--nathanw-v073).
 
+## Measured (2026-09-02) — Unsloth MIX b10715 is slower on this pair
+
+Same Orca weights on Unsloth MIX `b10715-mix` **ROCm gfx1151** + `shared-Q8_0` MTP: Czech **25.6 t/s**, EN code **42.4 t/s**. EasiiX sidecar rejected on MIX. Vendor 1.67× is NVIDIA B200, not Hilbert. Keep Nathanw. Details: [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md#measured-2026-09-02--unsloth-mix-b10715-rocm-gfx1151--orca--shared-mtp).
+
 ## Do not mix tables
 
 - Flash-Next **30 t/s** is a **different model** from 27B (~14–20 t/s) and from GLM (~14.6 t/s).
