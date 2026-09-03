@@ -113,3 +113,22 @@ Vendor Unsloth MTP guide (greedy, NVIDIA B200, `UD-Q4_K_XL`): 83.2 → 138.8 t/s
 
 `llama-server print_timing`. `--spec-type draft-mtp --spec-draft-n-max 7`. ROCm0 has no TOP_K sampler op (warning). Decode **lost** vs Nathanw Vulkan + EasiiX (Czech 30.4 → 25.6; EN code 58 → 42). Keep Nathanw as the Orca path. Do not mix into the AP-IQ4 30 t/s table.
 
+## Measured 2026-09-03 — llama.cpp PR #28136 `on-direct` (pread) vs mmap
+
+**Hilbert `llama-server` JSON `timings.prompt_per_second`. Not llama-bench. Not DGX Spark.**
+
+[PR #28136](https://github.com/ggml-org/llama.cpp/pull/28136) is **OPEN** (unmerged). Parallel `pread()` workers instead of mmap 4 KB page faults on the Flash-Next PLE/n-gram table. Nathanw v0.7.3 has `--tensor-read-lazy` (mmap), **not** `--lazy-mode on-direct`. Isolated HIP build of ggml-org + the PR, commit `c6a9e5c`, `gfx1151`.
+
+Weights: same AP-IQ4_XS `Qwen3.8-Flash-Next-AP-IQ4_XS.gguf` · **90,447,294,368 B**. Port `:18090`, 1 slot, `-c 32768 --ubatch-size 256 --flash-attn on`. XOR `:18081`. Telegram default unchanged. Pop!_OS unchanged. `n_predict=1` — **decode not measured**. No `drop_caches`. Prompt 28,728 tokens (Czech padding, not fully unique PLE). Marker `PR28136_HILBERT_20260903_COLD_210P7`.
+
+| `--lazy-mode` | tag | prompt_n | prompt_ms | pp t/s | vs mmap cold |
+|---|---|---:|---:|---:|---|
+| `on` (mmap) | cold | 28728 | 150871.583 | 190.41 | baseline |
+| `on-direct` (pread) | cold | 28728 | 136328.921 | **210.73** | **+10.7%** |
+| `on` (mmap) | warm | 28728 | 135975.715 | 211.27 | +11.0% vs own cold |
+| `on-direct` (pread) | warm | 28728 | 136621.784 | 210.27 | −0.5% vs mmap warm |
+
+Cold prefill moved; warm is a wash (page cache already hot). DGX Spark 2–3× (~300 → 750–800 t/s) did **not** reproduce on this 124 GiB unified box. Community Strix Halo +20–32% cold prefill is the right band; this run is the low end.
+
+**Not production.** Do not wire into `zapni flash`. Do not mix into the AP-IQ4 30 t/s decode table.
+
