@@ -113,23 +113,27 @@ Vendor Unsloth MTP guide (greedy, NVIDIA B200, `UD-Q4_K_XL`): 83.2 → 138.8 t/s
 
 `llama-server print_timing`. `--spec-type draft-mtp --spec-draft-n-max 7`. ROCm0 has no TOP_K sampler op (warning). Decode **lost** vs Nathanw Vulkan + EasiiX (Czech 30.4 → 25.6; EN code 58 → 42). Keep Nathanw as the Orca path. Do not mix into the AP-IQ4 30 t/s table.
 
-## Hub inventory 2026-09-03 — matching Uncensored MTP-draft (not measured)
+## Measured 2026-09-03 — matching Uncensored MTP-draft vs EasiiX
 
-Marker `ORCA_MTP_DRAFT_HUB_20260903`. Repo
-[`orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF`](https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF)
-`lastModified 2026-09-03T08:39:14Z` · commit `d2e41a316ee6`. **No Hilbert t/s.** Telegram default unchanged.
+Marker `ORCA_MTP_DRAFT_HILBERT_20260903`. Hub file
+`Qwen3.8-Flash-Next-Uncensored-MTP-draft.gguf` **4,135,893,632 B** (sha256 `ff803fb437e90567…`)
+on C:. Same-day A/B on `:18090`, Nathanw v0.7.3, Orca Q4_K_M, `-c 65536`, n-max 7, thinking off,
+3 runs after warmup. Telegram default unchanged. Production Orca restored to EasiiX.
 
-| file | bytes | Hub date | verdict |
-|---|---:|---|---|
-| Q4_K_M 3 shards (already on C:) | **119,150,722,944** | 2026-08-27 | keep · do not re-download |
-| `mmproj-…-Uncensored-F16.gguf` | 907,543,296 | 2026-08-27 | on disk · not in `zapni orca` |
-| **`Qwen3.8-Flash-Next-Uncensored-MTP-draft.gguf`** | **4,135,893,632** | **2026-09-03T08:39:14Z** | **only useful new file** · matching `-md` · **not on disk** |
-| IQ2_XXS 2 shards | 74,848,338,432 | 2026-08-27 | skip (quality) |
-| IQ4_XS 3 shards | 97,473,155,200 | 2026-08-27 | skip vs current Q4_K_M |
-| Q6_K 5 shards | 167,639,839,296 | 2026-08-29 | skip (disk XOR) |
-| Q8_0 5 shards (packed MTP) | 190,980,606,112 | 2026-09-03T08:00:46Z | skip · needs [PR #28243](https://github.com/ggml-org/llama.cpp/pull/28243) · not drop-in on Nathanw v0.7.3 |
+Hub draft is Unsloth/MIX layout (`blk.48.nextn.hc_head_*`). Stock Nathanw **FAIL**
+`output_hc_norm.weight not found`. MIX b10715 loads it. Nathanw needs a local 3-tensor rename
+(`…-MTP-draft-nathanw.gguf`).
 
-Live Orca path still uses the EasiiX official sidecar (Czech ~70% acc / mean draft 2.4). Hypothesis only: a matching uncensored draft may lift Czech acceptance. If tested: Nathanw v0.7.3, `:18090`, `--spec-type draft-mtp -md … --spec-draft-n-max 7`, XOR `:18081`. Never `zapni`. Do not mix into the AP-IQ4 30 t/s table.
+| arm | Czech decode | Czech acc | EN code decode | EN acc |
+|---|---:|---:|---:|---:|
+| Nathanw + EasiiX (same-day) | **30.7 t/s** (29.7–31.7) | 66% | **50.3 t/s** (49.1–52.2) | 90% |
+| Nathanw + renamed matching draft | **32.3 t/s** (31.4–32.9) | 73% | **50.8 t/s** (49.9–51.3) | 90% |
+| MIX b10715 + Hub matching draft | 27.0 t/s (26.3–27.3) | 64% | 44.9 t/s (43.6–46.6) | 91% |
+
+Czech **+1.6 t/s (+5%)**. EN code wash. Do not quote the 2026-09-01 58 t/s EN-code fill — this
+harness stopped at 140–250 tokens. Keep EasiiX in production (rename is a local hack). Skip
+IQ2/Q6/Q8_0 (~191 GB, [PR #28243](https://github.com/ggml-org/llama.cpp/pull/28243)). Never mix
+into the AP-IQ4 30 t/s table.
 
 ## Measured 2026-09-03 — llama.cpp PR #28136 `on-direct` (pread) vs mmap
 
