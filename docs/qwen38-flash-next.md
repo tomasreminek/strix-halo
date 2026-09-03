@@ -113,6 +113,24 @@ Vendor Unsloth MTP guide (greedy, NVIDIA B200, `UD-Q4_K_XL`): 83.2 → 138.8 t/s
 
 `llama-server print_timing`. `--spec-type draft-mtp --spec-draft-n-max 7`. ROCm0 has no TOP_K sampler op (warning). Decode **lost** vs Nathanw Vulkan + EasiiX (Czech 30.4 → 25.6; EN code 58 → 42). Keep Nathanw as the Orca path. Do not mix into the AP-IQ4 30 t/s table.
 
+## Hub inventory 2026-09-03 — matching Uncensored MTP-draft (not measured)
+
+Marker `ORCA_MTP_DRAFT_HUB_20260903`. Repo
+[`orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF`](https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF)
+`lastModified 2026-09-03T08:39:14Z` · commit `d2e41a316ee6`. **No Hilbert t/s.** Telegram default unchanged.
+
+| file | bytes | Hub date | verdict |
+|---|---:|---|---|
+| Q4_K_M 3 shards (already on C:) | **119,150,722,944** | 2026-08-27 | keep · do not re-download |
+| `mmproj-…-Uncensored-F16.gguf` | 907,543,296 | 2026-08-27 | on disk · not in `zapni orca` |
+| **`Qwen3.8-Flash-Next-Uncensored-MTP-draft.gguf`** | **4,135,893,632** | **2026-09-03T08:39:14Z** | **only useful new file** · matching `-md` · **not on disk** |
+| IQ2_XXS 2 shards | 74,848,338,432 | 2026-08-27 | skip (quality) |
+| IQ4_XS 3 shards | 97,473,155,200 | 2026-08-27 | skip vs current Q4_K_M |
+| Q6_K 5 shards | 167,639,839,296 | 2026-08-29 | skip (disk XOR) |
+| Q8_0 5 shards (packed MTP) | 190,980,606,112 | 2026-09-03T08:00:46Z | skip · needs [PR #28243](https://github.com/ggml-org/llama.cpp/pull/28243) · not drop-in on Nathanw v0.7.3 |
+
+Live Orca path still uses the EasiiX official sidecar (Czech ~70% acc / mean draft 2.4). Hypothesis only: a matching uncensored draft may lift Czech acceptance. If tested: Nathanw v0.7.3, `:18090`, `--spec-type draft-mtp -md … --spec-draft-n-max 7`, XOR `:18081`. Never `zapni`. Do not mix into the AP-IQ4 30 t/s table.
+
 ## Measured 2026-09-03 — llama.cpp PR #28136 `on-direct` (pread) vs mmap
 
 **Hilbert `llama-server` JSON `timings.prompt_per_second`. Not llama-bench. Not DGX Spark.**

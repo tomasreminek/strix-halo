@@ -34,6 +34,10 @@ Nathanw v0.7.3 + Orca Q4_K_M 3-shard + EasiiX sidecar: EN code **58.5 t/s** (95%
 
 Same Orca weights on Unsloth MIX `b10715-mix` **ROCm gfx1151** + `shared-Q8_0` MTP: Czech **25.6 t/s**, EN code **42.4 t/s**. EasiiX sidecar rejected on MIX. Vendor 1.67× is NVIDIA B200, not Hilbert. Keep Nathanw. Details: [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md#measured-2026-09-02--unsloth-mix-b10715-rocm-gfx1151--orca--shared-mtp).
 
+## Hub inventory (2026-09-03) — matching Uncensored MTP-draft, not measured
+
+[`orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF`](https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF) moved today. Q4_K_M 3-shard on C: is **unchanged** (111.00 GiB, Hub 2026-08-27). The only useful new file is `Qwen3.8-Flash-Next-Uncensored-MTP-draft.gguf` **4,135,893,632 B** — matching uncensored `-md`, **not on disk, no Hilbert t/s**. Skip IQ2/IQ4_XS/Q6_K and the 178 GiB Q8_0 packed-MTP (needs [PR #28243](https://github.com/ggml-org/llama.cpp/pull/28243); not drop-in on Nathanw v0.7.3). Never Telegram default. Details: [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md#hub-inventory-2026-09-03--matching-uncensored-mtp-draft-not-measured).
+
 ## Measured (2026-09-03) — llama.cpp PR #28136 `on-direct` is +10.7% cold prefill, not 2–3×
 
 HIP gfx1151 build of ggml-org + [PR #28136](https://github.com/ggml-org/llama.cpp/pull/28136) (`c6a9e5c`) vs mmap `--lazy-mode on`. Same AP-IQ4_XS. Port `:18090`. Cold **190.4 → 210.7 t/s (+10.7%)**. Warm wash. Decode not measured. Nathanw v0.7.3 has no `on-direct`. Not production. Do not mix into the 30 t/s decode table. Details: [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md#measured-2026-09-03--llama-cpp-pr-28136-on-direct-pread-vs-mmap).
