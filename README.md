@@ -48,6 +48,7 @@ HIP gfx1151 build of ggml-org + [PR #28136](https://github.com/ggml-org/llama.cp
 - PR #28136 `on-direct` is a **cold-prefill SSD-read** delta on AP-IQ4 (+10.7% here), not a decode winner and not the DGX Spark 2–3× claim.
 - julianmb/haloq38flash **56 t/s** is Flash-Next **MTP @ 8k**, not GLM. At 128k they report 19–27 t/s — slower than 30 t/s here without MTP.
 - GLM **Vulkan 8.57 t/s** is not the Hilbert ceiling. Same GGUF on **ROCm gfx1151** is **14.63 t/s**.
+- **Nex N2.5 Mini** (HaloFPX Vulkan, 2026-09-09): llama-bench tg64 **81.6 t/s** / pp512 **650**. Quality **reject** (Czech/EN garbage; thinking-on = 0 content). Not a winner. [docs/nex-n25-mini.md](docs/nex-n25-mini.md). Do not mix into Flash 30 t/s.
 
 ## Docs
 
@@ -56,7 +57,8 @@ HIP gfx1151 build of ggml-org + [PR #28136](https://github.com/ggml-org/llama.cp
 3. [Qwen3.8-Flash-Next](docs/qwen38-flash-next.md)
 4. [Qwen3.8 27B](docs/qwen38-27b.md)
 5. [MiniMax H3](docs/minimax-h3.md)
-6. [Reddit post draft](docs/reddit-post.md)
+6. [Nex N2.5 Mini (reject)](docs/nex-n25-mini.md)
+7. [Reddit post draft](docs/reddit-post.md)
 
 ## Licence
 
