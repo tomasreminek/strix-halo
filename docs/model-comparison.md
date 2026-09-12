@@ -15,7 +15,7 @@ Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-
 | **Signal 3.8-27B AP-Q4_K_XL** | Nathanw v0.7.3 Vulkan0 | **190.9** | **183.1** | **11.9** t/s | 19.3 CZ / 29.2 code (probe) | 2026-09-12 measured · MTP acc 0.60–0.90 |
 | **Ornith 1.5-9B Q4_0 ROCMFP4** | Vulkan0 (local build) | **990.7** | **842.8** | **40.7** t/s | 34.2–38.9 (probe) | 2026-09-12 measured · fastest 27B-worker prefill |
 | **Nex N2.5-mini ROCmFP4 STRIX_LEAN** | HaloFPX Vulkan0 | 650 | 581 | **81.6** t/s | 78.5 @8k | **Quality REJECT** (CZ/EN garbage; weights deleted) |
-| **CIRU-STRIX-Orca (Qwen3.8 Flash)** | CIRU runtime MTP sidecar | _in progress (rebench)_ | — | — | — | Pending 2026-09-12 rebench |
+| **CIRU-STRIX-Orca (Qwen3.8 Flash)** | CIRU v3 ROCm + PLE + MTP depth-6 | ~24 | — | **3.3** t/s decode · MTP acc 0.25–0.32 | — | **REJECT 2026-09-12** (retest: unusable decode, memory pressure) |
 
 \* cyjin/heretic numbers measured on qwen38-27b.md three-arm control rows.
 \† GLM short-prompt prefill ~99–103 t/s (server, Unsloth MIX b10715).
@@ -28,4 +28,16 @@ Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-
 | Ornith 1.5-9B Q4_0 ROCMFP4 | 990.7 / 694.8 | 842.8 / 560.2 | 40.72 / 36.51 | 750.8→287.6 / 34.2–38.9 · refused=false |
 | CIRU-STRIX-Orca | — invalid JSON (bench) — | — | — | partial: 5.8 / 9.5 t/s (1 task) |
 
-Evidence: `records/benchmarks/kanban-2026-09-12/` (bench JSON + probe JSON + server logs).
+Evidence: `records/benchmarks/kanban-2026-09-12/` (bench JSON + probe JSON + server logs; CIRU: ciru-strix-orca-server2.log).
+
+## CIRU-STRIX-Orca retest 2026-09-12 (verdict)
+
+Isolated server (CIRU v3 + PLE + MTP depth-6), n_ctx_slot 262144. Server timings:
+
+| run | prompt eval | decode | draft acceptance |
+|---|---|---|---|
+| task 0 (593 tok) | 24.10 t/s | 3.26 t/s | 0.32 |
+| task 19 (4 tok warm) | 2.96 t/s | 3.40 t/s | 0.25 |
+| czech prose (89 tok) | 4.74 t/s | 6.96 t/s | 0.27 |
+
+Decode ~3 t/s with MTP acceptance below 33% — deeper-than-expected draft overhead on RDNA3.5. Two subsequent tasks timed out (cancelled at 40+s + 90+s), server ended memory-pressured (104/24 GiB used). **Rejected for any production chat route**; not merged into any winner table.
