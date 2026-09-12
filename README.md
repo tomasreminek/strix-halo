@@ -58,7 +58,8 @@ HIP gfx1151 build of ggml-org + [PR #28136](https://github.com/ggml-org/llama.cp
 4. [Qwen3.8 27B](docs/qwen38-27b.md)
 5. [MiniMax H3](docs/minimax-h3.md)
 6. [Nex N2.5 Mini (reject)](docs/nex-n25-mini.md)
-7. [Reddit post draft](docs/reddit-post.md)
+7. [Kanban 2026-09-12 benchmark sweep](docs/kanban-2026-09-12.md)
+8. [Reddit post draft](docs/reddit-post.md)
 
 ## Licence
 
