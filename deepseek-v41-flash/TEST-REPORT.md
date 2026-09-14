@@ -12,6 +12,7 @@ Host: AMD Ryzen AI MAX+ 395 / Radeon 8060S / `gfx1151`
 - `python3 tools/test_tune_atlas.py` — PASS
 - `python3 -m compileall -q engine tools server` — PASS
 - `python3 tools/strix_halo_probe.py` — PASS as an audit; reports CUDA-specific upstream code
+- live runtime probe — `torch 2.13.0+cu130`, `torch_hip=None`, `cuda_is_available=False`, `device_count=0`, FP4 module import PASS; this confirms the current Python environment is CUDA-only and cannot execute the GPU path on Strix Halo yet
 
 ## Expected blocked gates
 
