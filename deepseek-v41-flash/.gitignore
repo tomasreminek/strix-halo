@@ -1,0 +1,7 @@
+.env
+.venv/
+models/
+results/generated/
+results/trace-*/
+__pycache__/
+*.pyc

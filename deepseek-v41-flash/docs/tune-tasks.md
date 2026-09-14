@@ -1,0 +1,365 @@
+# Working with `./tune.sh`
+
+Seven things people actually do with the tool. The screen itself is described in
+[`docs/tune.md`](tune.md), every field and flag in [`docs/tune-reference.md`](tune-reference.md),
+the ideas in [`docs/keep-sets.md`](keep-sets.md) and the arithmetic in
+[`docs/memory-budget.md`](memory-budget.md).
+
+## Choose the topics for a workload
+
+Start from what the server will actually be sent, not from what would be nice to have. Every topic
+selected spends part of a fixed budget, and the cost of the ones you do not need is paid by the
+ones you do.
+
+How steep that cost is depends on `DSV41_PRUNE_RANK`. Under the default `sum`, which is also what
+the screen budgets with, breadth is expensive: at `PRUNE_KEEP=0.36` the worst-served topic falls
+0.657 -> 0.410 going from four selected topics to eighteen. Under `maxmin` the same span costs it
+0.06 (both measured 2026-09-12). Neither rule creates capacity — under `maxmin` about sixteen
+topics still lands the worst-served one at 0.671, below the 0.7 line — but which advice below
+matters most is the rule's answer, not a constant.
+
+1. `./tune.sh`, or `./tune.sh --list` first to see what the keep-set carries.
+2. Select the topics the traffic consists of with `space`. `/` filters the list, `a` selects
+   everything visible, `n` clears it.
+3. Press `m`. That snaps the keep fraction to the smallest one at which **every** selected topic
+   reaches the coverage target, which is the cheapest configuration that serves the selection.
+4. Read the line above the keys. It names the weakest selected topic and its coverage, which is the
+   number that predicts whether long generations hold together.
+5. Read the verdict in the budget panel, and if it is not `FITS`, see
+   [fixing an over-budget selection](#fix-an-over-budget-selection).
+6. `r` writes `.env` and starts the server. `w` writes and stops.
+
+Selecting nothing is a legitimate answer: the engine then ranks on every topic in the file, which is
+what the shipped profiles do. It is the right choice when the traffic is mixed or unpredictable.
+
+Selecting one topic is the cheapest and the most brittle. On the shipped keep-set under the `sum`
+rule, `coding` alone reaches 0.85 coverage at 32 % keep where both topics together need 51 % — but
+at that setting `general` covers 0.45, and a keep-set that never saw a domain does not merely get
+worse at it, it produces degenerate output in it. Check the other bars before committing to a
+narrow selection.
+
+Check the bars of the registers a single request mixes, too, and not only the one it is nominally
+about. On 2026-09-12 a served selection of {english, html, python, reasoning} at `PRUNE_KEEP=0.36`
+left css at 0.518 and javascript at 0.564 — never selected, traced all along — and the model wrote
+`* { }`, then `box-sizing: inline-block`, then the same `<style>` block over and over to the token
+cap. Selecting css, javascript and typescript under `maxmin`, at the same 80.4 GB arena, produced
+114 correct declarations with custom properties and no repetition.
+
+Without a terminal, the same decisions are available one at a time:
+
+```bash
+./tune.sh --topics coding --keep 0.32 --print   # exits non-zero if it will not load
+./tune.sh --topics coding --keep 0.32 --write   # same, written into .env
+```
+
+## Keep a selection as a profile
+
+A selection that turned out well is worth more than the twenty minutes it took to find, and the
+profile screen is where the next person looks first. `s` on the topic screen puts it there: it asks
+for a name on the key line, `Enter` saves it, `Esc` cancels. Without a terminal:
+
+```bash
+./tune.sh --topics arabic,english,translation --save-profile "Arabic desk" \
+    --describe "Arabic and English prose, for a bilingual assistant"
+```
+
+Both write `$XDG_CONFIG_HOME/deepseek-v41-flash-spark/profiles.json`, which is outside the
+checkout, so a saved profile survives a fresh clone and never shows up in `git status`. For a
+profile that should travel with the checkout instead, put the same object in
+`results/keepsets/profiles.json`; both files are read, the user's one last, and a profile there
+replaces a built-in one of the same name rather than appearing twice. The format, the precedence
+and what happens to a file with a mistake in it are in
+[`docs/tune-reference.md`](tune-reference.md#profiles-from-a-file).
+
+Two things to know before relying on one:
+
+* **Topic names are a keep-set's own.** A profile that names `html` applies to a keep-set that
+  carries `html`. Against one that does not, it applies with the rest of its topics, and the
+  profile screen prints `not in this keep-set: html` underneath so that a selection which is
+  quietly a topic short does not look like one that worked.
+* **A saved profile is untested and says so.** Where a shipped profile shows the counts its own
+  generation run produced — `7 of 10 strict · 9 finished`, with the date and the keep fraction under
+  it — a profile from a file shows `untested`, and is budgeted from the coverage target because
+  there is no measured keep fraction for it. Coverage is a measurement; whether a selection
+  generates sound long output is not. Step 7 of [adding a topic](#add-a-topic-of-your-own) is how
+  that gate is run, and the result belongs in `results/keepsets/<name>/GATE.md` beside the shipped
+  ones.
+
+## Read the verdict
+
+| badge | what it means | what to do |
+|---|---|---|
+| `FITS` | both gates clear with at least 3 GB in hand | run it |
+| `TIGHT` | it will load and serve, with under 3 GB of margin on one of the gates | fine on a box with nothing else on it; one more process and it becomes the other verdict |
+| `WILL NOT LOAD` | either the engine's pre-flight refuses it, or the first prefill chunk would not fit | lower something before pressing `r`; the tool refuses to run it |
+
+`WILL NOT LOAD` is mostly the second case, and that is the one worth understanding: the engine's own
+pre-flight runs before the drafter experts, the KV cache and any prefill exist, so a configuration
+can pass it, load for three minutes, log `ready`, and be killed by the memory watchdog on the first
+request. On 2026-09-12 a 98 GB arena did exactly that with 5.5 GB free; an 87 GB arena left 16.5 GB
+and served. The tool applies the stricter test, so it refuses configurations the engine would have
+accepted.
+
+One colouring detail: `free after load` turns red only below the keep-free floor, so it can be green
+while the badge says `WILL NOT LOAD`. The badge is the number to act on.
+
+## Fix an over-budget selection
+
+In order of how much they buy, on a 121 GiB box with `cb3` experts:
+
+1. **Press `m`.** If the keep fraction was set by hand it is probably higher than the selection
+   needs. If `m` answers that the target needs a fraction this box cannot hold, the selection is too
+   broad for this box, not the keep fraction too high.
+2. **Lower the keep fraction** with `←`, and read the weakest-topic line as you go. This is trading
+   coverage for memory directly; below about 0.7 on a topic that matters, expect degeneration.
+3. **Check the format.** `f` switches between `cb3` at 14.45 MB a slot and `fp4` at 18.80 MB. The
+   same arena holds about 30 % more experts in `cb3`. At keep 39 % that is an 86.8 GB arena against
+   113.0 GB, which is the difference between serving and not fitting at all.
+4. **Deselect a topic.** Watch what the remaining bars do as it goes: a narrower selection reaches
+   the same coverage at a smaller keep fraction, and the keep fraction is the arena. Each 2-point
+   step of the keep slider is about 320 expert slots, which is 4.6 GB. This is a `sum`-rule lever
+   and it is listed here rather than second because of how much it buys under the other rule: at
+   `PRUNE_KEEP=0.36` dropping from eighteen selected topics to four buys the worst-served topic
+   0.247 under `sum` and 0.06 under `maxmin` (2026-09-12). It is also the lever that costs the most
+   elsewhere — a register dropped from the selection is the one a long generation then breaks in.
+5. **Shorten the context** only if the rest has been exhausted. It is the smallest term on the
+   screen: the whole range from 32k to 256k is 0.73 GB, less than a sixth of one keep step.
+6. **Check that nothing else holds the pool.** See below.
+
+What not to do: raise `ARENA_GB` in `.env` by hand afterwards. The tool writes an arena sized to
+hold exactly the kept experts plus the transient ring, and `tools/test_budget.py` checks that the
+rounding never leaves a kept expert outside it. A larger arena does not make more experts routable —
+`PRUNE_KEEP` decides that — it only takes memory the first prefill chunk then needs.
+
+## Add a topic of your own
+
+End to end, from source text to a keep-set the tool can compose. The trace is the expensive step, at
+roughly a minute per layer; everything after it is arithmetic.
+
+**1. Gather the text.** `corpus/fetch_topics.py` knows a 35-topic catalogue — sixteen programming
+languages taken from a tree you point it at, eleven natural languages from Wikipedia, and eight
+domain registers from a fixed set of English Wikipedia articles.
+
+Two topics the catalogue has gained since, `reasoning` and `reasoning_code`, are written by hand and
+are **not** in `fetch_topics.py`, so nothing below fetches them and `--print-topic-flags` does not
+emit them. `reasoning_code`'s source is `corpus/sources/reasoning_code.txt` and its kind is `think`;
+pass its flag alongside the generated ones (see [the `think` kind](#the-think-kind-for-deliberation)
+below).
+
+```bash
+python3 corpus/fetch_topics.py --list                      # the catalogue
+python3 corpus/fetch_topics.py --out topics --code-root ./sources --only rust,german
+```
+
+It writes `topics/<kind>/<topic>.txt`, skips a topic that is already there, and prints `THIN` for
+any topic it could not fill — those are the ones that will draw a hollow bar later.
+
+It asks Wikipedia for twenty article introductions per request, one request every two seconds,
+single threaded, and backs off when told to. That is not politeness for its own sake: a burst of
+parallel requests earns an IP-level 429 on every subsequent call, including single ones, for long
+enough to stall the job.
+
+For a topic the catalogue does not have, any text file works. One file per topic, not a directory.
+
+**2. Build the trace corpus.** Each `--topic` becomes a sequence category, and one category becomes
+one histogram in the finished `coverage.json`.
+
+```bash
+python3 corpus/make_corpus.py --tokenizer $MODEL_DIR --target 3000 \
+    --out corpus/trace_mine.jsonl \
+    $(python3 corpus/fetch_topics.py --out topics --print-topic-flags)
+```
+
+`--print-topic-flags` emits one `--topic NAME:KIND:PATH[:lang]` per file already in `topics/`, with
+`KIND` being `code` or `prose`. It only ever emits what `fetch_topics.py` itself wrote, so a
+hand-written topic — `reasoning`, `reasoning_code`, `reasoning_design`, `reasoning_lang` — is
+silently absent from a corpus built from it alone; add those flags next to the substitution:
+
+```bash
+python3 corpus/make_corpus.py --tokenizer $MODEL_DIR --target 3000 \
+    --out corpus/trace_mine.jsonl \
+    --topic reasoning_code:think:corpus/sources/reasoning_code.txt \
+    $(python3 corpus/fetch_topics.py --out topics --print-topic-flags)
+```
+
+The same flags can be written by hand:
+
+```bash
+python3 corpus/make_corpus.py --tokenizer $MODEL_DIR --target 3000 \
+    --topic rust:code:topics/code/rust.txt:rust \
+    --topic german:prose:topics/lang/german.txt \
+    --out corpus/trace_mine.jsonl
+```
+
+`--target` is tokens per topic. Aim for a few thousand: below 2,000 the tool marks the topic thin,
+and a thin topic's coverage is biased upward rather than merely noisy. The script prints what each
+topic actually reached — that is the number to check, not the file size, because CJK text is far
+denser per character than Latin text.
+
+Only the first `--target` tokens are taken, in file order, so the ordering of a hand-written source
+file is load-bearing: put the registers you care about first, or rotate them, and everything past
+the cut is never traced.
+
+### The `think` kind, for deliberation
+
+`code` and `prose` both write `</think>` immediately after the assistant tag, so both close an
+*empty* think block, and `prose` collapses every run of whitespace to a single space. Neither can
+represent what a model writes inside a think block when the task is code — prose and code
+interleaved, a fragment revised in the next sentence, an approach abandoned mid-thought — and
+neither ever measures the close itself. Counted over the two shipped trace corpora: 95 sequences,
+85 with `</think>` adjacent to the assistant tag, none with it after real content.
+
+That gap is not cosmetic. The experts that fire on "the deliberation is finished, close it, begin
+the answer" are never ranked, so on a pruned server they are not resident and the model cannot stop
+deliberating: at temperature 0 it writes a decisive closing line and then repeats a short phrase to
+the token cap with an answer of length zero. Lowering `reasoning_effort` makes it worse, not better.
+
+`think` reads records and wraps them as `<think>{deliberation}</think>{answer}`, preserving
+indentation and fences:
+
+```
+=== PROMPT
+one line, a realistic request
+=== THINK
+the deliberation, fenced fragments and all
+=== ANSWER
+the answer
+=== END
+```
+
+```bash
+python3 corpus/make_corpus.py --tokenizer $MODEL_DIR --target 3400 \
+    --topic reasoning_code:think:corpus/sources/reasoning_code.txt \
+    --out corpus/trace_reasoning_code.jsonl
+```
+
+The whole record — prompt, deliberation and answer together — must fit `--max-len` (512, the
+exactness bound of the pure-torch port); a record over budget is reported and skipped, so check the
+count the script prints. Write the deliberation by hand. A model cannot produce a register its
+resident experts do not cover, so sampling this text from the server that needs it is circular, and
+the samples come back degenerate.
+
+**3. Fetch the Engram rows the corpus needs.** The two n-gram tables are 101 GB each and are never
+downloaded; only the rows this corpus touches are fetched, over multipart HTTP range requests.
+
+```bash
+python3 tools/engram_rows.py --model-dir $MODEL_DIR --corpus corpus/trace_mine.jsonl \
+    --out engram_rows_mine
+```
+
+Add `--local-shard $MODEL_DIR/model-00047-of-00048.safetensors --local-shard
+$MODEL_DIR/model-00048-of-00048.safetensors` when the shards are already on disk.
+
+**4. Trace the routing.** One layer shard at a time, so at most one layer's weights are live.
+`--resume` checkpoints after every layer, so this can run while the rest of the checkpoint is still
+downloading.
+
+```bash
+python3 tools/expert_trace.py --model-dir $MODEL_DIR --corpus corpus/trace_mine.jsonl \
+    --engram-dir engram_rows_mine --out results/trace-mine --layers 0-39 --resume
+```
+
+**5. Turn the trace into histograms.**
+
+```bash
+python3 tools/expert_stats.py --trace results/trace-mine --out results/keepsets/mine
+```
+
+That writes `coverage.json` with one `counts_<topic>` histogram per category per layer, which is
+everything a keep-set needs. The raw per-layer trace arrays are not needed afterwards.
+
+**6. Use it.**
+
+```bash
+./tune.sh --stats results/keepsets/mine/coverage.json --list
+EXPERT_PROFILE=mine ./tune.sh
+```
+
+**7. Gate it.** Run free generation on your domains *and* on domains your corpus does not contain,
+and write both results down next to the profile, the way the shipped `GATE.md` files do. A keep-set
+that never saw a domain fails in it structurally, not gradually, and teacher-forced loss will not
+show you that — the configuration that could not write an HTML file measured better on loss than the
+one that replaced it.
+
+## Write the topic work out as a task
+
+The step before all of that is deciding which topic to add, and the screen cannot help with it. A
+coverage bar is the fraction of a topic's *measured* routing that stays resident, so it sees a gap
+in the **selection** and never a gap in the **catalogue**: a register that was never traced has no
+histogram, therefore no bar, no number and no warning. That is not a hypothetical. A five-topic
+profile here scored 0.85 or better on every topic it had and still reasoned in circles on a
+two-train arithmetic question. Nothing on the screen was wrong. There was simply nothing there to be
+wrong.
+
+The catalogue now carries `reasoning` and `reasoning_code` (added 2026-09-12), and tracing the
+second of them narrowed that diagnosis from "no reasoning register" to something far more specific:
+**the think-exit was never traced at all**. Every wrapper in `corpus/make_corpus.py` other than
+`wrap_think` writes `</think>` immediately after the assistant tag, so it closes an *empty* block —
+across the two shipped trace corpora, 95 sequences, 85 with `</think>` adjacent to the tag and none
+with it after real content (`corpus/make_corpus.py`, `wrap_think`'s docstring). The experts that
+fire on "the deliberation is finished, close it, begin the answer" were therefore never ranked and
+never resident, and at temperature 0 the server writes "I'll write the code now." and then repeats
+"Let me write." to the token cap with an answer of length zero. `reasoning_code` (hand-written
+deliberation that closes a block it actually filled) was traced on 2026-09-12 to close that gap,
+and every shipped profile now carries it. It helped and it did not finish the job: on the gate runs
+of 2026-09-13 and 2026-09-14 the think-exit went from a common failure to a rare one — Backend and
+Data and research recorded none at all at keep 0.36 — while a fragment redrafted three to ten times
+inside a long think block became the dominant remaining miss (`RESULTS.md` §5.2 and the 2026-09-14
+addenda).
+
+`--brief` writes that whole task out, as Markdown, from the keep-set that is loaded:
+
+```bash
+./tune.sh --brief > topic-task.md              # for the current keep-set and selection
+./tune.sh --stats results/keepsets/mine/coverage.json --topics python,html --brief
+```
+
+`b` on the profile screen does the same into `tune-brief.md` in the checkout and says so on the key
+line. What comes out is meant to be followed by hand or handed to somebody else, and it is
+generated rather than copied, so it stays true as the keep-set changes:
+
+* which topics this keep-set carries, and how many tokens each was traced on;
+* which of `corpus/fetch_topics.py`'s own groups are absent or thinly sampled here, counted rather
+  than asserted, and which registers the catalogue has no entry for at all;
+* the commands, in order, with this checkout's paths and the flags each script requires;
+* how much text a topic needs before its bar means anything, with the two measured correlations
+  behind that number;
+* what one more topic costs the topics already selected, in coverage and in keep fraction, computed
+  on the file in hand rather than as a general caution;
+* why the existing topics do not have to be traced again, with the snippet that concatenates the
+  per-layer counts;
+* and that the result is untested until it has been through the generation gate.
+
+The last three are the ones people get wrong. A new topic is cheap to trace and expensive to keep:
+it does not add slots, it takes a share of the ones there are, so every topic already in the
+selection covers slightly less once it is added. The brief prints that number for the selection in
+front of you, computed under `sum` — which is the expensive rule for this. Measured 2026-09-12 at
+`PRUNE_KEEP=0.36`, four topics to eighteen costs the worst-served topic 0.247 under `sum` and 0.06
+under `maxmin`, so a topic that is unaffordable on the screen may well be affordable on a server
+started with `DSV41_PRUNE_RANK=maxmin`.
+
+## When the screen says something is already running
+
+```
+ already running here: v41_engine.py (pid 12345) — this box holds one at a time
+```
+
+`r` refuses while that line is up, and `--print` and `--write` repeat it on stderr but still emit
+settings. Stop the other process and wait for the memory to come back:
+
+```bash
+./stop.sh          # SIGTERM -> SIGKILL, then blocks until MemAvailable recovers
+```
+
+The waiting is the part that matters. A pinned, page-cache-backed arena is reclaimed lazily, so
+`MemAvailable` climbs back over seconds rather than instantly, and starting the next server before
+it lands is the classic way to wedge the box: two arenas of this size push the host past the point
+where `sshd` can fork, and it answers ping and accepts TCP on 22 while being unreachable until
+someone power-cycles it. The header's free figure is re-read every second, so the screen can simply
+be watched until it recovers.
+
+The probe reads `/proc`, so it sees only processes on this host, and it matches the *script*
+argument of a Python process against `v41_engine.py`, `app.py`, `expert_trace.py` and
+`engram_rows.py`. A shell watching for one of those names does not trip it, and something holding
+the pool under a different name — another inference server, a container — will not be named, though
+`start.sh` refuses below `MIN_FREE_GIB` and does list what is holding memory.
