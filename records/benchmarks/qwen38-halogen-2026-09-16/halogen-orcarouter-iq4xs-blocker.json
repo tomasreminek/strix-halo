@@ -1,0 +1,18 @@
+{
+  "status": "BLOCKED",
+  "classification": "INCOMPATIBLE_GGUF_TENSOR_LAYOUT",
+  "tested_utc": "2026-09-16T08:44:27.429851+00:00",
+  "image": "ghcr.io/peonist-ai/halogen-flash-server:0.11.1",
+  "image_id": "sha256:d1e860d26c578cf510f4ed85a60d1b69aa3f7e6708b5a62f3624cb35021df317",
+  "model_url": "https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF",
+  "model_revision": "0434906af7b5202b676d43f108cf4f73d25691ef",
+  "quant_label": "IQ4_XS",
+  "loader_exit_code": 1,
+  "error": "gguf: blk.0.attn_qkv.weight: Q5_K is not read by this engine (K-quants and the IQ2/IQ1/F16 families are not repacked losslessly; no lossy fallback is offered). Use a build whose experts are IQ4_NL, IQ4_XS, IQ3_S or Q4_0 and whose trunk is Q8_0, such as unsloth's UD-IQ4_XS",
+  "interpretation": "The filename quant label describes the expert-oriented build but does not guarantee a Halogen-compatible dense trunk. This artifact contains Q5_K in blk.0.attn_qkv.weight; Halogen requires Q8_0 dense tensors. No benchmark was run and no 0 tok/s result is reported.",
+  "raw_evidence": {
+    "server_log": "/home/tomasreminek/benchmarks/qwen38-acceleration/runs/halogen-orcarouter-iq4xs-loader-smoke-preserved-20260916-104351/server.log",
+    "docker_inspect": "/home/tomasreminek/benchmarks/qwen38-acceleration/runs/halogen-orcarouter-iq4xs-loader-smoke-preserved-20260916-104351/docker-inspect.json",
+    "download_provenance": "/mnt/c/AI-Models/Halogen-OrcaRouter-Qwen38-Flash-Next-Uncensored-IQ4_XS/DOWNLOAD_PROVENANCE.json"
+  }
+}

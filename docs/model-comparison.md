@@ -7,7 +7,9 @@ Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-
 
 | Model (quant) | Backend / runtime | pp512 | pp16k | tg64 / decode | Server decode (prose) | Verdict |
 |---|---|---:|---:|---|---|---|
-| **Qwen3.8-Flash-Next AP-IQ4_XS** | Nathanw v0.7.3 Vulkan | 428 | 373 | **30.1** t/s | 29.4–30.5 EN/CZ | **Chat / lite winner** |
+| **Qwen3.8-Flash-Next native HGN** | **Halogen 0.11.0 ROCm** · quality overlay | — | — | **44.66** short serving | **40.08 @64k · 38.03 @~126k** | **Overall performance winner** · identity review required |
+| **Qwen3.8-Flash-Next Orca Q4_K_M + MTP7** | Nathanw **v0.7.6** Vulkan | — | — | **35.26** varied | **27.69 @64k · 25.89 sustained @126k** | **Uncensored winner / fallback** |
+| Qwen3.8-Flash-Next AP-IQ4_XS | Nathanw v0.7.3 Vulkan | 428 | 373 | 30.1 t/s | 29.4–30.5 EN/CZ | Superseded overall winner |
 | **Qwen3.8-27B ROCmFP4 FAST** (+MTP n-max 2) | Laurent Vulkan HIP | 61 | 56 | 14.1 | **20.2** CZ (73% acc) | **Full agent winner** (cache-reuse) |
 | **Qwen3.8-27B heretic-ara + MTP** | HIP ROCmFPX | 335* | 308* | 14.4 → **18.9** MTP | — | Uncensored worker |
 | **Qwen3.8-27B cyjin IQ4_XS** | Nathanw | 334 | 308 | 13.3 | 13.3 | Dropped (slower than heretic) |

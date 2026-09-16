@@ -17,14 +17,17 @@ Living dashboard (same numbers, plus video clips):
 | OS | Pop!_OS / Linux 7.0.11, x86_64 |
 | Rule | **One GPU-heavy job at a time.** Unload the LLM before ComfyUI, and vice versa. |
 
-## Winners (2026-08)
+## Winners (2026-09-16)
 
 | Workload | Winner | Decode / wall | Recipe |
 |---|---|---|---|
-| **Chat / lite worker** | Qwen3.8-Flash-Next AP-IQ4_XS + Nathanw **v0.7.3** Vulkan | **30.1 t/s** tg64 · pp16k **373 t/s** (+15% vs 0.7.2) | [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md) |
+| **Overall main model** | **Native Halogen Qwen3.8-Flash-Next** · quality overlay · 128k slot | **44.66 t/s** short · **40.08 t/s @64k** · **38.03 t/s @~126k** | [docs/qwen38-halogen.md](docs/qwen38-halogen.md) |
+| **Uncensored fallback** | OrcaRouter Q4_K_M + EasiiX Q8_0 MTP · Nathanw **v0.7.6** Vulkan | **35.26 t/s** varied · **27.69 @64k** · **25.89 sustained @126k** | [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md) |
 | **GLM-5.3-Flash (320B MoE)** | aj9o9 AJ-IQ2_XXS + Unsloth MIX **ROCm gfx1151** | **14.63 t/s** decode · **128k KV / 64k Hermes window** | [docs/glm-53-flash.md](docs/glm-53-flash.md) |
 | **Full agent 27B** | Qwen3.8-27B ROCmFP4 FAST + MTP `n-max=2` | Czech **20.2 t/s** (73% acc) · no-draft **14.2 t/s** | [docs/qwen38-27b.md](docs/qwen38-27b.md) |
 | **MiniMax H3 Czech video** | FP8 + Qwen3-VL 32B + Euler/simple 8–11 | 3s T2V **~11 min** · human 8/10 | [docs/minimax-h3.md](docs/minimax-h3.md) |
+
+Halogen is the performance winner even though the serial/MTP byte-identity gate remains under review; practical Czech, coding, tools, strict JSON, Responses API and vision gates passed. The tested uncensored OrcaRouter IQ4_XS cannot currently load in Halogen because its dense trunk contains `Q5_K`, while Halogen requires dense `Q8_0`. This is a compatibility blocker, not a `0 t/s` result.
 
 ## Measured (2026-09-01) — Orca + MTP sidecar
 
@@ -54,13 +57,14 @@ HIP gfx1151 build of ggml-org + [PR #28136](https://github.com/ggml-org/llama.cp
 
 1. [Hardware & measurement rules](docs/00-hardware.md)
 2. [GLM-5.3-Flash](docs/glm-53-flash.md) — download, bytes, ROCm vs Vulkan, OOM path
-3. [Qwen3.8-Flash-Next](docs/qwen38-flash-next.md)
-4. [Qwen3.8 27B](docs/qwen38-27b.md)
-5. [MiniMax H3](docs/minimax-h3.md)
-6. [Nex N2.5 Mini (reject)](docs/nex-n25-mini.md)
-7. [Model comparison · master table](docs/model-comparison.md)
-8. [Kanban 2026-09-12 benchmark sweep](docs/kanban-2026-09-12.md)
-9. [Reddit post draft](docs/reddit-post.md)
+3. [Qwen3.8 Flash-Next · native Halogen winner](docs/qwen38-halogen.md)
+4. [Qwen3.8-Flash-Next · llama.cpp / Orca](docs/qwen38-flash-next.md)
+5. [Qwen3.8 27B](docs/qwen38-27b.md)
+6. [MiniMax H3](docs/minimax-h3.md)
+7. [Nex N2.5 Mini (reject)](docs/nex-n25-mini.md)
+8. [Model comparison · master table](docs/model-comparison.md)
+9. [Kanban 2026-09-12 benchmark sweep](docs/kanban-2026-09-12.md)
+10. [Reddit post draft](docs/reddit-post.md)
 
 ## Licence
 

@@ -1,13 +1,40 @@
 # Qwen3.8-Flash-Next on Strix Halo
 
-**Current runtime 2026-09-01:** Nathanw **v0.7.3** + AP-IQ4_XS.
+**Current hierarchy 2026-09-16:** native **Halogen 0.11.0** is the overall performance winner; see [qwen38-halogen.md](qwen38-halogen.md). The fastest verified **uncensored llama.cpp** fallback is Orca Q4_K_M + EasiiX MTP7 on Nathanw **v0.7.6**.
 
 Not a full-skill Hermes daily driver: qwen4exp **disables** `--cache-reuse` and `--context-shift`
 even when you pass them. 27B is still the agent path with persistent KV.
 
-Exclusive ~84–103 GiB. Stop 27B, GLM, and Comfy first. Do **not** change the host OS to copy a Fedora recipe.
+Exclusive ~84–123 GiB depending on the route. Stop 27B, GLM, and Comfy first. Do **not** change the host OS to copy a Fedora recipe.
 
-## Winner numbers (same weights, two runtimes)
+## New overall winner and uncensored fallback · measured 2026-09-16
+
+### Overall winner: native Halogen
+
+Native Halogen Qwen3.8 Flash-Next with its default quality overlay is now the recommended main-model direction because speed is the primary gate: **44.66 tok/s** on the short serving set, **40.08 tok/s @64k**, and **38.03 tok/s @~126k**. Czech, executed Python, tools, strict JSON, Responses API and vision passed. Serial/MTP byte identity still differs, so the published status is `PERFORMANCE_GATE_PASSED / IDENTITY_REVIEW_REQUIRED`, not an unconditional correctness claim. Exact download, hashes, container image and command: [qwen38-halogen.md](qwen38-halogen.md).
+
+### Uncensored fallback: Orca Q4_K_M + EasiiX MTP7 + Nathanw v0.7.6
+
+This keeps the same target and MTP sidecar as the previous Orca service but upgrades the portable Vulkan runtime:
+
+- runtime release: <https://github.com/Nathanw1014/strix-halo-llamacpp/releases/tag/v0.7.6>;
+- portable asset SHA-256: `4128c797be892816662196a1b14fb48ffb713afadafb3809b69aaa90cafe3f93`;
+- llama.cpp build `10707`, commit `50c271f8`;
+- target: <https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF>, revision `0434906af7b5202b676d43f108cf4f73d25691ef`, Q4_K_M three-shard set;
+- MTP: <https://huggingface.co/EasiiX/Qwen3.8-Flash-Next-MTP-Strix-Halo-GGUF>, revision `6f7900648b1c6b14f067a182c640e47971e9ab35`, SHA-256 `9db03a687670608286e99b563fcc86d0ee76c8dd863f64b2afc0b54eb0eb975d`;
+- server: 131,072 slot, Q8_0 KV, MTP `n-max=7`, `p-min=0.75`, mmap, `--no-host`, `--no-repack`.
+
+Measured v0.7.6: varied decode **35.2558 tok/s**; 32k prefill/decode **473.91 / 30.64**; 64k **384.07 / 27.69**. At 126k, the sustained 256-token canary measured **260.61 prefill / 25.89 decode tok/s**. Against the previous v0.7.3 varied mean `30.3029`, v0.7.6 is **+16.34%**. All Czech/chat/prose/coding/tool/strict-JSON/Responses gates passed.
+
+Use the extracted top-level `llama-server` launcher; never canonicalize its symlink or call the internal binary directly, because `_run` configures the bundled RADV/Mesa dispatch.
+
+### Why Halogen does not yet run this uncensored Orca
+
+The tested OrcaRouter IQ4_XS export is `BLOCKED`, not slow: Halogen 0.11.1 rejected dense tensor `blk.0.attn_qkv.weight` because it is `Q5_K`; Halogen's BYO-GGUF path requires dense `Q8_0` and supported expert layouts. No benchmark ran. We monitor future Halogen releases and compatible uncensored exports.
+
+Raw summaries: [`records/benchmarks/qwen38-halogen-2026-09-16/`](../records/benchmarks/qwen38-halogen-2026-09-16/).
+
+## Winner numbers (historical AP weights, two runtimes)
 
 Weights: [`agentionai/Qwen3.8-Flash-Next-AP-GGUF`](https://huggingface.co/agentionai/Qwen3.8-Flash-Next-AP-GGUF)
 `AP-IQ4_XS/Qwen3.8-Flash-Next-AP-IQ4_XS.gguf` · **90,447,294,368 B** (84.23 GiB) · `qwen4exp A3B IQ4_NL - 4.5 bpw`.

@@ -1,0 +1,39 @@
+{
+  "status": "MEASURED",
+  "created_utc": "2026-09-16T11:11:29.538570+00:00",
+  "context_slot_tokens": 131072,
+  "target_prompt_tokens": 126000,
+  "target_generation_tokens": 256,
+  "arms": {
+    "v0.7.5": {
+      "path": "/home/tomasreminek/benchmarks/qwen38-acceleration/runs/orca-qwen38-v0.7.5-126k-longgen-20260916-125129",
+      "status": "MEASURED",
+      "prompt_n": 126000,
+      "predicted_n": 256,
+      "prefill_tok_s": 234.8102830564165,
+      "decode_tok_s": 26.099946418345294,
+      "draft_n": 160,
+      "draft_n_accepted": 136,
+      "decode_valid": true,
+      "content_chars": 1391,
+      "server_exit_code": 0
+    },
+    "v0.7.6": {
+      "path": "/home/tomasreminek/benchmarks/qwen38-acceleration/runs/orca-qwen38-v0.7.6-126k-longgen-20260916-130157",
+      "status": "MEASURED",
+      "prompt_n": 126000,
+      "predicted_n": 256,
+      "prefill_tok_s": 260.6105000351038,
+      "decode_tok_s": 25.88568111723818,
+      "draft_n": 170,
+      "draft_n_accepted": 135,
+      "decode_valid": true,
+      "content_chars": 1285,
+      "server_exit_code": 0
+    }
+  },
+  "v0.7.6_vs_v0.7.5_percent": {
+    "prefill": 10.987686162146693,
+    "decode": -0.820941536326325
+  }
+}

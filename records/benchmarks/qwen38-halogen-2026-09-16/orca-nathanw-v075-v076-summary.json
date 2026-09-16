@@ -1,0 +1,246 @@
+{
+  "status": "MEASURED",
+  "created_utc": "2026-09-16T10:49:45.154393+00:00",
+  "model": "orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF Q4_K_M",
+  "mtp": "EasiiX Q8_0 n=7 p_min=0.75",
+  "context_slot_tokens": 131072,
+  "arms": {
+    "v0.7.5": {
+      "path": "/home/tomasreminek/benchmarks/qwen38-acceleration/runs/orca-qwen38-nathanw-v0.7.5-mtp7-ab-20260916-112832",
+      "status": "MEASURED",
+      "varied_decode_tok_s": [
+        34.345400241764686,
+        32.837263159629785,
+        35.95180934882391
+      ],
+      "mean_varied_decode_tok_s": 34.37815758340613,
+      "depth": {
+        "32768": {
+          "tokenized_prompt_tokens": 32768,
+          "decode_tok_s": [
+            28.351282702238077,
+            28.429025000743035,
+            28.423919503459967
+          ],
+          "prefill_tok_s": [
+            342.73964049092723,
+            344.51210344783357,
+            345.6199677886156
+          ],
+          "mean_decode_tok_s": 28.40140906881369,
+          "mean_prefill_tok_s": 344.2905705757921,
+          "http_statuses": [
+            200,
+            200,
+            200
+          ]
+        },
+        "65536": {
+          "tokenized_prompt_tokens": 65536,
+          "decode_tok_s": [
+            23.038313762983922,
+            22.23324901542078,
+            22.192363406003235
+          ],
+          "prefill_tok_s": [
+            293.89403833772747,
+            290.7330637055074,
+            291.63127703438755
+          ],
+          "mean_decode_tok_s": 22.487975394802646,
+          "mean_prefill_tok_s": 292.08612635920747,
+          "http_statuses": [
+            200,
+            200,
+            200
+          ]
+        },
+        "126000": {
+          "tokenized_prompt_tokens": 126000,
+          "decode_tok_s": [
+            31.5897306298541,
+            29.759121170638796,
+            30.77153018027721
+          ],
+          "prefill_tok_s": [
+            230.59706978436688,
+            231.24112487157103,
+            232.35098135234927
+          ],
+          "mean_decode_tok_s": 30.706793993590036,
+          "mean_prefill_tok_s": 231.39639200276238,
+          "http_statuses": [
+            200,
+            200,
+            200
+          ]
+        }
+      },
+      "quality_validation": {
+        "czech": {
+          "nonempty": true,
+          "content": "Reprodukovatelnost zajišťuje, že výsledky jsou objektivní a nezávislé na náhodných vlivech nebo chybách v nastavení. Umožňuje tak férové srovnávání výkonu různých modelů a ověřování jejich skutečných schopností."
+        },
+        "chat": {
+          "nonempty": true,
+          "content": "To je skvělý start. Dvě hodiny hluboké práce jsou vzácné a cenné, takže je škoda je promarnit na něco, co by šlo udělat i v „šedém“ režimu.\n\nNeexistuje jedna univerzální pravidlo, ale tady je **nejrychlejší a nejúčinnější způsob**, jak vybrat ten *jediný* úkol, který má největší dopad:\n\n### 1. Polož si otázku: „Co když udělám jen TOTO?“\nPředstav si, že dnes uděláš **jen jednu věc** a zbytek dne budeš mít volno (nebo jen rutinu).\n*   Který úkol by ti dal největší pocit uspokojení?\n*   Který úkol by ti nejvíce ulevil od stresu?\n*   Který úkol by posunul tvůj projekt nebo kariérní cíl nejblíže k cíli?\n\n👉 **Vyber ten, který splňuje alespoň dvě z těchto tří podmínek.**\n\n### 2. Použij"
+        },
+        "prose": {
+          "nonempty": true,
+          "content": "Asfalt lesklý jako lak na nehtech odráží matné světlo pouličních lamp, které ještě nestihly zhasnout. Vzduch je těžký a chladný, prolezlý vůní mokré hlíny a zbytků benzínu, co se drží v kalužích u obrubníků. První tramvaj projíždí křižovatkou s tichým šuměním, její okna jsou zamlžená a uvnitř sedí jen pár lidí s hlavami skloněnými do telefonů. Na chodníku se rozlévá tenká vrstva vody, která pomalu ustupuje do kanalizace, a na stromech visí těžké kapky, jež padají na zaparkovaná auta s tichým lupnutím. Město se probouzí bez hluku, jen s tím neustálým kapáním a vzdáleným zvukem budíku v nějakém bytě nad kavárnou, která ještě nemá otevřeno."
+        },
+        "coding": {
+          "parsed": true,
+          "tests_passed": true,
+          "returncode": 0,
+          "stderr": ""
+        },
+        "tool_call": {
+          "valid": true,
+          "arguments": {
+            "city": "Praha"
+          }
+        },
+        "structured_json": {
+          "valid": true,
+          "value": {
+            "answer": "Prague",
+            "confidence": 1.0
+          }
+        },
+        "responses_api": {
+          "valid": true
+        }
+      },
+      "peak_rss_kib": 72945384,
+      "server_exit_code": 0
+    },
+    "v0.7.6": {
+      "path": "/home/tomasreminek/benchmarks/qwen38-acceleration/runs/orca-qwen38-nathanw-v0.7.6-mtp7-ab-20260916-121332",
+      "status": "MEASURED",
+      "varied_decode_tok_s": [
+        35.28176780750378,
+        34.73083399355968,
+        35.75480281646891
+      ],
+      "mean_varied_decode_tok_s": 35.255801539177455,
+      "depth": {
+        "32768": {
+          "tokenized_prompt_tokens": 32768,
+          "decode_tok_s": [
+            30.64672957604429,
+            31.114712874843896,
+            30.151979683047877
+          ],
+          "prefill_tok_s": [
+            474.75538789339276,
+            475.69904190513984,
+            471.2607930449915
+          ],
+          "mean_decode_tok_s": 30.63780737797869,
+          "mean_prefill_tok_s": 473.9050742811747,
+          "http_statuses": [
+            200,
+            200,
+            200
+          ]
+        },
+        "65536": {
+          "tokenized_prompt_tokens": 65536,
+          "decode_tok_s": [
+            27.635482955187808,
+            27.762494384404544,
+            27.662899901796703
+          ],
+          "prefill_tok_s": [
+            383.6892783804996,
+            384.30800785626525,
+            384.222925841399
+          ],
+          "mean_decode_tok_s": 27.68695908046302,
+          "mean_prefill_tok_s": 384.0734040260546,
+          "http_statuses": [
+            200,
+            200,
+            200
+          ]
+        },
+        "126000": {
+          "tokenized_prompt_tokens": 126000,
+          "decode_tok_s": [
+            20.013026660990242,
+            20.09205815737561,
+            20.16914579083679
+          ],
+          "prefill_tok_s": [
+            280.72364879804127,
+            281.1250882166622,
+            280.09274181895785
+          ],
+          "mean_decode_tok_s": 20.091410203067547,
+          "mean_prefill_tok_s": 280.64715961122045,
+          "http_statuses": [
+            200,
+            200,
+            200
+          ]
+        }
+      },
+      "quality_validation": {
+        "czech": {
+          "nonempty": true,
+          "content": "Reprodukovatelnost zajišťuje, že výsledky jsou objektivní a nezávislé na náhodných vlivech nebo chybách v nastavení. Umožňuje tak férové srovnávání výkonu různých modelů a ověřování jejich skutečných schopností."
+        },
+        "chat": {
+          "nonempty": true,
+          "content": "To je skvělý výchozí bod. Dvě hodiny soustředěné práce jsou cenné, ale pokud je rozdrobíš na pět malých úkolů, pravděpodobně nedokončíš nic zásadního. Klíčem je **ruthless prioritization** (bezohledná priorita).\n\nZkus projít tento rychlý filtr, abys našel ten *jeden* úkol:\n\n### 1. Polož si otázku: „Co se stane, když to dnes neudělám?“\n*   Pokud je odpověď „nic závažného“ nebo „můžu to posunout na zítra bez následků“ → **Vyhoď to z dnešního seznamu.**\n*   Pokud je odpověď „ztratím peníze“, „zklamu klienta“, „zablokuji tým“ nebo „ztratím příležitost“ → **To je tvůj kandidát.**\n\n### 2. Použij pravidlo „Jeden domino efekt“\nKterý z tvých úkolů, když ho dokončíš, udělá všechny ostatní úkoly jednoduššími, zbyteč"
+        },
+        "prose": {
+          "nonempty": true,
+          "content": "Asfalt lesklý jako lak na nehtech odráží matné světlo pouličních lamp, které ještě nestihly zhasnout. Vzduch je těžký a chladný, prolezlý vůní mokré hlíny a zbytků benzínu, co se drží v kalužích u obrubníků. První tramvaj projíždí křižovatkou s tichým šuměním, její okna jsou zamlžená a uvnitř sedí jen pár lidí s hlavami skloněnými do telefonů. Na chodníku se rozlévá šedá mlha, která postupně ustupuje před ranním sluncem, a město se probouzí do ticha, které ruší jen kapky padající z okapů na prázdné lavičky."
+        },
+        "coding": {
+          "parsed": true,
+          "tests_passed": true,
+          "returncode": 0,
+          "stderr": ""
+        },
+        "tool_call": {
+          "valid": true,
+          "arguments": {
+            "city": "Praha"
+          }
+        },
+        "structured_json": {
+          "valid": true,
+          "value": {
+            "answer": "Prague",
+            "confidence": 1.0
+          }
+        },
+        "responses_api": {
+          "valid": true
+        }
+      },
+      "peak_rss_kib": 72940884,
+      "server_exit_code": 0
+    }
+  },
+  "v0.7.6_vs_v0.7.5_percent": {
+    "varied_decode": 2.552911550428605,
+    "depth": {
+      "32768": {
+        "decode": 7.874251251923581,
+        "prefill": 37.64683519755276
+      },
+      "65536": {
+        "decode": 23.118949546974086,
+        "prefill": 31.49320332788461
+      },
+      "126000": {
+        "decode": -34.57014689562975,
+        "prefill": 21.28415537605708
+      }
+    }
+  }
+}

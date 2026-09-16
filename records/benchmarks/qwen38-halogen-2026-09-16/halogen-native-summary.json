@@ -1,0 +1,631 @@
+{
+  "status": "COMPLETE_PERFORMANCE_GATE_PASSED_IDENTITY_REVIEW_REQUIRED",
+  "matrix_complete": true,
+  "performance_gate": "PASSED_VS_CURRENT_ORCA_REFERENCE",
+  "production_decision": "PENDING_DIRECT_ORCA_AB_AND_HERMES_CANARY",
+  "candidate_eligible_for_production": null,
+  "reason": "Halogen exceeds the current Orca speed reference and practical API/quality probes pass, but serial/MTP byte identity differs in every serving regime; verify against current Orca behavior and real Hermes workflows before cutover",
+  "resumed_speed_only": true,
+  "resume_utc": "2026-09-16T06:09:21.655788+00:00",
+  "image": "ghcr.io/peonist-ai/halogen-flash-server:0.11.0",
+  "image_digest": "sha256:7f4036110c6b316d72c3bc534bd5cd88af3078ca1d59fe710f3e342a534d3598",
+  "model_revision": "b8dbb46d03f5d1d0e63b432c2ca763db7e8e0aa4",
+  "quality": {
+    "result": {
+      "name": "quality",
+      "overlay": "default-quality",
+      "container": "halogen-qwen38-quality-1567978",
+      "start_utc": "2026-09-16T02:11:58.387767+00:00",
+      "docker_command": [
+        "docker",
+        "run",
+        "-d",
+        "--rm",
+        "--pull",
+        "never",
+        "--name",
+        "halogen-qwen38-quality-1567978",
+        "-p",
+        "127.0.0.1:8731:8731",
+        "--device",
+        "/dev/kfd",
+        "--device",
+        "/dev/dri",
+        "--group-add",
+        "44",
+        "--group-add",
+        "992",
+        "--ipc=host",
+        "--ulimit",
+        "memlock=-1:-1",
+        "-e",
+        "HALOGEN_CTX=131072",
+        "-e",
+        "HALOGEN_KV_POOL_POSITIONS=131072",
+        "-e",
+        "HALOGEN_KV_SLOTS=1",
+        "-e",
+        "HALOGEN_MAX_TOK=32768",
+        "-e",
+        "HALOGEN_PROMPT_CACHE=2",
+        "-e",
+        "HALOGEN_VISION_TOWER=1",
+        "-e",
+        "HALOGEN_VERBOSE=1",
+        "-v",
+        "/mnt/c/AI-Models/Halogen-Qwen38-Flash-Next:/models:ro",
+        "ghcr.io/peonist-ai/halogen-flash-server:0.11.0",
+        "all"
+      ],
+      "health_ready_s": 121.07276538386941,
+      "launch_to_health_s": 121.17293568095192,
+      "status": "PARTIAL",
+      "sweep_prefill_exit": 0,
+      "sweep_decode_exit": 0,
+      "serving_benchmark_exit": 1,
+      "serving_benchmark": {
+        "mtp": {
+          "mean_tok_s": 44.66,
+          "min_tok_s": 38.13,
+          "max_tok_s": 51.94,
+          "commit_per_round": 1.7
+        }
+      },
+      "serving_depth": {
+        "32k": {
+          "context_regime": "128k server slot; approximately 32k target prompt",
+          "server_context_slot_tokens": 131072,
+          "target_prompt_tokens": 32768,
+          "slice_depth_parameter": 32768,
+          "generated_tokens": 256,
+          "measured_prompt_tokens_source": "raw engine/bench-serving log",
+          "prefix": {
+            "source": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.txt",
+            "source_manifest": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.json",
+            "source_commit": "9f31776c3773cf03f98535c19b7e6d394af374b4",
+            "bytes": 684407,
+            "sha256": "e4c3b195d68a870213e3180ff721df10b94ae162bbb7de6dc30b6c90f84ad4d5",
+            "estimated_tokens_at_3.6_cpt": 190112,
+            "kind": "concatenated real open-source C++ source; no repeated synthetic filler",
+            "server_context_slot_tokens": 131072
+          },
+          "exit_code": 1,
+          "parsed_means": {
+            "mtp": {
+              "mean_tok_s": 41.37,
+              "min_tok_s": 35.44,
+              "max_tok_s": 48.95,
+              "commit_per_round": 1.67
+            }
+          },
+          "target_46_tok_s_reached": false
+        },
+        "64k": {
+          "context_regime": "128k server slot; approximately 64k target prompt",
+          "server_context_slot_tokens": 131072,
+          "target_prompt_tokens": 65536,
+          "slice_depth_parameter": 65536,
+          "generated_tokens": 256,
+          "measured_prompt_tokens_source": "raw engine/bench-serving log",
+          "prefix": {
+            "source": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.txt",
+            "source_manifest": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.json",
+            "source_commit": "9f31776c3773cf03f98535c19b7e6d394af374b4",
+            "bytes": 684407,
+            "sha256": "e4c3b195d68a870213e3180ff721df10b94ae162bbb7de6dc30b6c90f84ad4d5",
+            "estimated_tokens_at_3.6_cpt": 190112,
+            "kind": "concatenated real open-source C++ source; no repeated synthetic filler",
+            "server_context_slot_tokens": 131072
+          },
+          "exit_code": 1,
+          "parsed_means": {
+            "mtp": {
+              "mean_tok_s": 40.08,
+              "min_tok_s": 32.97,
+              "max_tok_s": 46.46,
+              "commit_per_round": 1.64
+            }
+          },
+          "target_46_tok_s_reached": false
+        },
+        "128k-slot": {
+          "context_regime": "128k server slot; calibrated to approximately 126k measured prompt tokens with generation headroom",
+          "server_context_slot_tokens": 131072,
+          "target_prompt_tokens": 126000,
+          "slice_depth_parameter": 121174,
+          "generated_tokens": 256,
+          "measured_prompt_tokens_source": "raw engine/bench-serving log",
+          "prefix": {
+            "source": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.txt",
+            "source_manifest": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.json",
+            "source_commit": "9f31776c3773cf03f98535c19b7e6d394af374b4",
+            "bytes": 684407,
+            "sha256": "e4c3b195d68a870213e3180ff721df10b94ae162bbb7de6dc30b6c90f84ad4d5",
+            "estimated_tokens_at_3.6_cpt": 190112,
+            "kind": "concatenated real open-source C++ source; no repeated synthetic filler",
+            "server_context_slot_tokens": 131072
+          },
+          "exit_code": 1,
+          "parsed_means": {
+            "mtp": {
+              "mean_tok_s": 38.03,
+              "min_tok_s": 31.57,
+              "max_tok_s": 44.95,
+              "commit_per_round": 1.63
+            }
+          },
+          "target_46_tok_s_reached": false
+        }
+      },
+      "validation": {
+        "czech": {
+          "nonempty": true,
+          "has_czech_diacritics": true
+        },
+        "coding": {
+          "parsed": true,
+          "tests_passed": true,
+          "returncode": 0,
+          "stderr": ""
+        },
+        "tool_call": {
+          "valid": true,
+          "arguments": {
+            "city": "Prague",
+            "unit": "celsius"
+          }
+        },
+        "structured_json": {
+          "valid": true,
+          "value": {
+            "answer": "Prague",
+            "confidence": 1.0
+          }
+        },
+        "responses_api": {
+          "valid": true
+        },
+        "vision": {
+          "valid": true,
+          "expected": "ORBIT 4729",
+          "content": "ORBIT 4729"
+        }
+      },
+      "varied": [
+        {
+          "name": "varied-1",
+          "status": "OK",
+          "wall_s": 7.140078982105479,
+          "timings": {
+            "prompt_n": 39,
+            "predicted_n": 256,
+            "prompt_ms": 546.5,
+            "predicted_ms": 6589.3,
+            "prompt_per_second": 71.363,
+            "predicted_per_second": 38.851,
+            "cache_n": 0,
+            "draft_n": 163,
+            "draft_n_accepted": 95
+          }
+        },
+        {
+          "name": "varied-2",
+          "status": "OK",
+          "wall_s": 7.537823777878657,
+          "timings": {
+            "prompt_n": 37,
+            "predicted_n": 256,
+            "prompt_ms": 502.8,
+            "predicted_ms": 7030.6,
+            "prompt_per_second": 73.588,
+            "predicted_per_second": 36.412,
+            "cache_n": 0,
+            "draft_n": 174,
+            "draft_n_accepted": 83
+          }
+        },
+        {
+          "name": "varied-3",
+          "status": "OK",
+          "wall_s": 7.050962490029633,
+          "timings": {
+            "prompt_n": 38,
+            "predicted_n": 256,
+            "prompt_ms": 507.7,
+            "predicted_ms": 6538.5,
+            "prompt_per_second": 74.847,
+            "predicted_per_second": 39.153,
+            "cache_n": 0,
+            "draft_n": 164,
+            "draft_n_accepted": 95
+          }
+        }
+      ],
+      "cache": {
+        "first": {
+          "prompt_n": 28011,
+          "predicted_n": 32,
+          "prompt_ms": 20982.4,
+          "predicted_ms": 739.9,
+          "prompt_per_second": 1334.976,
+          "predicted_per_second": 43.249,
+          "cache_n": 0,
+          "draft_n": 19,
+          "draft_n_accepted": 14
+        },
+        "followup": {
+          "prompt_n": 28011,
+          "predicted_n": 32,
+          "prompt_ms": 20972.3,
+          "predicted_ms": 840.5,
+          "prompt_per_second": 1335.619,
+          "predicted_per_second": 38.073,
+          "cache_n": 0,
+          "draft_n": 24,
+          "draft_n_accepted": 11
+        }
+      },
+      "end_utc": "2026-09-16T04:04:45.436191+00:00"
+    },
+    "serving_evidence": {
+      "serving-benchmark": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 44.66,
+          "min_tok_s": 38.13,
+          "max_tok_s": 51.94,
+          "commit_per_round": 1.7
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": null,
+        "slice_depth_parameter": null
+      },
+      "serving-benchmark-depth-32k": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 41.37,
+          "min_tok_s": 35.44,
+          "max_tok_s": 48.95,
+          "commit_per_round": 1.67
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": 32768,
+        "slice_depth_parameter": 32768
+      },
+      "serving-benchmark-depth-64k": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 40.08,
+          "min_tok_s": 32.97,
+          "max_tok_s": 46.46,
+          "commit_per_round": 1.64
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": 65536,
+        "slice_depth_parameter": 65536
+      },
+      "serving-benchmark-depth-128k-slot": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 38.03,
+          "min_tok_s": 31.57,
+          "max_tok_s": 44.95,
+          "commit_per_round": 1.63
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": 126000,
+        "slice_depth_parameter": 121174
+      }
+    }
+  },
+  "speed": {
+    "result": {
+      "name": "speed",
+      "overlay": "/models/qwen38-flash-next-w4b.overlay-speed.hgn",
+      "container": "halogen-qwen38-speed-1598730",
+      "start_utc": "2026-09-16T04:07:45.054172+00:00",
+      "docker_command": [
+        "docker",
+        "run",
+        "-d",
+        "--rm",
+        "--pull",
+        "never",
+        "--name",
+        "halogen-qwen38-speed-1598730",
+        "-p",
+        "127.0.0.1:8731:8731",
+        "--device",
+        "/dev/kfd",
+        "--device",
+        "/dev/dri",
+        "--group-add",
+        "44",
+        "--group-add",
+        "992",
+        "--ipc=host",
+        "--ulimit",
+        "memlock=-1:-1",
+        "-e",
+        "HALOGEN_CTX=131072",
+        "-e",
+        "HALOGEN_KV_POOL_POSITIONS=131072",
+        "-e",
+        "HALOGEN_KV_SLOTS=1",
+        "-e",
+        "HALOGEN_MAX_TOK=32768",
+        "-e",
+        "HALOGEN_PROMPT_CACHE=2",
+        "-e",
+        "HALOGEN_VISION_TOWER=1",
+        "-e",
+        "HALOGEN_VERBOSE=1",
+        "-v",
+        "/mnt/c/AI-Models/Halogen-Qwen38-Flash-Next:/models:ro",
+        "-e",
+        "HALOGEN_CK_OVERLAY=/models/qwen38-flash-next-w4b.overlay-speed.hgn",
+        "ghcr.io/peonist-ai/halogen-flash-server:0.11.0",
+        "all"
+      ],
+      "health_ready_s": 71.05246980511583,
+      "launch_to_health_s": 71.15255591389723,
+      "status": "PARTIAL",
+      "sweep_prefill_exit": 0,
+      "sweep_decode_exit": 0,
+      "serving_benchmark_exit": 1,
+      "serving_benchmark": {
+        "mtp": {
+          "mean_tok_s": 44.18,
+          "min_tok_s": 37.63,
+          "max_tok_s": 52.56,
+          "commit_per_round": 1.66
+        }
+      },
+      "serving_depth": {
+        "32k": {
+          "context_regime": "128k server slot; approximately 32k target prompt",
+          "server_context_slot_tokens": 131072,
+          "target_prompt_tokens": 32768,
+          "slice_depth_parameter": 32768,
+          "generated_tokens": 256,
+          "measured_prompt_tokens_source": "raw engine/bench-serving log",
+          "prefix": {
+            "source": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.txt",
+            "source_manifest": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.json",
+            "source_commit": "9f31776c3773cf03f98535c19b7e6d394af374b4",
+            "bytes": 684407,
+            "sha256": "e4c3b195d68a870213e3180ff721df10b94ae162bbb7de6dc30b6c90f84ad4d5",
+            "estimated_tokens_at_3.6_cpt": 190112,
+            "kind": "concatenated real open-source C++ source; no repeated synthetic filler",
+            "server_context_slot_tokens": 131072
+          },
+          "exit_code": 1,
+          "parsed_means": {
+            "mtp": {
+              "mean_tok_s": 41.71,
+              "min_tok_s": 35.81,
+              "max_tok_s": 48.06,
+              "commit_per_round": 1.66
+            }
+          },
+          "target_46_tok_s_reached": false
+        },
+        "64k": {
+          "context_regime": "128k server slot; approximately 64k target prompt",
+          "server_context_slot_tokens": 131072,
+          "target_prompt_tokens": 65536,
+          "slice_depth_parameter": 65536,
+          "generated_tokens": 256,
+          "measured_prompt_tokens_source": "raw engine/bench-serving log",
+          "prefix": {
+            "source": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.txt",
+            "source_manifest": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.json",
+            "source_commit": "9f31776c3773cf03f98535c19b7e6d394af374b4",
+            "bytes": 684407,
+            "sha256": "e4c3b195d68a870213e3180ff721df10b94ae162bbb7de6dc30b6c90f84ad4d5",
+            "estimated_tokens_at_3.6_cpt": 190112,
+            "kind": "concatenated real open-source C++ source; no repeated synthetic filler",
+            "server_context_slot_tokens": 131072
+          },
+          "exit_code": 1,
+          "parsed_means": {
+            "mtp": {
+              "mean_tok_s": 39.79,
+              "min_tok_s": 34.15,
+              "max_tok_s": 47.01,
+              "commit_per_round": 1.65
+            }
+          },
+          "target_46_tok_s_reached": false
+        },
+        "128k-slot": {
+          "context_regime": "128k server slot; calibrated to approximately 126k measured prompt tokens with generation headroom",
+          "server_context_slot_tokens": 131072,
+          "target_prompt_tokens": 126000,
+          "slice_depth_parameter": 121174,
+          "generated_tokens": 256,
+          "measured_prompt_tokens_source": "raw engine/bench-serving log",
+          "prefix": {
+            "source": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.txt",
+            "source_manifest": "/home/tomasreminek/benchmarks/qwen38-acceleration/fixtures/llama-cpp-depth-prefix-9f31776.json",
+            "source_commit": "9f31776c3773cf03f98535c19b7e6d394af374b4",
+            "bytes": 684407,
+            "sha256": "e4c3b195d68a870213e3180ff721df10b94ae162bbb7de6dc30b6c90f84ad4d5",
+            "estimated_tokens_at_3.6_cpt": 190112,
+            "kind": "concatenated real open-source C++ source; no repeated synthetic filler",
+            "server_context_slot_tokens": 131072
+          },
+          "exit_code": 1,
+          "parsed_means": {
+            "mtp": {
+              "mean_tok_s": 36.39,
+              "min_tok_s": 29.89,
+              "max_tok_s": 46.55,
+              "commit_per_round": 1.61
+            }
+          },
+          "target_46_tok_s_reached": false
+        }
+      },
+      "validation": {
+        "czech": {
+          "nonempty": true,
+          "has_czech_diacritics": true
+        },
+        "coding": {
+          "parsed": true,
+          "tests_passed": true,
+          "returncode": 0,
+          "stderr": ""
+        },
+        "tool_call": {
+          "valid": true,
+          "arguments": {
+            "city": "Prague",
+            "unit": "celsius"
+          }
+        },
+        "structured_json": {
+          "valid": true,
+          "value": {
+            "answer": "Prague",
+            "confidence": 1.0
+          }
+        },
+        "responses_api": {
+          "valid": true
+        },
+        "vision": {
+          "valid": true,
+          "expected": "ORBIT 4729",
+          "content": "ORBIT 4729"
+        }
+      },
+      "varied": [
+        {
+          "name": "varied-1",
+          "status": "OK",
+          "wall_s": 7.177864813013002,
+          "timings": {
+            "prompt_n": 39,
+            "predicted_n": 256,
+            "prompt_ms": 551.7,
+            "predicted_ms": 6618.8,
+            "prompt_per_second": 70.691,
+            "predicted_per_second": 38.678,
+            "cache_n": 0,
+            "draft_n": 163,
+            "draft_n_accepted": 96
+          }
+        },
+        {
+          "name": "varied-2",
+          "status": "OK",
+          "wall_s": 7.478836668888107,
+          "timings": {
+            "prompt_n": 37,
+            "predicted_n": 256,
+            "prompt_ms": 503.2,
+            "predicted_ms": 6969.5,
+            "prompt_per_second": 73.529,
+            "predicted_per_second": 36.731,
+            "cache_n": 0,
+            "draft_n": 171,
+            "draft_n_accepted": 84
+          }
+        },
+        {
+          "name": "varied-3",
+          "status": "OK",
+          "wall_s": 7.060328490100801,
+          "timings": {
+            "prompt_n": 38,
+            "predicted_n": 256,
+            "prompt_ms": 506.1,
+            "predicted_ms": 6548.9,
+            "prompt_per_second": 75.084,
+            "predicted_per_second": 39.091,
+            "cache_n": 0,
+            "draft_n": 168,
+            "draft_n_accepted": 93
+          }
+        }
+      ],
+      "cache": {
+        "first": {
+          "prompt_n": 28011,
+          "predicted_n": 32,
+          "prompt_ms": 20940.5,
+          "predicted_ms": 876.3,
+          "prompt_per_second": 1337.647,
+          "predicted_per_second": 36.517,
+          "cache_n": 0,
+          "draft_n": 24,
+          "draft_n_accepted": 11
+        },
+        "followup": {
+          "prompt_n": 28011,
+          "predicted_n": 32,
+          "prompt_ms": 20932.6,
+          "predicted_ms": 884.5,
+          "prompt_per_second": 1338.152,
+          "predicted_per_second": 36.179,
+          "cache_n": 0,
+          "draft_n": 23,
+          "draft_n_accepted": 10
+        }
+      },
+      "end_utc": "2026-09-16T06:09:21.653971+00:00"
+    },
+    "serving_evidence": {
+      "serving-benchmark": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 44.18,
+          "min_tok_s": 37.63,
+          "max_tok_s": 52.56,
+          "commit_per_round": 1.66
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": null,
+        "slice_depth_parameter": null
+      },
+      "serving-benchmark-depth-32k": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 41.71,
+          "min_tok_s": 35.81,
+          "max_tok_s": 48.06,
+          "commit_per_round": 1.66
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": 32768,
+        "slice_depth_parameter": 32768
+      },
+      "serving-benchmark-depth-64k": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 39.79,
+          "min_tok_s": 34.15,
+          "max_tok_s": 47.01,
+          "commit_per_round": 1.65
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": 65536,
+        "slice_depth_parameter": 65536
+      },
+      "serving-benchmark-depth-128k-slot": {
+        "exit_code": 1,
+        "mtp": {
+          "mean_tok_s": 36.39,
+          "min_tok_s": 29.89,
+          "max_tok_s": 46.55,
+          "commit_per_round": 1.61
+        },
+        "identity_failed": true,
+        "target_prompt_tokens": 126000,
+        "slice_depth_parameter": 121174
+      }
+    }
+  }
+}
