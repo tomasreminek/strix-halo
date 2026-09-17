@@ -8,6 +8,10 @@ DGX Spark EXL3, and “128 GB recipe” claims are **not** copied as results.
 Living dashboard (same numbers, plus video clips):
 [strix-halo.html](http://hilbertkb.31.97.126.27.sslip.io/strix-halo.html)
 
+## DeepSeek V4.1 Flash Q2 · second pass 2026-09-17
+
+No replicated useful acceleration certified. Cache24 is a working lower-residency fallback, not a speed winner; repeated cache80 pressure aborts qualify the earlier practical recommendation. Prefix reuse is a single exploratory observation, not a general decode gain. [Second-pass report](docs/deepseek-v41-speed2-20260917.md), [comparison table](docs/model-comparison.md). The separately measured model-authored game has not yet passed browser QA.
+
 ## Hardware
 
 | | |

@@ -3,7 +3,13 @@
 Every number here was measured on **Hilbert** (Ryzen AI MAX+ 395 / Radeon 8060S gfx1151, 124 GiB, one GPU job).
 Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-server print_timing`. Do not mix tables.
 
-## DeepSeek V4.1 Flash Q2 · 2026-09-17 overnight result
+## DeepSeek V4.1 Flash Q2 · second pass closed 2026-09-17
+
+**No replicated acceleration certified.** Repeated cache80 pressure aborts qualify the historical recommendation below. Cache24 completed correct extraction/Python/Czech at 17.05372/33.32440/32.19019 seconds, but is a lower-residency fallback, not a speed winner. One exact-output prefix pair was 5.17455s live versus 8.49956s replay; repeated validation aborted, so no general or replicated gain is claimed. Mapped-memory synthetic success failed the full inference gate. Optimization ended early; model-authored game generation and browser QA are separate, still unverified gates.
+
+[Full second-pass evidence and caveats](deepseek-v41-speed2-20260917.md). Marker: `DEEPSEEK_V41_SPEED2_20260917`.
+
+## DeepSeek V4.1 Flash Q2 · 2026-09-17 overnight result (historical)
 
 Marker: `DEEPSEEK_V41_NIGHT_20260917`. Separate HTTP task-latency experiment; **do not mix these rates with native decode in the leaderboard**.
 
