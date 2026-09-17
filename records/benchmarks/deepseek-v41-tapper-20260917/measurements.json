@@ -51,9 +51,22 @@
       "ttft_s": 29.157689982792363,
       "finish_reason": "stop",
       "end_to_end_output_tokens_per_s": 3.915695267806288
+    },
+    {
+      "attempt": "repair04",
+      "status": "MEASURED",
+      "usage": {
+        "prompt_tokens": 938,
+        "completion_tokens": 5259,
+        "total_tokens": 6197
+      },
+      "wall_s": 1274.176028410904,
+      "ttft_s": null,
+      "finish_reason": "stop",
+      "end_to_end_output_tokens_per_s": 4.1268
     }
   ],
-  "total_output_tokens": 15316,
-  "total_http_wall_s": 3704.6757912938483,
-  "acceptance": "FAILED; owner rejected repair03 mobile playability; repair04 separate pending follow-up"
+  "total_output_tokens": 20575,
+  "total_http_wall_s": 4978.852,
+  "acceptance": "FAILED; repair03 AND repair04 rejected as unplayable on the physical phone; user stopped the experiment"
 }

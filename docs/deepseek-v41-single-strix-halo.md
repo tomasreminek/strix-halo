@@ -32,9 +32,10 @@ Task: a procedural Three.js Tapper-inspired game in one HTML file, with keyboard
 |---|---:|---:|---:|---|
 | generate01 | 6,200 | 1,458.93 s | 27.23 s | Output limit reached; incomplete HTML |
 | generate02 | 4,637 | 1,101.89 s | 43.21 s | Complete HTML; real desktop/mobile-emulated QA rejected core service/return loop |
-| repair03 | 4,479 | 1,143.86 s | 29.16 s | Complete repair; delivered for inspection, **owner rejected as unplayable on mobile** |
+| repair03 | 4,479 | 1,143.86 s | 29.16 s | Complete repair; owner rejected as unplayable on his physical phone |
+| repair04 | 5,259 | 1,274.18 s | — | Complete targeted mobile rework (camera aspect, control layout, per-object meshes). **Also unusable on the real phone; experiment stopped, no accepted mobile build.** |
 
-Total through repair03: **15,316 output tokens and 3,704.68 s (61 min 44.68 s) of model-request wall time**. This excludes model startup, orchestration gaps, packaging, QA and download/build time; it is **not total time to a working game**, because no game passed acceptance. generate02 and repair03 achieved **4.21 and 3.92 completion tokens/s end-to-end**, respectively, not certified native decode. Failed attempts remain in the accounting.
+Total through repair04: **20,575 output tokens and 4,978.86 s (83 min) of model-request wall time**, ~3.9–4.2 end-to-end (non-decode) tok/s. No gameplay passed acceptance; the owner stopped the experiment. generate02 and repair03 achieved **4.21 and 3.92 completion tokens/s end-to-end**, respectively, not certified native decode. Failed attempts remain in the accounting.
 
 Raw requests, complete responses, stream timestamps and native logs are retained locally under `benchmarks/qwen38-acceleration/runs/deepseek-v41-tapper-20260917/`. [Public compact measurement ledger](../records/benchmarks/deepseek-v41-tapper-20260917/measurements.json) records actual usage and timings without private environment dumps.
 
