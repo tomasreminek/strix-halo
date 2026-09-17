@@ -1,5 +1,11 @@
 # Strix Halo recipes (measured)
 
+## 🏆 Overall winner: Qwen3.8 Flash-Next on native Halogen (quality overlay, MTP)
+
+**44.66 tok/s short serving · 41.37 @~32k · 40.08 @~64k · 38.03 @~126k** (MTP decode, prompts actually filled, 256 generated tokens). Czech with diacritics, sandbox Python, OpenAI tool calls, strict JSON, Responses API and vision OCR all pass. The serial-vs-MTP byte-identity gate remains under review, published as a caveat, not hidden. Engine is closed source (`halogen-flash-server:0.11.0`). Full recipe, pinned hashes and download commands: **[docs/qwen38-halogen.md](docs/qwen38-halogen.md)**.
+
+Everything else — including overnight DeepSeek V4.1 attempts and GLM-5.3-Flash — is below the winner.
+
 Replicable configs from a **Ryzen AI MAX+ 395 / Radeon 8060S (`gfx1151`)** box.
 
 Every number below was measured on this machine. Forum screenshots, 3090 CUDA,
