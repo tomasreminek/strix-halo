@@ -1,0 +1,59 @@
+{
+  "model": "DeepSeek V4.1 Flash Q2",
+  "attempts": [
+    {
+      "attempt": "generate01",
+      "status": "INCONCLUSIVE",
+      "usage": {
+        "prompt_tokens": 543,
+        "completion_tokens": 6200,
+        "total_tokens": 6743,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 543
+        }
+      },
+      "wall_s": 1458.929186719004,
+      "ttft_s": 27.2337424850557,
+      "finish_reason": "length",
+      "end_to_end_output_tokens_per_s": null
+    },
+    {
+      "attempt": "generate02",
+      "status": "MEASURED",
+      "usage": {
+        "prompt_tokens": 599,
+        "completion_tokens": 4637,
+        "total_tokens": 5236,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 599
+        }
+      },
+      "wall_s": 1101.8884405279532,
+      "ttft_s": 43.20637996587902,
+      "finish_reason": "stop",
+      "end_to_end_output_tokens_per_s": 4.2082300071849845
+    },
+    {
+      "attempt": "repair03",
+      "status": "MEASURED",
+      "usage": {
+        "prompt_tokens": 957,
+        "completion_tokens": 4479,
+        "total_tokens": 5436,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 957
+        }
+      },
+      "wall_s": 1143.858164046891,
+      "ttft_s": 29.157689982792363,
+      "finish_reason": "stop",
+      "end_to_end_output_tokens_per_s": 3.915695267806288
+    }
+  ],
+  "total_output_tokens": 15316,
+  "total_http_wall_s": 3704.6757912938483,
+  "acceptance": "FAILED; owner rejected repair03 mobile playability; repair04 separate pending follow-up"
+}

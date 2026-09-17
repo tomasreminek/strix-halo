@@ -7,6 +7,10 @@ Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-
 
 **No replicated acceleration certified.** Repeated cache80 pressure aborts qualify the historical recommendation below. Cache24 completed correct extraction/Python/Czech at 17.05372/33.32440/32.19019 seconds, but is a lower-residency fallback, not a speed winner. One exact-output prefix pair was 5.17455s live versus 8.49956s replay; repeated validation aborted, so no general or replicated gain is claimed. Mapped-memory synthetic success failed the full inference gate. Optimization ended early; model-authored game generation and browser QA are separate, still unverified gates.
 
+## DeepSeek V4.1 Flash Q2 · single-Strix-Halo community result 2026-09-17
+
+**User stopped the overnight experiment; no accepted mobile game build.** DeepSeek itself wrote a complete Three.js Tapper-inspired single-HTML game across three attempts: 15,316 completion tokens, 3,704.68 s total request wall, 3.9–4.2 end-to-end completion tok/s (not native decode). generate01 hit the 6,200-token limit without finishing; generate02 produced a complete game that failed real desktop/mobile QA (no customer service/return loop); repair03 completed but the owner rejected it as unplayable on a physical phone. A further DeepSeek-authored mobile repair (repair04, prompt-04-mobile.txt) was requested separately and is not an accepted result. Exact usage/timings ledger: `records/benchmarks/deepseek-v41-tapper-20260917/measurements.json`. QA for a later attempt hit a test-environment WebGL-instantiation blocker, not certified gameplay evidence. [Full measured report, honest outcome and exact guides](deepseek-v41-single-strix-halo.md). [Community summary post](deepseek-v41-community-post.md). Marker: `DEEPSEEK_V41_COMMUNITY_20260917`.
+
 [Full second-pass evidence and caveats](deepseek-v41-speed2-20260917.md). Marker: `DEEPSEEK_V41_SPEED2_20260917`.
 
 ## DeepSeek V4.1 Flash Q2 · 2026-09-17 overnight result (historical)
