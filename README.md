@@ -1,23 +1,5 @@
 # Strix Halo recipes (measured)
 
-## 🏆 Overall winner: Qwen3.8 Flash-Next on native Halogen (quality overlay, MTP)
-
-**44.66 tok/s short serving · 41.37 @~32k · 40.08 @~64k · 38.03 @~126k** (MTP decode, prompts actually filled, 256 generated tokens). Czech with diacritics, sandbox Python, OpenAI tool calls, strict JSON, Responses API and vision OCR all pass. The serial-vs-MTP byte-identity gate remains under review, published as a caveat, not hidden. Engine is closed source (`halogen-flash-server:0.11.0`). Full recipe, pinned hashes and download commands: **[docs/qwen38-halogen.md](docs/qwen38-halogen.md)**.
-
-Everything else — including overnight DeepSeek V4.1 attempts and GLM-5.3-Flash — is below the winner.
-
-Replicable configs from a **Ryzen AI MAX+ 395 / Radeon 8060S (`gfx1151`)** box.
-
-Every number below was measured on this machine. Forum screenshots, 3090 CUDA,
-DGX Spark EXL3, and “128 GB recipe” claims are **not** copied as results.
-
-Living dashboard (same numbers, plus video clips):
-[strix-halo.html](http://hilbertkb.31.97.126.27.sslip.io/strix-halo.html)
-
-## DeepSeek V4.1 Flash Q2 · second pass 2026-09-17
-
-No replicated useful acceleration certified. Cache24 is a working lower-residency fallback, not a speed winner; repeated cache80 pressure aborts qualify the earlier practical recommendation. Prefix reuse is a single exploratory observation, not a general decode gain. [Second-pass report](docs/deepseek-v41-speed2-20260917.md), [single-Strix-Halo deep dive + exact DeepSeek guides](docs/deepseek-v41-single-strix-halo.md), [comparison table](docs/model-comparison.md). The model-authored Tapper coding trial was stopped by the user after repair03 was rejected as unplayable on a physical phone; **no accepted mobile build exists yet** (details and exact timings in the deep dive).
-
 ## Hardware
 
 | | |
@@ -27,7 +9,13 @@ No replicated useful acceleration certified. Cache24 is a working lower-residenc
 | OS | Pop!_OS / Linux 7.0.11, x86_64 |
 | Rule | **One GPU-heavy job at a time.** Unload the LLM before ComfyUI, and vice versa. |
 
-## Winners (2026-09-16)
+## 🏆 Overall winner: Qwen3.8 Flash-Next on native Halogen (quality overlay, MTP)
+
+**44.66 tok/s short serving · 41.37 @~32k · 40.08 @~64k · 38.03 @~126k** (MTP decode, prompts actually filled, 256 generated tokens). Czech with diacritics, sandbox Python, OpenAI tool calls, strict JSON, Responses API and vision OCR all pass. The serial-vs-MTP byte-identity gate remains under review, published as a caveat, not hidden. Engine is closed source (`halogen-flash-server:0.11.0`). Full recipe, pinned hashes and download commands: **[docs/qwen38-halogen.md](docs/qwen38-halogen.md)**.
+
+Everything else — including overnight DeepSeek V4.1 attempts and GLM-5.3-Flash — is below the winner.
+
+## Master test table (2026-09-17)
 
 | Workload | Winner | Decode / wall | Recipe |
 |---|---|---|---|
@@ -35,9 +23,35 @@ No replicated useful acceleration certified. Cache24 is a working lower-residenc
 | **Uncensored fallback** | OrcaRouter Q4_K_M + EasiiX Q8_0 MTP · Nathanw **v0.7.6** Vulkan | **35.26 t/s** varied · **27.69 @64k** · **25.89 sustained @126k** | [docs/qwen38-flash-next.md](docs/qwen38-flash-next.md) |
 | **GLM-5.3-Flash (320B MoE)** | aj9o9 AJ-IQ2_XXS + Unsloth MIX **ROCm gfx1151** | **14.63 t/s** decode · **128k KV / 64k Hermes window** | [docs/glm-53-flash.md](docs/glm-53-flash.md) |
 | **Full agent 27B** | Qwen3.8-27B ROCmFP4 FAST + MTP `n-max=2` | Czech **20.2 t/s** (73% acc) · no-draft **14.2 t/s** | [docs/qwen38-27b.md](docs/qwen38-27b.md) |
+| **DeepSeek V4.1 Flash Q2 (340 GiB, SSD-streamed)** | Runs on single Strix Halo, **not a speed winner**; user stopped the experiment | **7.12 tok/s** completion incl. reasoning (**not native decode**) · coding/Czech medians 29.2/26.4/**20.4** s | [docs/deepseek-v41-single-strix-halo.md](docs/deepseek-v41-single-strix-halo.md) · [docs/deepseek-v41-night-20260917.md](docs/deepseek-v41-night-20260917.md) |
 | **MiniMax H3 Czech video** | FP8 + Qwen3-VL 32B + Euler/simple 8–11 | 3s T2V **~11 min** · human 8/10 | [docs/minimax-h3.md](docs/minimax-h3.md) |
 
-Halogen is the performance winner even though the serial/MTP byte-identity gate remains under review; practical Czech, coding, tools, strict JSON, Responses API and vision gates passed. The tested uncensored OrcaRouter IQ4_XS cannot currently load in Halogen because its dense trunk contains `Q5_K`, while Halogen requires dense `Q8_0`. This is a compatibility blocker, not a `0 t/s` result.
+### DeepSeek V4.1 detail (user stopped the overnight run)
+
+DeepSeek V4.1 Flash Q2 runs on this box via the kyuz0 `ds4` ROCm runtime with SSD expert streaming; measured host portability fix `869a09d`, ROCm 7.2.4, `--ssd-streaming-cache-experts`, `--ctx 8192`, `--batched-session 1`. Exact checkpoint 365,713,686,528 B / SHA-256 `1ce6a8f8806205c…` in the [full report](docs/deepseek-v41-single-strix-halo.md). Game-code trial: the model itself wrote a complete Three.js Tapper-inspired HTML over three attempts (15,316 output tokens, 3,704.68 s model wall). generate02/repair03 passed transport but real desktop/mobile QA rejected the core service/return loop; the owner found the final build unusable on a real phone and **stopped the experiment**. Exact per-attempt data in `records/benchmarks/deepseek-v41-tapper-20260917/measurements.json`. Complete reproducible commands, checksums and every failure: **[docs/deepseek-v41-single-strix-halo.md](docs/deepseek-v41-single-strix-halo.md)**.
+
+### Qwen3.8 Flash-Next (uncensored Orca route) detail
+
+Real-channel series (same repo → Nathanw v0.7.6 → today) measured: code **58.5 t/s** (95% acc) / Czech **30.5 t/s** (70% acc, 2026-09-01) on v0.7.3; Unsloth MIX b10715 slower (25.6 / 42.4) — vendor 1.67× claim is NVIDIA B200, keep Nathanw; matching Uncensored MTP-draft ≈ EasiiX (Czech +5%, 73% vs 66% acc); llama.cpp PR #28136 `on-direct` +10.7% cold prefill only; OrcaRouter Q4_K_M + EasiiX Q8_0 MTP on Nathanw **v0.7.6** Vulkan reaches **35.26 t/s** varied / **27.69 @64k** / **25.89 sustained @~126k**. Uncensored IQ4_XS on Halogen stays loader-blocked (dense `Q5_K` vs required `Q8_0`). All details and exact runlinks: **[docs/qwen38-flash-next.md](docs/qwen38-flash-next.md)**.
+
+### GLM-5.3-Flash detail
+
+Same AJ-IQ2_XXS GGUF, same flags: **ROCm 14.63 t/s vs Vulkan 8.57 t/s** (the ROCm build is the lift, not a quant change). Runs with 128k KV / 64k window. Architectural path is `glm5next` (open PR #27754), so Unsloth MIX build required. Vendor CUDA 3090 11.5 t/s does not transfer. All details: **[docs/glm-53-flash.md](docs/glm-53-flash.md)**.
+
+Every number here was measured on this machine. Forum screenshots, 3090 CUDA,
+DGX Spark EXL3, and “128 GB recipe” claims are **not** copied as results.
+
+Living dashboard (same numbers, plus video clips):
+[strix-halo.html](http://hilbertkb.31.97.126.27.sslip.io/strix-halo.html)
+
+## DeepSeek V4.1 Flash Q2 · second pass 2026-09-17
+
+No replicated useful acceleration certified. Cache24 is a working lower-residency fallback, not a speed winner; repeated cache80 pressure aborts qualify the earlier practical recommendation. Prefix reuse is a single exploratory observation, not a general decode gain. [Second-pass report](docs/deepseek-v41-speed2-20260917.md), [single-Strix-Halo deep dive + exact DeepSeek guides](docs/deepseek-v41-single-strix-halo.md), [comparison table](docs/model-comparison.md). The model-authored Tapper coding trial was stopped by the user after repair03 was rejected as unplayable on a physical phone; **no accepted mobile build exists yet** (details and exact timings in the deep dive).
+
+
+## Historical measured series (full background)
+
+Nathanw v0.7.3 + Orca Q4_K_M 3-shard + EasiiX sidecar era entries, PR #28136, MIX b10715, Nex N2.5 Mini reject and everything else stays below unchanged.
 
 ## Measured (2026-09-01) — Orca + MTP sidecar
 
