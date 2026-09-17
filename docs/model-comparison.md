@@ -3,6 +3,18 @@
 Every number here was measured on **Hilbert** (Ryzen AI MAX+ 395 / Radeon 8060S gfx1151, 124 GiB, one GPU job).
 Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-server print_timing`. Do not mix tables.
 
+## DeepSeek V4.1 Flash Q2 · 2026-09-17 overnight result
+
+Marker: `DEEPSEEK_V41_NIGHT_20260917`. Separate HTTP task-latency experiment; **do not mix these rates with native decode in the leaderboard**.
+
+Best-supported tested tuple for small coding and Czech chat: exact antirez V4.1 Flash Q2, ds4 baseline + host portability fix `869a09dec445def450bf2d7e6333ced5b9152753`, ROCm 7.2.4/gfx1151, SSD streaming, 80 GiB expert cache, 8192 context, one batched session, default threads, `reasoning_effort: none`. Provisional practical choice, not a universal winner or production promotion.
+
+Three fresh-server repetitions: Python task median 29.21s (first useful answer 13.10s), bugfix 26.41s, Czech 20.41s (first answer 6.96s), JSON 11.49s, extraction 8.42s. Narrow semantic/sandbox tests pass; strict only-code formatting sometimes fails. Native tool-call API remains unverified. Highest finalist median HTTP completion tokens/wall second: **7.12**, on default reasoning (42.69s wall, first useful answer 37.65s); includes reasoning, **not native decode or useful-answer throughput**.
+
+Engine-measured context: 7157/622, 31679/564 and 64461/556 prompt/output tokens; retrieval, sustained output and sandbox coding pass, requested word count fails. Total times 149.28/370.60/687.38s. 128k **INCONCLUSIVE**: calibration timed out at 905.52s, no final answer. MTP/DSpark unsupported; newer runtime and thread variants showed no demonstrated advantage. Cache alternatives had only one ordered trial; natural page-cache effects prevent causal claims.
+
+[Full report, exact identity, commands, caveats and matrix](deepseek-v41-night-20260917.md). No global model/backend change.
+
 ## Master leaderboard
 
 | Model (quant) | Backend / runtime | pp512 | pp16k | tg64 / decode | Server decode (prose) | Verdict |
