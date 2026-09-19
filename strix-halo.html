@@ -14,7 +14,7 @@ nav.toc a:hover,nav.toc a:focus{color:var(--cyan);border-color:var(--cyan);backg
 @media(max-width:680px){main{padding:20px 14px 48px}.grid,.two,.three,.video-grid{grid-template-columns:1fr}header{flex-direction:column;align-items:flex-start;gap:14px}h2{font-size:21px;margin:30px 0 12px}.metric b{font-size:23px}table{min-width:760px;font-size:12px}.card{padding:15px}}
 </style></head>
 <body><main>
-<nav class="toc" aria-label="Page sections"><a href="#runtime">Runtime</a><a href="#qwen">Qwen 3.8</a><a href="#nex-n25">Nex N2.5</a><a href="#flash-next">Flash-Next</a><a href="#glm53">GLM-5.3-Flash</a><a href="#workflows">Video workflows</a><a href="#h3-fast">H3 Acc / FastH3</a><a href="#drama">Vertical drama</a><a href="#videos">Top videos</a><a href="video-benchmark.html">Full benchmark ↗</a></nav>
+<nav class="toc" aria-label="Page sections"><a href="#runtime">Runtime</a><a href="#qwen">Qwen 3.8</a><a href="#nex-n25">Nex N2.5</a><a href="#flash-next">Flash-Next</a><a href="#split-chat-worker">Chat+Worker split</a><a href="#glm53">GLM-5.3-Flash</a><a href="#workflows">Video workflows</a><a href="#h3-fast">H3 Acc / FastH3</a><a href="#drama">Vertical drama</a><a href="#videos">Top videos</a><a href="video-benchmark.html">Full benchmark ↗</a></nav>
 <header><div><div class="eyebrow">Hilbert media lab · AMD unified memory</div><h1>Strix Halo</h1><p class="sub">A living benchmark and workflow sheet for Tome's Radeon 8060S machine. Measured facts are separated from claims, hypotheses and unfinished experiments.</p></div><div><span class="badge ok">Flash winner · AP-IQ4_XS 128k · 30 t/s · 2026-08-30</span></div></header>
 <section class="grid">
  <div class="card metric"><b>AMD 8060S</b><span>Ryzen AI MAX+ 395 · gfx1151</span></div>
@@ -180,6 +180,19 @@ nav.toc a:hover,nav.toc a:focus{color:var(--cyan);border-color:var(--cyan);backg
 </tbody></table></div>
 <p><strong>xhigh is not longer.</strong> Uncapped budget, same hard prompt, <code>max_tokens=900</code>: low 32.4 s / 2854 reason chars; medium 32.0 s / 3090; xhigh 32.4 s / 2544 — all <code>finish=length</code> inside thought. Production keeps budget 256 so agents do not eat <code>max_tokens</code>.</p>
 <p class="muted">Load log: <code>KV cache shifting is not supported for this context</code> · <code>cache_reuse is not supported</code>. Every Hermes turn re-prefills the system prompt.</p>
+</div>
+<h2 id="split-chat-worker">Flash-Next split · chat model + working worker (2026-09-19)</h2>
+<div class="card" style="border-color:var(--cyan);background:linear-gradient(110deg,#103247,#0d1a25)">
+<div class="statusline"><h3>One model, two roles — live configuration</h3><span class="badge pass">running · verified 2026-09-19</span></div>
+<p>The same local Qwen3.8-Flash-Next instance is both the <strong>chat model</strong> (short interactive turns) and the <strong>worker model</strong> (long output-heavy coding runs). No second server, no second cold load. The split lives in three layers:</p>
+<ul>
+<li><strong>Server:</strong> one <code>halogen-flash-server</code> container with <code>HALOGEN_KV_SLOTS=2</code> and <code>KV_POOL_POSITIONS=131072</code> — slot A holds the chat conversation, slot B holds the worker session simultaneously.</li>
+<li><strong>Routing:</strong> the agent framework keeps two config routes at the <em>same</em> endpoint — interactive chat route vs <code>delegation</code> route with its own reasoning effort, iteration budget and <code>max_concurrent_children: 1</code> (one chat + one worker = two slots).</li>
+<li><strong>Discipline:</strong> chat never grinds inline. Long jobs are dispatched as headless worker sessions with a written task contract (goal, ownership rules, verification gates, commit message). Worker checkpoints into git; a supervisor watches liveness and gate status, so a crashed worker resumes from its last commit — state lives in git, not in KV.</li>
+</ul>
+<p><strong>Zero-GPU helper:</strong> a cloud CLI agent (Antigravity / Gemini family) runs concurrently on the same repo for free — the local GPU never sees it, so you get a second pair of hands without touching unified memory.</p>
+<div class="note"><strong>Pitfalls measured the hard way:</strong> (1) worker <code>max_tokens=8192</code> + 29k-token prompt vs 32,768 slot room → HTTP 400; cap completion below <code>min(HALOGEN_MAX_TOK, room − prompt)</code>. (2) Headless cloud agent auto-denies file reads without <code>--dangerously-skip-permissions</code>. (3) Never run two heavy local models "just in case" — they compete for the same unified memory. (4) Uncommitted worker WIP is lost WIP — checkpoint before reviewing.</div>
+<p>Full recipe with commands and config blocks: <a href="docs/qwen-flash-next-chat-and-worker.md" style="color:var(--cyan)">docs/qwen-flash-next-chat-and-worker.md</a>.</p>
 </div>
 <h2 id="glm53">GLM-5.3-Flash · Hilbert (2026-08-31)</h2>
 <div class="note">Experimental MoE — <strong>not</strong> a Hermes default until <code>qwen38-switch.sh glm</code>. Not mixed into the Flash-Next 30 t/s table. Same Unsloth MIX <code>b10698-mix</code>. Speed path = AJ-IQ2_XXS on <strong>ROCm0 gfx1151</strong>. Hermes split: server KV <strong>128k</strong> / agent window <strong>64k</strong>. Jinja thinking is <code>low</code>|<code>high</code> only (else <code>max</code>).</div>
