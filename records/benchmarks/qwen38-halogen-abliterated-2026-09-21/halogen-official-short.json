@@ -1,0 +1,29 @@
+{
+  "label": "official",
+  "runs": [
+    {
+      "name": "reasoning",
+      "seconds": 10.392,
+      "completion_tokens": 260,
+      "tok_s": 25.019,
+      "chars": 1264,
+      "sample": "Speculative decoding improves throughput by using a small draft model to generate several candidate tokens, then verifying them in parallel with the target model in one forward pass. If the draft tokens match the target model’s greedy argma"
+    },
+    {
+      "name": "coding",
+      "seconds": 12.304,
+      "completion_tokens": 512,
+      "tok_s": 41.614,
+      "chars": 1762,
+      "sample": "```python\nfrom collections import deque\nfrom typing import Dict, List, Set\n\n\ndef topological_sort(graph: Dict[str, List[str]]) -> List[str]:\n    \"\"\"\n    Perform a topological sort of a directed graph using Kahn's algorithm.\n\n    Args:\n     "
+    },
+    {
+      "name": "czech",
+      "seconds": 14.466,
+      "completion_tokens": 512,
+      "tok_s": 35.394,
+      "chars": 1621,
+      "sample": "Stručný, praktický plán diagnostiky WebGL aplikace, která na mobilu zobrazuje černé plátno:\n\n1. **Zjisti, zda je WebGL vůbec dostupný**\n   - Otevři na mobilu testovací stránku, např. `webglreport.com` nebo vlastní test:\n   ```js\n   const ca"
+    }
+  ]
+}

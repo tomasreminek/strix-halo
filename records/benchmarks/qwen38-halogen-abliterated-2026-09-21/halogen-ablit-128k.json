@@ -1,0 +1,8 @@
+{
+  "label": "abliterated",
+  "seconds": 322.541,
+  "prompt_tokens": 123679,
+  "completion_tokens": 43,
+  "retrieval_ok": true,
+  "text": "BEGIN_CODE_128K END_CODE_128K"
+}

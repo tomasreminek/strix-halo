@@ -1,0 +1,28 @@
+{
+  "single_long": {
+    "label": "SINGLE_LONG",
+    "seconds": 135.885,
+    "prompt_tokens": 48060,
+    "completion_tokens": 33,
+    "tok_s": 0.243,
+    "text": "CONTEXT_OK SINGLE_LONG"
+  },
+  "dual_slots": [
+    {
+      "label": "SLOT_1",
+      "seconds": 195.141,
+      "prompt_tokens": 26461,
+      "completion_tokens": 33,
+      "tok_s": 0.169,
+      "text": "CONTEXT_OK SLOT_1"
+    },
+    {
+      "label": "SLOT_2",
+      "seconds": 195.047,
+      "prompt_tokens": 26461,
+      "completion_tokens": 34,
+      "tok_s": 0.174,
+      "text": "CONTEXT_OK SLOT_2"
+    }
+  ]
+}

@@ -29,7 +29,8 @@ Engine-measured context: 7157/622, 31679/564 and 64461/556 prompt/output tokens;
 
 | Model (quant) | Backend / runtime | pp512 | pp16k | tg64 / decode | Server decode (prose) | Verdict |
 |---|---|---:|---:|---|---|---|
-| **Qwen3.8-Flash-Next native HGN** | **Halogen 0.11.0 ROCm** · quality overlay | — | — | **44.66** short serving | **40.08 @64k · 38.03 @~126k** | **Overall performance winner** · identity review required |
+| **Qwen3.8-Flash-Next Abliterated native HGN** | **Halogen 0.11.0 ROCm** · patched experts + 727-tensor overlay | — | — | **40.68** warm 3-prompt mean (36.91–46.20 on sustained rows) | retrieval PASS 8k/16k/32k/60k/123.7k · 2×26.5k PASS | **Preferred main candidate** · no material speed regression; broad quality benchmark still needed |
+| **Qwen3.8-Flash-Next native HGN** | **Halogen 0.11.0 ROCm** · quality overlay | — | — | **44.66** short serving | **40.08 @64k · 38.03 @~126k** | **Aligned performance reference** · identity review required |
 | **Qwen3.8-Flash-Next Orca Q4_K_M + MTP7** | Nathanw **v0.7.6** Vulkan | — | — | **35.26** varied | **27.69 @64k · 25.89 sustained @126k** | **Uncensored winner / fallback** |
 | Qwen3.8-Flash-Next AP-IQ4_XS | Nathanw v0.7.3 Vulkan | 428 | 373 | 30.1 t/s | 29.4–30.5 EN/CZ | Superseded overall winner |
 | **Qwen3.8-27B ROCmFP4 FAST** (+MTP n-max 2) | Laurent Vulkan HIP | 61 | 56 | 14.1 | **20.2** CZ (73% acc) | **Full agent winner** (cache-reuse) |

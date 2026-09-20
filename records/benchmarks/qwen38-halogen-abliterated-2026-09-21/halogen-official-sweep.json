@@ -1,0 +1,37 @@
+{
+  "label": "official",
+  "runs": [
+    {
+      "band": "8k",
+      "seconds": 8.247,
+      "prompt_tokens": 7875,
+      "completion_tokens": 39,
+      "retrieval_ok": true,
+      "text": "BEGIN_CODE_8K END_CODE_8K"
+    },
+    {
+      "band": "16k",
+      "seconds": 13.229,
+      "prompt_tokens": 16037,
+      "completion_tokens": 41,
+      "retrieval_ok": true,
+      "text": "BEGIN_CODE_16K END_CODE_16K"
+    },
+    {
+      "band": "32k",
+      "seconds": 183.303,
+      "prompt_tokens": 31997,
+      "completion_tokens": 41,
+      "retrieval_ok": true,
+      "text": "BEGIN_CODE_32K END_CODE_32K"
+    },
+    {
+      "band": "60k",
+      "seconds": 246.735,
+      "prompt_tokens": 60077,
+      "completion_tokens": 41,
+      "retrieval_ok": true,
+      "text": "BEGIN_CODE_60K END_CODE_60K"
+    }
+  ]
+}

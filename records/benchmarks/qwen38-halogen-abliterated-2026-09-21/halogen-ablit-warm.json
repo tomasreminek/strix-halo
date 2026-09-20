@@ -1,0 +1,29 @@
+{
+  "label": "abliterated-warm",
+  "runs": [
+    {
+      "name": "reasoning",
+      "seconds": 6.91,
+      "completion_tokens": 269,
+      "tok_s": 38.926,
+      "chars": 1295,
+      "sample": "Speculative decoding improves throughput by using a small “draft” model to propose several tokens, then verifying them in parallel with the target model in one forward pass. If the draft tokens match the target model’s greedy argmax decisio"
+    },
+    {
+      "name": "coding",
+      "seconds": 11.081,
+      "completion_tokens": 512,
+      "tok_s": 46.204,
+      "chars": 1791,
+      "sample": "```python\nfrom collections import deque\nfrom typing import Dict, List, Set\n\n\ndef topological_sort(graph: Dict[str, List[str]]) -> List[str]:\n    \"\"\"\n    Perform a topological sort of a directed graph using Kahn's algorithm.\n\n    Args:\n     "
+    },
+    {
+      "name": "czech",
+      "seconds": 13.872,
+      "completion_tokens": 512,
+      "tok_s": 36.908,
+      "chars": 1556,
+      "sample": "Tady je stručný a praktický plán diagnostiky:\n\n1. **Zjisti, jestli je WebGL obecně dostupný**\n   - Otevři na mobilu stránku [webglreport.com](https://webglreport.com/) nebo [webgl.org](https://webgl.org/).\n   - Pokud nefunguje ani tam, prob"
+    }
+  ]
+}

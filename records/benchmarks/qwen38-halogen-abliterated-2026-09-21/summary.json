@@ -1,0 +1,206 @@
+{
+  "short_mean_tok_s": {
+    "official": 34.009,
+    "abliterated": 40.679
+  },
+  "short_runs": {
+    "official": [
+      {
+        "name": "reasoning",
+        "seconds": 10.392,
+        "completion_tokens": 260,
+        "tok_s": 25.019,
+        "chars": 1264,
+        "sample": "Speculative decoding improves throughput by using a small draft model to generate several candidate tokens, then verifying them in parallel with the target model in one forward pass. If the draft tokens match the target model’s greedy argma"
+      },
+      {
+        "name": "coding",
+        "seconds": 12.304,
+        "completion_tokens": 512,
+        "tok_s": 41.614,
+        "chars": 1762,
+        "sample": "```python\nfrom collections import deque\nfrom typing import Dict, List, Set\n\n\ndef topological_sort(graph: Dict[str, List[str]]) -> List[str]:\n    \"\"\"\n    Perform a topological sort of a directed graph using Kahn's algorithm.\n\n    Args:\n     "
+      },
+      {
+        "name": "czech",
+        "seconds": 14.466,
+        "completion_tokens": 512,
+        "tok_s": 35.394,
+        "chars": 1621,
+        "sample": "Stručný, praktický plán diagnostiky WebGL aplikace, která na mobilu zobrazuje černé plátno:\n\n1. **Zjisti, zda je WebGL vůbec dostupný**\n   - Otevři na mobilu testovací stránku, např. `webglreport.com` nebo vlastní test:\n   ```js\n   const ca"
+      }
+    ],
+    "abliterated": [
+      {
+        "name": "reasoning",
+        "seconds": 6.91,
+        "completion_tokens": 269,
+        "tok_s": 38.926,
+        "chars": 1295,
+        "sample": "Speculative decoding improves throughput by using a small “draft” model to propose several tokens, then verifying them in parallel with the target model in one forward pass. If the draft tokens match the target model’s greedy argmax decisio"
+      },
+      {
+        "name": "coding",
+        "seconds": 11.081,
+        "completion_tokens": 512,
+        "tok_s": 46.204,
+        "chars": 1791,
+        "sample": "```python\nfrom collections import deque\nfrom typing import Dict, List, Set\n\n\ndef topological_sort(graph: Dict[str, List[str]]) -> List[str]:\n    \"\"\"\n    Perform a topological sort of a directed graph using Kahn's algorithm.\n\n    Args:\n     "
+      },
+      {
+        "name": "czech",
+        "seconds": 13.872,
+        "completion_tokens": 512,
+        "tok_s": 36.908,
+        "chars": 1556,
+        "sample": "Tady je stručný a praktický plán diagnostiky:\n\n1. **Zjisti, jestli je WebGL obecně dostupný**\n   - Otevři na mobilu stránku [webglreport.com](https://webglreport.com/) nebo [webgl.org](https://webgl.org/).\n   - Pokud nefunguje ani tam, prob"
+      }
+    ]
+  },
+  "context_sweep": {
+    "official": [
+      {
+        "band": "8k",
+        "seconds": 8.247,
+        "prompt_tokens": 7875,
+        "completion_tokens": 39,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_8K END_CODE_8K"
+      },
+      {
+        "band": "16k",
+        "seconds": 13.229,
+        "prompt_tokens": 16037,
+        "completion_tokens": 41,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_16K END_CODE_16K"
+      },
+      {
+        "band": "32k",
+        "seconds": 183.303,
+        "prompt_tokens": 31997,
+        "completion_tokens": 41,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_32K END_CODE_32K"
+      },
+      {
+        "band": "60k",
+        "seconds": 246.735,
+        "prompt_tokens": 60077,
+        "completion_tokens": 41,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_60K END_CODE_60K"
+      }
+    ],
+    "abliterated": [
+      {
+        "band": "8k",
+        "seconds": 57.102,
+        "prompt_tokens": 7875,
+        "completion_tokens": 39,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_8K END_CODE_8K"
+      },
+      {
+        "band": "16k",
+        "seconds": 13.347,
+        "prompt_tokens": 16037,
+        "completion_tokens": 41,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_16K END_CODE_16K"
+      },
+      {
+        "band": "32k",
+        "seconds": 129.092,
+        "prompt_tokens": 31997,
+        "completion_tokens": 40,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_32K END_CODE_32K"
+      },
+      {
+        "band": "60k",
+        "seconds": 143.094,
+        "prompt_tokens": 60077,
+        "completion_tokens": 41,
+        "retrieval_ok": true,
+        "text": "BEGIN_CODE_60K END_CODE_60K"
+      }
+    ]
+  },
+  "dual_slots": {
+    "official": {
+      "single_long": {
+        "label": "SINGLE_LONG",
+        "seconds": 135.885,
+        "prompt_tokens": 48060,
+        "completion_tokens": 33,
+        "tok_s": 0.243,
+        "text": "CONTEXT_OK SINGLE_LONG"
+      },
+      "dual_slots": [
+        {
+          "label": "SLOT_1",
+          "seconds": 195.141,
+          "prompt_tokens": 26461,
+          "completion_tokens": 33,
+          "tok_s": 0.169,
+          "text": "CONTEXT_OK SLOT_1"
+        },
+        {
+          "label": "SLOT_2",
+          "seconds": 195.047,
+          "prompt_tokens": 26461,
+          "completion_tokens": 34,
+          "tok_s": 0.174,
+          "text": "CONTEXT_OK SLOT_2"
+        }
+      ]
+    },
+    "abliterated": {
+      "single_long": {
+        "label": "SINGLE_LONG",
+        "seconds": 113.509,
+        "prompt_tokens": 48060,
+        "completion_tokens": 32,
+        "tok_s": 0.282,
+        "text": "CONTEXT_OK SINGLE_LONG"
+      },
+      "dual_slots": [
+        {
+          "label": "SLOT_1",
+          "seconds": 156.508,
+          "prompt_tokens": 26461,
+          "completion_tokens": 34,
+          "tok_s": 0.217,
+          "text": "CONTEXT_OK SLOT_1"
+        },
+        {
+          "label": "SLOT_2",
+          "seconds": 156.602,
+          "prompt_tokens": 26461,
+          "completion_tokens": 33,
+          "tok_s": 0.211,
+          "text": "CONTEXT_OK SLOT_2"
+        }
+      ]
+    }
+  },
+  "near_128k": {
+    "official": {
+      "label": "official",
+      "seconds": 509.175,
+      "prompt_tokens": 123679,
+      "completion_tokens": 43,
+      "retrieval_ok": true,
+      "text": "BEGIN_CODE_128K END_CODE_128K"
+    },
+    "abliterated": {
+      "label": "abliterated",
+      "seconds": 322.541,
+      "prompt_tokens": 123679,
+      "completion_tokens": 43,
+      "retrieval_ok": true,
+      "text": "BEGIN_CODE_128K END_CODE_128K"
+    }
+  }
+}
