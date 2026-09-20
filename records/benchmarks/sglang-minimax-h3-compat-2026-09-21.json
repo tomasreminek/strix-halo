@@ -1,0 +1,33 @@
+{
+  "task_id": "t_sglang_minimax_h3",
+  "date": "2026-09-21",
+  "status": "compatibility_blocker",
+  "host": {
+    "gpu": "AMD Radeon 8060S / gfx1151 / Strix Halo",
+    "memory": "124 GiB unified",
+    "kernel": "7.0.11-76070011-generic"
+  },
+  "upstream": {
+    "repository": "sgl-project/sglang",
+    "inspected_commit": "f31a7bd45c6ab86796aa012ebfd2378bc42e1a59",
+    "cookbook": "docs/cookbook/diffusion/MiniMax/MiniMax-H3.mdx",
+    "config": "docs/src/snippets/configs/MiniMaxAI/minimax-h3.jsx",
+    "rocm_pr": "https://github.com/sgl-project/sglang/pull/39448",
+    "rocm_pr_state": "open_unmerged"
+  },
+  "findings": [
+    "The H3 cookbook selector lists AMD only as mi300x and mi355x; gfx1151 is not supportedHardware.",
+    "The requested B200 recipe is an 8-GPU NVIDIA/Ulysses topology and cannot be reproduced on one gfx1151 APU.",
+    "The cookbook labels GGUF transformer and GGUF text-encoder routes as CUDA capacity paths.",
+    "PR 39448 says current HIP execution is rejected before the denoise loop because the allowlist lacks current_platform.is_rocm(); the PR remains open.",
+    "Local ComfyUI already has native H3 nodes, validated H3 artifacts and gfx1151-compatible model variants, so it is the nearest verifiable route."
+  ],
+  "actions": {
+    "downloaded_full_checkpoint": false,
+    "installed_sglang_runtime": false,
+    "gpu_job_started": false,
+    "reason": "Compatibility gate failed before any long GPU job, as required by the card. Installing or downloading the full stack would not create a supported gfx1151 execution path."
+  },
+  "nearest_verified_route": "Existing local ComfyUI MiniMax-H3 ROCm workflow, serialized with all local LLM services stopped.",
+  "retest_trigger": "SGLang merges ROCm H3 runtime support and publishes or CI-validates a consumer/gfx1151 route (or a generic ROCm torch_sdpa/eager recipe without MI-only kernels)."
+}
