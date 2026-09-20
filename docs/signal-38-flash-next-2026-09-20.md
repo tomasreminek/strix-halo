@@ -86,3 +86,19 @@ HALOGEN_KV_SLOTS=1
 ```
 
 Then run the `0.11.0` container with the model directory mounted read-only. The preflight error above is emitted before the engine starts listening.
+
+## Heretic2 on Nathanw Vulkan (verified)
+
+The Cygnal `Qwen3.8-Flash-Next-Heretic2-IQ4XS-NGQ4.gguf` loaded successfully in Nathanw `strix-halo-llamacpp-v0.7.6` build 10707 on `gfx1151`.
+
+- Endpoint: `127.0.0.1:18092`
+- Main GGUF: 98,403,355,776 bytes (92 GiB on disk)
+- Context: 65,536 tokens
+- Projector omitted for this text-only test
+- MTP: not enabled; this is serial decode
+- Raw `/completion` endpoint, `temperature=0`, `n_predict=512`
+- 64k runs: 31.61 and 31.61 tok/s predicted
+- Earlier 8k runs: 31.52, 31.56, 31.54 tok/s
+- The first 65k chat test with the multimodal projector caused Nathanw to exit with `status=11/SEGV`; text-only raw completion then worked at both 8k and 65k. Treat projector/chat-template multimodal serving as a separate unresolved issue.
+
+This confirms Heretic2 is usable on the Nathanw Vulkan route for text inference. It does not yet validate MTP; a llama.cpp-compatible draft GGUF must be tested separately from the Halogen `.hgn` head.
