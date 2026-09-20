@@ -102,3 +102,35 @@ The Cygnal `Qwen3.8-Flash-Next-Heretic2-IQ4XS-NGQ4.gguf` loaded successfully in 
 - The first 65k chat test with the multimodal projector caused Nathanw to exit with `status=11/SEGV`; text-only raw completion then worked at both 8k and 65k. Treat projector/chat-template multimodal serving as a separate unresolved issue.
 
 This confirms Heretic2 is usable on the Nathanw Vulkan route for text inference. It does not yet validate MTP; a llama.cpp-compatible draft GGUF must be tested separately from the Halogen `.hgn` head.
+
+## Decision and current operating configuration (2026-09-20)
+
+The benchmark document and `halogen-assessment.md` were reconciled with the local tests. The important distinction is **official Halogen checkpoint vs. external BYO-GGUF**:
+
+- Official Halogen Qwen includes a quality overlay and is the recommended daily chat + coding-worker route.
+- Heretic2 BYO-GGUF can load in Halogen, but the published HumanEval+ result was only `65.2% / 61.0%` versus `84.1% / 79.3%` for the same Heretic2 weights through llama-server. This is an overlay/serving-quality caveat, not evidence that Halogen itself is low quality.
+- Heretic2 is therefore kept as an optional uncensored Nathanw profile, not the default shared chat/worker server.
+- The failed OrcaRouter external GGUF was removed after the `Q5_K` Halogen preflight blocker; no running service referenced it.
+
+The restored official Halogen service is configured for concurrent use:
+
+```text
+HALOGEN_CTX=65536
+HALOGEN_KV_POOL_POSITIONS=131072
+HALOGEN_KV_SLOTS=2
+HALOGEN_MTP_HEAD=loaded by the official checkpoint
+```
+
+The health endpoint verified `slots=2`, `kv_pool_positions=131072`, `drafters_available=[serial,mtp]`, with the worker and chat able to occupy separate slots. This is the recommended configuration for a quality programmer plus interactive chat.
+
+## Benchmark-source interpretation
+
+The supplied 12-quantization benchmark reports:
+
+- Heretic2 IQ4_XS NGQ4 via llama-server: `84.1% / 79.3%`, about `4.16 s/problem`.
+- Uncensored IQ4_XS NGQ4 via llama-server: `81.7% / 78.7%`.
+- Official Halogen with overlay: `82.3% / 78.0%`.
+- Heretic2 BYO through Halogen: `65.2% / 61.0%`.
+- The article's Halogen quality warning is specific to BYO models without the matching overlay. Its comments also indicate that thinking can be controlled with `enable_thinking=false`; that setting should be included in any future reproduction rather than treating the original thinking-mode result as universal.
+
+The benchmark's reported Halogen speed advantage is real mainly for prefill. It does not by itself justify replacing the official overlay-backed route with an external Heretic2 checkpoint.
