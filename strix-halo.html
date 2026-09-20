@@ -14,7 +14,7 @@ nav.toc a:hover,nav.toc a:focus{color:var(--cyan);border-color:var(--cyan);backg
 @media(max-width:680px){main{padding:20px 14px 48px}.grid,.two,.three,.video-grid{grid-template-columns:1fr}header{flex-direction:column;align-items:flex-start;gap:14px}h2{font-size:21px;margin:30px 0 12px}.metric b{font-size:23px}table{min-width:760px;font-size:12px}.card{padding:15px}}
 </style></head>
 <body><main>
-<nav class="toc" aria-label="Page sections"><a href="#runtime">Runtime</a><a href="#qwen">Qwen 3.8</a><a href="#nex-n25">Nex N2.5</a><a href="#flash-next">Flash-Next</a><a href="#split-chat-worker">Chat+Worker split</a><a href="#glm53">GLM-5.3-Flash</a><a href="#workflows">Video workflows</a><a href="#h3-fast">H3 Acc / FastH3</a><a href="#drama">Vertical drama</a><a href="#videos">Top videos</a><a href="video-benchmark.html">Full benchmark ↗</a></nav>
+<nav class="toc" aria-label="Page sections"><a href="#runtime">Runtime</a><a href="#qwen">Qwen 3.8</a><a href="#nex-n25">Nex N2.5</a><a href="#flash-next">Flash-Next</a><a href="#signal-flash-next">Signal Flash-Next</a><a href="#split-chat-worker">Chat+Worker split</a><a href="#glm53">GLM-5.3-Flash</a><a href="#workflows">Video workflows</a><a href="#h3-fast">H3 Acc / FastH3</a><a href="#drama">Vertical drama</a><a href="#videos">Top videos</a><a href="video-benchmark.html">Full benchmark ↗</a></nav>
 <header><div><div class="eyebrow">Hilbert media lab · AMD unified memory</div><h1>Strix Halo</h1><p class="sub">A living benchmark and workflow sheet for Tome's Radeon 8060S machine. Measured facts are separated from claims, hypotheses and unfinished experiments.</p></div><div><span class="badge ok">Flash winner · AP-IQ4_XS 128k · 30 t/s · 2026-08-30</span></div></header>
 <section class="grid">
  <div class="card metric"><b>AMD 8060S</b><span>Ryzen AI MAX+ 395 · gfx1151</span></div>
@@ -180,6 +180,18 @@ nav.toc a:hover,nav.toc a:focus{color:var(--cyan);border-color:var(--cyan);backg
 </tbody></table></div>
 <p><strong>xhigh is not longer.</strong> Uncapped budget, same hard prompt, <code>max_tokens=900</code>: low 32.4 s / 2854 reason chars; medium 32.0 s / 3090; xhigh 32.4 s / 2544 — all <code>finish=length</code> inside thought. Production keeps budget 256 so agents do not eat <code>max_tokens</code>.</p>
 <p class="muted">Load log: <code>KV cache shifting is not supported for this context</code> · <code>cache_reuse is not supported</code>. Every Hermes turn re-prefills the system prompt.</p>
+</div>
+<h2 id="signal-flash-next">Signal 3.8 Flash Next · external GGUF tests (2026-09-20)</h2>
+<div class="card" style="border-color:var(--amber);background:linear-gradient(110deg,#2b2111,#171514)">
+<div class="statusline"><h3>Signal + Halogen MTP: schema blockers, not performance results</h3><span class="badge warn">two Halogen preflights blocked</span></div>
+<p><strong>New Signal 3.8 Flash Next</strong> is distinct from the older Signal 3.8 27B row above. The AP-Q4_K_XL GGUF and auxiliary files were SHA-256 verified. On Unsloth MIX b10715 ROCm gfx1151, the main Signal GGUF loaded without MTP and produced <strong>21.9–22.0 tok/s</strong> in three 256-token runs at 64k context. The released AgentionAI MTP GGUF has a tensor-name layout mismatch with this llama.cpp build, so no draft acceptance number is claimed.</p>
+<div class="tblwrap"><table><thead><tr><th>candidate / route</th><th>result</th><th>evidence</th></tr></thead><tbody>
+<tr><td>Signal AP-Q4_K_XL · MIX b10715 · no MTP</td><td><strong>21.9–22.0 tok/s</strong></td><td>three 256-token generations; health + API pass</td></tr>
+<tr><td>Signal AP-Q4_K_XL · Halogen 0.11.0 + MTP head</td><td><span class="badge bad">BLOCKED</span></td><td><code>blk.0.ffn_gate_exps.weight: Q4_K is not read</code></td></tr>
+<tr><td>OrcaRouter uncensored IQ4_XS · Halogen 0.11.0 + MTP head</td><td><span class="badge bad">BLOCKED</span></td><td><code>blk.0.attn_qkv.weight: Q5_K is not read</code></td></tr>
+</tbody></table></div>
+<p>Both Halogen failures happen in lossless GGUF preflight before inference starts. They are not zero-tok/s results. Halogen requires a compatible dense trunk (Q8_0) and supported expert types; a filename such as IQ4_XS does not guarantee that every tensor meets the loader schema.</p>
+<p class="muted">Full artifacts, SHA-256 values, commands and reproduction notes: <a href="docs/signal-38-flash-next-2026-09-20.md" style="color:var(--cyan)">docs/signal-38-flash-next-2026-09-20.md</a>.</p>
 </div>
 <h2 id="split-chat-worker">Flash-Next split · chat model + working worker (2026-09-19)</h2>
 <div class="card" style="border-color:var(--cyan);background:linear-gradient(110deg,#103247,#0d1a25)">
