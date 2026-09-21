@@ -1,0 +1,81 @@
+[
+  {
+    "port": 18083,
+    "seconds": 13.299814580008388,
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "length",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "# 60 Practical Tips for Writing Reliable Python Tests\n\n1. **Start with `TESTS_OK`** \u2014 Always begin your test file or suite by asserting the baseline passes, so you have a known-good starting point before introducing changes.\n\n2. **Use descriptive test names** \u2014 Name each test to describe what it verifies (e.g., `test_addition_handles_negative_numbers`) rather than generic names like `test_1`.\n\n3. **Isolate tests from each other** \u2014 Ensure one failing test doesn't affect others; avoid shared mutable state that causes cross-test contamination.\n\n4. **Follow Arrange-Act-Assert structure** \u2014 Clearly separate setup, action under test, and assertions for readable, maintainable tests.\n\n5. **Avoid hardcoded dependencies on time** \u2014 Use dependency injection or mock clocks instead of relying on current timestamps in tests.\n\n6. **Mock external services carefully** \u2014 Mock network calls, databases, and third-party APIs to keep tests fast and deterministic.\n\n7. **Prefer pytest fixtures over global state** \u2014 Fixtures make setup/teardown explicit and reusable across tests.\n\n8. **Test public interfaces, not implementation details** \u2014 Focus on observable behavior rather than internal code structure.\n\n9. **Keep tests small and focused** \u2014 Each test should verify a single behavior; extract helper functions when needed.\n\n10. **Run tests frequently** \u2014 Integrate testing into your workflow with CI so regressions are caught immediately.\n\n11. **Use parameterized tests** \u2014 Cover multiple scenarios efficiently by parametrizing inputs and expected outputs.\n\n12. **Provide meaningful error messages** \u2014 When an assertion fails, ensure the message clearly explains what was expected vs. actual.\n\n13. **Avoid order-dependent execution** \u2014 Don't rely on tests running in sequence; mark independent tests as `xfail` only when truly"
+          }
+        }
+      ],
+      "created": 1790005315,
+      "model": "ornith-1.5-9b-abliterated-rocmfp4-strix-lean",
+      "system_fingerprint": "b1-510155c",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 384,
+        "prompt_tokens": 43,
+        "total_tokens": 427,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "id": "chatcmpl-ILJOkdYLFLVwYxmkRYyufZYm2pTiJH74",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 43,
+        "prompt_ms": 171.382,
+        "prompt_per_token_ms": 3.9856279069767444,
+        "prompt_per_second": 250.90149490611617,
+        "predicted_n": 384,
+        "predicted_ms": 13037.0,
+        "predicted_per_token_ms": 34.039164490861616,
+        "predicted_per_second": 29.377924369103322
+      }
+    }
+  },
+  {
+    "port": 18081,
+    "seconds": 18.9194040291477,
+    "response": {
+      "id": "chatcmpl-4adffa8274d3498896c6460b",
+      "created": 1790005302,
+      "model": "halogen-qwen3.8-flash-next",
+      "object": "chat.completion",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "length",
+          "message": {
+            "role": "assistant",
+            "content": "TESTS_OK\n\n1. Use a dedicated testing framework like `pytest` or `unittest` rather than writing custom test runners.\n2. Keep tests independent; one test failure should not cause other tests to fail.\n3. Ensure tests are deterministic; avoid relying on random seeds or time-dependent logic without mocking.\n4. Follow the Arrange-Act-Assert (AAA) pattern for clear test structure.\n5. Use descriptive test names that explain the scenario, action, and expected outcome.\n6. Test one logical assertion per test case to isolate failures easily.\n7. Use fixtures to set up and tear down test environments consistently.\n8. Mock external dependencies like databases, APIs, and file systems to avoid side effects.\n9. Use `pytest-mock` or `unittest.mock` for robust mocking capabilities.\n10. Avoid testing private methods directly; test through public interfaces instead.\n11. Use parameterized tests to cover multiple input scenarios with minimal code duplication.\n12. Test edge cases such as empty lists, zero values, and boundary conditions.\n13. Test error handling paths to ensure exceptions are raised correctly.\n14. Use `pytest.raises` or `assertRaises` to verify expected exceptions.\n15. Keep test code simple and readable; avoid complex logic in tests.\n16. Do not use `print` statements for debugging in tests; use logging or assertions.\n17. Use `pytest.mark.skip` or `unittest.skip` for tests that are temporarily broken or irrelevant.\n18. Use `pytest.mark.xfail` for tests that are expected to fail until a bug is fixed.\n19. Ensure tests run quickly; slow tests discourage frequent execution.\n20. Use `pytest-cov` to measure code coverage and identify untested areas.\n21. Aim for high"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 43,
+        "completion_tokens": 384,
+        "total_tokens": 427,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "timings": {
+        "prompt_n": 43,
+        "predicted_n": 384,
+        "prompt_ms": 1252.1,
+        "predicted_ms": 17643.1,
+        "prompt_per_second": 34.342,
+        "predicted_per_second": 21.765,
+        "cache_n": 0,
+        "draft_n": 269,
+        "draft_n_accepted": 127
+      }
+    }
+  }
+]

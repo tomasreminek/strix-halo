@@ -1,0 +1,81 @@
+[
+  {
+    "port": 18083,
+    "seconds": 0.2390797350089997,
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "COEXIST_OK"
+          }
+        }
+      ],
+      "created": 1790005122,
+      "model": "ornith-1.5-9b-abliterated-rocmfp4-strix-lean",
+      "system_fingerprint": "b1-510155c",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 4,
+        "prompt_tokens": 18,
+        "total_tokens": 22,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "id": "chatcmpl-lRzxZSNMWlU9615V9lIiWM6pinDd5HPY",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 18,
+        "prompt_ms": 144.808,
+        "prompt_per_token_ms": 8.044888888888888,
+        "prompt_per_second": 124.30252472239103,
+        "predicted_n": 4,
+        "predicted_ms": 84.111,
+        "predicted_per_token_ms": 28.037000000000003,
+        "predicted_per_second": 35.66715411777294
+      }
+    }
+  },
+  {
+    "port": 18081,
+    "seconds": 12.93966247793287,
+    "response": {
+      "id": "chatcmpl-658745938cf84814bb9638b0",
+      "created": 1790005122,
+      "model": "halogen-qwen3.8-flash-next",
+      "object": "chat.completion",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "COEXIST_OK"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 18,
+        "completion_tokens": 4,
+        "total_tokens": 22,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "timings": {
+        "prompt_n": 18,
+        "predicted_n": 4,
+        "prompt_ms": 11477.9,
+        "predicted_ms": 1437.7,
+        "prompt_per_second": 1.568,
+        "predicted_per_second": 2.782,
+        "cache_n": 0,
+        "draft_n": 2,
+        "draft_n_accepted": 2
+      }
+    }
+  }
+]

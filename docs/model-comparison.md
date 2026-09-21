@@ -1,5 +1,8 @@
 # Model comparison table · Strix Halo (measured)
 
+> **Correction:** the previous coexistence failure was caused by systemd `Conflicts=ornith.service`, not demonstrated OOM. Both uncensored servers now pass concurrent generation with a 32k Halogen worker slot. See [corrected evidence](ornith-halogen-coexistence-correction.md).
+
+
 Every number here was measured on **Hilbert** (Ryzen AI MAX+ 395 / Radeon 8060S gfx1151, 124 GiB, one GPU job).
 Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-server print_timing`. Do not mix tables.
 

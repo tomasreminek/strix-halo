@@ -1,5 +1,8 @@
 # Ornith 1.5 9B Abliterated · main-agent gate · 2026-09-21
 
+> **Correction:** the previous coexistence failure was caused by systemd `Conflicts=ornith.service`, not demonstrated OOM. Both uncensored servers now pass concurrent generation with a 32k Halogen worker slot. See [corrected evidence](ornith-halogen-coexistence-correction.md).
+
+
 ## Candidate
 
 Source: https://huggingface.co/kingjones777/Ornith-1.5-9B-Abliterated-ROCmFP4-GGUF

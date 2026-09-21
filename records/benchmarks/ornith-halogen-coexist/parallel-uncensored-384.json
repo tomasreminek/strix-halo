@@ -1,0 +1,81 @@
+[
+  {
+    "port": 18083,
+    "seconds": 10.115523335058242,
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "length",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "# How to Test a Python HTTP API Reliably: 45 Practical Tips\n\nTesting an HTTP API well means covering **correctness, reliability, and maintainability**. Below are 45 actionable tips grouped by concern.\n\n---\n\n## Part 1 \u2014 Choose the Right Testing Strategy\n\n**1. Prefer integration tests over end-to-end (E2E) for most cases.** Integration tests spin up the real app + server stack but hit in-process endpoints, giving you realistic behavior without network flakiness. E2E is valuable for smoke testing but should be fewer and more lenient.\n\n**2. Use `pytest` as your core framework.** It's the de facto standard for Python APIs, offers excellent fixtures, parametrization, and plugins (`pytest-httpx`, `pytest-aiohttp`).\n\n**3. Pick one HTTP client library and stick with it.** Common choices: `requests` (sync), `httpx` (sync + async), or `aiohttp`/`fastapi.testclient`. Consistency reduces cognitive load.\n\n**4. Match your client to your server model.** Sync clients for sync servers; async clients (`httpx.AsyncClient`) for async servers. Mixing them causes hangs and false failures.\n\n**5. Isolate each test from shared state.** HTTP tests can leak data across requests if they share a DB session or cache. Reset state between tests to avoid cross-contamination.\n\n**6. Test against a fresh database per test when feasible.** Using a transaction-per-test pattern (e.g., SQLAlchemy's `Session.begin_nested()`) gives isolation without spinning up new databases repeatedly.\n\n**7. Decide what counts as \"the API.\"** Clearly separate **unit tests** (pure functions, e.g., request parsing) from **integration tests** (HTTP layer). This keeps fast unit tests green even when network issues occur.\n\n"
+          }
+        }
+      ],
+      "created": 1790005452,
+      "model": "ornith-1.5-9b-abliterated-rocmfp4-strix-lean",
+      "system_fingerprint": "b1-510155c",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 384,
+        "prompt_tokens": 34,
+        "total_tokens": 418,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "id": "chatcmpl-MptxMpnBXsckVGOtcDgBkYP4bL3y25XZ",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 34,
+        "prompt_ms": 107.738,
+        "prompt_per_token_ms": 3.168764705882353,
+        "prompt_per_second": 315.5803894633277,
+        "predicted_n": 384,
+        "predicted_ms": 9945.737,
+        "predicted_per_token_ms": 25.967981723237596,
+        "predicted_per_second": 38.50896117602949
+      }
+    }
+  },
+  {
+    "port": 18081,
+    "seconds": 44.67668431205675,
+    "response": {
+      "id": "chatcmpl-55c38544e96b46bfbef837c9",
+      "created": 1790005442,
+      "model": "halogen-qwen3.8-flash-next",
+      "object": "chat.completion",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "length",
+          "message": {
+            "role": "assistant",
+            "content": "Testing a Python HTTP API reliably requires a multi-layered approach that combines unit testing, integration testing, contract testing, and performance monitoring. Below are **40+ practical tips** organized by category, with explanations to ensure robust, maintainable, and reliable test suites.\n\n---\n\n### **I. Test Framework & Setup**\n\n1. **Use `pytest` as the primary test runner**  \n   `pytest` is the de facto standard in Python due to its simplicity, powerful fixtures, and extensive plugin ecosystem. It reduces boilerplate and supports parallel execution.\n\n2. **Use `httpx` or `requests` for HTTP client testing**  \n   `httpx` is modern, async-capable, and supports HTTP/2. `requests` is simpler for synchronous tests. Choose one consistently to avoid confusion.\n\n3. **Use `pytest-httpx` or `responses` for mocking HTTP calls**  \n   These libraries allow you to mock external HTTP requests without making real network calls, speeding up tests and ensuring determinism.\n\n4. **Isolate tests with fixtures**  \n   Use `pytest` fixtures to set up and tear down test environments (e.g., database, server instance). This ensures each test runs in a clean state.\n\n5. **Use `pytest-cov` for code coverage**  \n   Measure how much of your API code is exercised by tests. Aim for >80% coverage, but prioritize critical paths over arbitrary numbers.\n\n6. **Run tests in parallel with `pytest-xdist`**  \n   Speed up large test suites by distributing tests across CPU cores. Ensure tests are independent to avoid race conditions.\n\n7. **Use `pytest-mock` for mocking internal functions**  \n   Mock internal service calls (e.g., database queries, external APIs) to isolate the unit under test.\n\n8. **Configure `pytest.ini`"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 34,
+        "completion_tokens": 384,
+        "total_tokens": 418,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "timings": {
+        "prompt_n": 34,
+        "predicted_n": 384,
+        "prompt_ms": 34249.4,
+        "predicted_ms": 10402.7,
+        "prompt_per_second": 0.993,
+        "predicted_per_second": 36.913,
+        "cache_n": 0,
+        "draft_n": 255,
+        "draft_n_accepted": 143
+      }
+    }
+  }
+]

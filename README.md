@@ -1,5 +1,9 @@
 # Strix Halo recipes (measured)
 
+## Ornith main + uncensored Halogen worker: coexistence verified
+
+The earlier OOM claim was incorrect: a systemd conflict stopped the other service. After correction both models generated concurrently. Ornith has a 128k slot; Halogen uses one 32k worker slot with pinned trunk and the verified abliterated experts + overlay. [Measurements and limitations](docs/ornith-halogen-coexistence-correction.md).
+
 ## Hardware
 
 | | |
