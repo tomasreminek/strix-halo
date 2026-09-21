@@ -90,6 +90,7 @@ HIP gfx1151 build of ggml-org + [PR #28136](https://github.com/ggml-org/llama.cp
 9. [Kanban 2026-09-12 benchmark sweep](docs/kanban-2026-09-12.md)
 10. [Reddit post draft](docs/reddit-post.md)
 11. [K2 Horizon candidate sweep (2026-09-21)](docs/k2-horizon-candidates-20260921.md)
+12. [Ornith 1.5 9B Abliterated main-agent gate (2026-09-21)](docs/ornith-abliterated-20260921.md)
 
 ## Licence
 

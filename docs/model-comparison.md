@@ -78,3 +78,13 @@ Three requested K2 Horizon candidates were tested serially on Hilbert with the R
 | `kingjones777/K2-Horizon-7B-ROCmFP4-GGUF` | Tensor type 100 in `blk.0.attn_k.weight` unsupported by loader | **BLOCKED** loader |
 
 The same sweep records the preceding MiniCPM5 Q8_0 and Bonsai 2 Hermes-agent gates. Neither passed the main-agent acceptance bar.
+
+## Ornith 1.5 9B Abliterated · main-agent gate · 2026-09-21
+
+**Promoted as the current small uncensored local main-agent candidate.** The `Q4_0_ROCMFP4_STRIX_LEAN` artifact passed the model-specific ROCmFPX loader, short direct responses, direct tool calls, a full Hermes no-tool turn, a full Hermes tool loop, 63,029-token retrieval, and a 117,830-token retrieval at a 131,072 slot. [Full report with hash, runtime, exact gates and the Halogen coexistence failure](ornith-abliterated-20260921.md).
+
+| Model | Runtime | Main gates | Verdict |
+|---|---|---|---|
+| **Ornith 1.5 9B Abliterated Q4_0_ROCMFP4_STRIX_LEAN** | ROCmFPX/b10715-derived Strix build | loader PASS · Hermes tool loop PASS · 63k retrieval PASS · 117.8k retrieval PASS | **Current local main candidate** |
+
+Halogen Qwen Flash Next remains the configured delegation worker, but cannot remain resident beside GPU-offloaded Ornith on this 124-GiB UMA host without killing one process. The active policy is Ornith main / Halogen stopped, not a false claim of concurrent worker availability.
