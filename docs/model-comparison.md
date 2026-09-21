@@ -66,3 +66,15 @@ Isolated server (CIRU v3 + PLE + MTP depth-6), n_ctx_slot 262144. Server timings
 | czech prose (89 tok) | 4.74 t/s | 6.96 t/s | 0.27 |
 
 Decode ~3 t/s with MTP acceptance below 33% — deeper-than-expected draft overhead on RDNA3.5. Two subsequent tasks timed out (cancelled at 40+s + 90+s), server ended memory-pressured (104/24 GiB used). **Rejected for any production chat route**; not merged into any winner table.
+
+## K2 Horizon candidate sweep · 2026-09-21
+
+Three requested K2 Horizon candidates were tested serially on Hilbert with the ROCm llama.cpp build. None passed the loader gate; no Hermes route was changed. [Full report with exact files, SHA-256 hashes, commands and raw loader errors](k2-horizon-candidates-20260921.md).
+
+| Candidate | Artifact / gate | Verdict |
+|---|---|---|
+| `darkc0de/K2-Horizon-3.7B-heretic-xortron` | Safetensors + custom Transformers code; no GGUF | **BLOCKED** preflight |
+| `geantendormi/K2-Horizon-7B-Uno-Uncensored-GGUF` | `unknown model architecture: 'k2-horizon'` | **BLOCKED** loader |
+| `kingjones777/K2-Horizon-7B-ROCmFP4-GGUF` | Tensor type 100 in `blk.0.attn_k.weight` unsupported by loader | **BLOCKED** loader |
+
+The same sweep records the preceding MiniCPM5 Q8_0 and Bonsai 2 Hermes-agent gates. Neither passed the main-agent acceptance bar.
