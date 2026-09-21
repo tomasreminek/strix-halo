@@ -1,0 +1,44 @@
+[
+  {
+    "tag": "medium",
+    "seconds": 33.58356332778931,
+    "usage": {
+      "prompt_tokens": 31391,
+      "completion_tokens": 65,
+      "total_tokens": 31456,
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    },
+    "pass": true
+  },
+  {
+    "tag": "long",
+    "seconds": 51.86917424201965,
+    "usage": {
+      "prompt_tokens": 53391,
+      "completion_tokens": 65,
+      "total_tokens": 53456,
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    },
+    "pass": true
+  },
+  {
+    "tag": "long-repeat",
+    "seconds": 4.1423680782318115,
+    "usage": {
+      "prompt_tokens": 53391,
+      "completion_tokens": 65,
+      "total_tokens": 53456,
+      "prompt_tokens_details": {
+        "cached_tokens": 53384
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    },
+    "pass": true
+  }
+]

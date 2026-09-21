@@ -1,0 +1,44 @@
+{
+  "seconds": 33.58356332778931,
+  "response": {
+    "id": "chatcmpl-1fe500b063e04225a61708e5",
+    "created": 1790005859,
+    "model": "halogen-qwen3.8-flash-next",
+    "object": "chat.completion",
+    "choices": [
+      {
+        "index": 0,
+        "finish_reason": "stop",
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"start\": \"cedar_87\",\n  \"middle\": \"opal_42\",\n  \"end\": \"birch_93\",\n  \"code\": \"def clamp(value, low, high):\\n    return max(low, min(value, high))\"\n}"
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 31391,
+      "completion_tokens": 65,
+      "total_tokens": 31456,
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    },
+    "timings": {
+      "prompt_n": 31391,
+      "predicted_n": 65,
+      "prompt_ms": 32060.3,
+      "predicted_ms": 1464.9,
+      "prompt_per_second": 979.124,
+      "predicted_per_second": 44.372,
+      "cache_n": 0,
+      "draft_n": 41,
+      "draft_n_accepted": 32
+    }
+  },
+  "test": {
+    "returncode": 0,
+    "stdout": "PASS\n",
+    "stderr": ""
+  },
+  "pass": true
+}

@@ -1,5 +1,8 @@
 # Model comparison table · Strix Halo (measured)
 
+> Current worker capacity: **64k**. Earlier 32k settings below are historical. [Full measured context tests and mandatory coexistence policy](halogen-worker-64k.md).
+
+
 > **Correction:** the previous coexistence failure was caused by systemd `Conflicts=ornith.service`, not demonstrated OOM. Both uncensored servers now pass concurrent generation with a 32k Halogen worker slot. See [corrected evidence](ornith-halogen-coexistence-correction.md).
 
 

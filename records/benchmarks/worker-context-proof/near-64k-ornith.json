@@ -1,0 +1,39 @@
+{
+  "seconds": 0.2847011089324951,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "ORNITH_OK"
+        }
+      }
+    ],
+    "created": 1790005978,
+    "model": "ornith-1.5-9b-abliterated-rocmfp4-strix-lean",
+    "system_fingerprint": "b1-510155c",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 4,
+      "prompt_tokens": 22,
+      "total_tokens": 26,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-p5Y1fJmviZSFVzZvCWfyFaHJpKG6ajI8",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 22,
+      "prompt_ms": 182.223,
+      "prompt_per_token_ms": 8.282863636363636,
+      "prompt_per_second": 120.73119200100975,
+      "predicted_n": 4,
+      "predicted_ms": 97.321,
+      "predicted_per_token_ms": 32.440333333333335,
+      "predicted_per_second": 30.825823820141594
+    }
+  }
+}

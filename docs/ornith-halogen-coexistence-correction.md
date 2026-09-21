@@ -1,5 +1,8 @@
 # Ornith + Halogen coexistence: correction and live proof
 
+> Current worker capacity: **64k**. Earlier 32k settings below are historical. [Full measured context tests and mandatory coexistence policy](halogen-worker-64k.md).
+
+
 The earlier claim that Halogen OOM-killed Ornith was not supported. `qwen38-flashnext.service` explicitly declared `Conflicts=ornith.service`; the journal records systemd stopping Ornith cleanly. Removing only that conflict allowed both servers to run. The previous CPU attempt failed because quantized V cache was paired with flash attention off, not because CPU inference was proven impossible.
 
 ## Verified configuration
