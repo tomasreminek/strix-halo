@@ -1,11 +1,10 @@
 # Strix Halo recipes (measured)
 
-> Current worker capacity: **64k**. Earlier 32k settings below are historical. [Full measured context tests and mandatory coexistence policy](docs/halogen-worker-64k.md).
+> **Current endpoints checked 2026-09-25:** Ornith chat/task assignment on `:18083`; uncensored Halogen coding worker on `:18081`, one 131,072-token slot/KV pool. The 32k/64k worker proofs are historical configurations, not current capacity. C&C conversion is paused; an enabled worker is not an active coding loop. [64k proof](docs/halogen-worker-64k.md) · [current concurrent control](docs/flash-next-gufo-ciru-halogen-20260925.md).
 
+## Ornith + uncensored Halogen: bounded coexistence verified
 
-## Ornith main + uncensored Halogen worker: coexistence verified
-
-The earlier OOM claim was incorrect: a systemd conflict stopped the other service. After correction both models generated concurrently. Ornith has a 128k slot; Halogen uses one 32k worker slot with pinned trunk and the verified abliterated experts + overlay. [Measurements and limitations](docs/ornith-halogen-coexistence-correction.md).
+The earlier OOM claim was incorrect: a systemd conflict stopped the other service. After correction both models generated concurrently, including a cold ~62k Halogen prompt and a short Ornith reply on 2026-09-25. Neither a reboot nor a multi-day soak was tested. [Correction and historical 32k data](docs/ornith-halogen-coexistence-correction.md).
 
 ## Hardware
 
@@ -16,13 +15,23 @@ The earlier OOM claim was incorrect: a systemd conflict stopped the other servic
 | OS | Pop!_OS / Linux 7.0.11, x86_64 |
 | Rule | **One GPU-heavy job at a time.** Unload the LLM before ComfyUI, and vice versa. |
 
-## 🏆 Overall winner: Qwen3.8 Flash-Next on native Halogen (quality overlay, MTP)
+## Historical performance reference: native Halogen quality overlay (2026-09-16)
 
-**44.66 tok/s short serving · 41.37 @~32k · 40.08 @~64k · 38.03 @~126k** (MTP decode, prompts actually filled, 256 generated tokens). Czech with diacritics, sandbox Python, OpenAI tool calls, strict JSON, Responses API and vision OCR all pass. The serial-vs-MTP byte-identity gate remains under review, published as a caveat, not hidden. Engine is closed source (`halogen-flash-server:0.11.0`). Full recipe, pinned hashes and download commands: **[docs/qwen38-halogen.md](docs/qwen38-halogen.md)**.
+**44.66 tok/s short serving · 41.37 @~32k · 40.08 @~64k · 38.03 @~126k** (MTP decode, prompts actually filled, 256 generated tokens). This was the **aligned quality-profile winner in that historical sweep**, not the currently resident uncensored expert-patched worker. Czech with diacritics, sandbox Python, OpenAI tool calls, strict JSON, Responses API and vision OCR passed; serial-vs-MTP byte identity remained under review. Engine is closed source (`halogen-flash-server:0.11.0`). [Exact recipe and evidence](docs/qwen38-halogen.md). Current abliterated worker has a [separate A/B](docs/qwen38-halogen-abliterated.md) and [latest comparison](docs/flash-next-gufo-ciru-halogen-20260925.md).
 
-Everything else — including overnight DeepSeek V4.1 attempts and GLM-5.3-Flash — is below the winner.
+## Latest LLM measurements: Gufo / CIRU / Halogen · 2026-09-24–25
 
-## Master test table (2026-09-17)
+**Engine-reported output decode tok/s**, cold / cached warm; not request-wall throughput. Same marker-retrieval fixture at long contexts, but **different checkpoints, quantizations and speculation settings**. CIRU short runs used only a 47-token prompt despite an 8k configured slot; do not compare that row as an 8k filled-context test. All completed marker values passed (a narrow retrieval gate, not general quality certification).
+
+| Tested configuration | Short prompt decode | ~62.4k prompt decode | ~127.5k prompt decode | Cold ~62k prefill | Concurrent Ornith |
+|---|---:|---:|---:|---:|---|
+| **Gufo** official Unsloth UD-Q4_K_XL base, serial/MTP off | 25.74 @9.5k | 22.94 / 22.88–22.89 | 21.05 / 20.98–20.99 | 45.32 s | **Not tested** |
+| **CIRU Orca v4.4.1** custom GGUF + PLE + Q8 MTP4 | 30.94 / 36.31 @47 tokens | 17.24 / 19.12 | **Not tested** | 207.87 s | 18.94 short; 13.75 cached ~62k, memory pressure |
+| **Uncensored Halogen HGN 0.11.0** abliterated experts + overlay, MTP | 32.91 / 36.96 @9.6k | 31.41 / 34.64 | 30.54 / 33.25–33.26 | 53.05 s | 30.95 cold ~62k; Ornith replied in 1.81 s |
+
+Gufo won **cold ~127.5k request wall time** (113.47 s vs Halogen 125.47 s); Halogen won decode and cached requests. CIRU without MTP: **23.67 / 27.37 tok/s** on the same 47-token short prompt. Its historical **v3 ~3.3 tok/s reject is a different runtime**, not this v4.4.1 result. No CIRU 128k, Gufo+Ornith, reboot or multi-day soak result exists. [Full method, identity, counters and caveats](docs/flash-next-gufo-ciru-halogen-20260925.md) · [raw synthetic API evidence](records/benchmarks/flash-next-september-2026/README.md) · [all LLM reports and failed gates](docs/llm-test-index.md).
+
+## Master test table (historical 2026-09-17; not current service state)
 
 | Workload | Winner | Decode / wall | Recipe |
 |---|---|---|---|
