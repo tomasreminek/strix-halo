@@ -1,0 +1,22 @@
+{
+  "upstream_commit": "6e4c285a92a1de11863784b748f196b5d4b88a48",
+  "scope": "CPU synthetic tests, no model weights, no GPU inference",
+  "tests": [
+    {
+      "target": "test-engram",
+      "exit_code": 0
+    },
+    {
+      "target": "test-ssd-cache",
+      "exit_code": 0
+    },
+    {
+      "target": "test-deepseek41-gguf",
+      "exit_code": 0
+    },
+    {
+      "target": "test-linux-memory",
+      "exit_code": 0
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "unsloth/Qwen3.8-Flash-Next-GGUF",
+  "sha": "38bb39ee97821de2c9009abb7e93950eec396e66",
+  "license": "other",
+  "shards": [
+    {
+      "rfilename": "UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+      "blobId": "001977c3783820fbfdc63fd9ba52ed0f3626062f",
+      "size": 10946624,
+      "lfs": {
+        "sha256": "4448186216b3af4cc558bbce2c3213f01608f8f8b2e5267a9767971dd3ec8082",
+        "size": 10946624,
+        "pointerSize": 133
+      }
+    },
+    {
+      "rfilename": "UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00002-of-00004.gguf",
+      "blobId": "0dd3921aadf70d33e46271ad8744221d32b2f9c0",
+      "size": 49859583136,
+      "lfs": {
+        "sha256": "3f342f1c1580473f1ee94ddd5b28206e8c07a70fa1a366f59d1d6c922919a6c9",
+        "size": 49859583136,
+        "pointerSize": 136
+      }
+    },
+    {
+      "rfilename": "UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00003-of-00004.gguf",
+      "blobId": "992dec031e26339fe4d856d86aa1c4a5c849a454",
+      "size": 49376141504,
+      "lfs": {
+        "sha256": "56758f40269cad5cd9b0d3d6fbae0f40f6d5be6de49e4ab392dbe83157d9cbd3",
+        "size": 49376141504,
+        "pointerSize": 136
+      }
+    },
+    {
+      "rfilename": "UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00004-of-00004.gguf",
+      "blobId": "f3e014c1d11275be90fa148a4b12ef304b4f41fb",
+      "size": 12087983520,
+      "lfs": {
+        "sha256": "753bda48b98ba4f1636134a90a967de1b2d3908a236c026e464777342e53510a",
+        "size": 12087983520,
+        "pointerSize": 136
+      }
+    }
+  ]
+}

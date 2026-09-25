@@ -1,0 +1,130 @@
+{
+  "gufo-5000-1.json": {
+    "bytes": 3694,
+    "sha256": "d73ae86ac254aaba04d3c9abbf35a4cfe3e2c8e3979d8d2ef0fb5f9786840b89"
+  },
+  "gufo-33000-1.json": {
+    "bytes": 3652,
+    "sha256": "da474dc81f19fe8469120ebf130c2dc68a0789b12a45ec618455870af7c1b637"
+  },
+  "gufo-33000-2.json": {
+    "bytes": 3456,
+    "sha256": "07feb2a5cbf5d9ad69c10edd2d5e664de069be8a2ff7f7c0ba362131b5e5757c"
+  },
+  "gufo-33000-3.json": {
+    "bytes": 3456,
+    "sha256": "2c217fd635af0cf5f735735a18090f5f6cd0b85e3487f6da94a69e3c70758423"
+  },
+  "gufo-67500-1.json": {
+    "bytes": 3668,
+    "sha256": "f9de5f9bf15743243710077559c84caddebfa30b64617d528f894501c2a906f8"
+  },
+  "gufo-67500-2.json": {
+    "bytes": 3468,
+    "sha256": "9c4177882ca276d2983c7cb36d254015392cdc18a3df8777abdc472af89bd9a2"
+  },
+  "gufo-67500-3.json": {
+    "bytes": 3475,
+    "sha256": "89d6d9a43363346c04dec35c211de7ee0916fcf1228f4cff8048be950a04c444"
+  },
+  "halogen-33000-1.json": {
+    "bytes": 2469,
+    "sha256": "3edcf21de9fc6410627441c36fd2837a06094d963970e64358b8d4d3a2e5e241"
+  },
+  "halogen-33000-2.json": {
+    "bytes": 2512,
+    "sha256": "721d0817acea8d0498ae173147c3de3520813315105d41be02d808b1d3fa1a6b"
+  },
+  "halogen-33000-3.json": {
+    "bytes": 2512,
+    "sha256": "c806799a8b0408997b0044332d247738a6ee7d385a9e7f7a5c4e41f9efe72da4"
+  },
+  "halogen-5000-1.json": {
+    "bytes": 2442,
+    "sha256": "42917e76c44139b9cb7573cfa4c3941f6f717dd710487f7de8a5c03fcecfb146"
+  },
+  "halogen-5000-2.json": {
+    "bytes": 2485,
+    "sha256": "74e4c64648d8846107d3bcd1bae855abe1b7780ef91f00a1bf1682bb2829c02e"
+  },
+  "halogen-5000-3.json": {
+    "bytes": 2484,
+    "sha256": "d4e6b4f53b5375d2e2fb65ea9ab57617fe959e43df2dffdfe65ca028a0bdf32f"
+  },
+  "halogen-67500-1.json": {
+    "bytes": 2466,
+    "sha256": "acbe26ff7ac18daa0ac53ec5f45e1135b289fd34db93486ad219cd737a07cbd4"
+  },
+  "halogen-67500-2.json": {
+    "bytes": 2509,
+    "sha256": "96a1063d15f94cc3e62bdf1dd6f80e622188f3d44a44011cc208500c066dd368"
+  },
+  "halogen-67500-3.json": {
+    "bytes": 2509,
+    "sha256": "55b485053fddaec49b33d569515fcf3523e1c704c3412d5489d15dfd7e6b5dd8"
+  },
+  "halogen-coexist-64k-halogen.json": {
+    "bytes": 2469,
+    "sha256": "9866b311c2baaa71e4df67514326af1eab9e8041f8b9dd3f7c5c9eef84a95756"
+  },
+  "halogen-coexist-64k-ornith.json": {
+    "bytes": 853,
+    "sha256": "af89cfb66d4a85eda158a40d6cb028e6f0edcf6967fe1667eadbecec8dfa37b0"
+  },
+  "ciru-64k-mtp-b8192-1.json": {
+    "bytes": 2546,
+    "sha256": "4689154ccc147384405cd30c85700be0f9b862c2643d77ae4d6f78f96215ca75"
+  },
+  "ciru-64k-mtp-b8192-2.json": {
+    "bytes": 2539,
+    "sha256": "89b30b5ca9275242e06a3d0b048a39612cc0ddea3f86eb1be605856fed1a69d2"
+  },
+  "ciru-8k-mtp-1.json": {
+    "bytes": 2228,
+    "sha256": "af0896130cf6e4b87208a9dd63f6ff5a14ad7291ac6cca9ac040eaa63329dd11"
+  },
+  "ciru-8k-mtp-2.json": {
+    "bytes": 2213,
+    "sha256": "e87d4b13977a4a4ba382e68c013ab62aa5d44958e6a8b3bf5e8bd5172b3da223"
+  },
+  "ciru-8k-short-1.json": {
+    "bytes": 2256,
+    "sha256": "dfddd259139ecd90fb162094892ebdf1977d6074e05336f533160fbb4b69bf38"
+  },
+  "ciru-8k-short-2.json": {
+    "bytes": 2243,
+    "sha256": "b1f57544811cee8938d7cbad2f8f29c1ac7e402346b03fd88a353b728be2a177"
+  },
+  "ciru-coexist-64k-ciru.json": {
+    "bytes": 2538,
+    "sha256": "ed080a236a6949c63d2dd75d65fcd7b2f851e3f07ff90ad9d4ad9660e7f0fe62"
+  },
+  "ciru-coexist-64k-ornith.json": {
+    "bytes": 866,
+    "sha256": "f383ded7a72966ff1db55e2af7cb65c4a230d8de8ea40ca50ac3d86dfc39710a"
+  },
+  "ciru-coexist-ciru.json": {
+    "bytes": 2248,
+    "sha256": "47bfdfc729ca31cc2311fc6cd961840d72c46b23e050f92d597abb96e4fe2e50"
+  },
+  "ciru-coexist-mtp-ciru.json": {
+    "bytes": 2216,
+    "sha256": "73002a7d5d5a610defb3574376fbedfecb5ea7e704b610bb9167d02b9dd18022"
+  },
+  "ciru-coexist-mtp-ornith.json": {
+    "bytes": 866,
+    "sha256": "4edc9832063adab009df6d0729b3425d9bdbbb7d40170adfea4869dc18b93dba"
+  },
+  "ciru-coexist-ornith.json": {
+    "bytes": 1193,
+    "sha256": "81667ccb508f4eb74eae65ef4af93720da8a888bfb348f6aae843267469bc297"
+  },
+  "sha256sum.txt": {
+    "bytes": 584,
+    "sha256": "1f96304bdb4ee82a9861f64974416dadd173588805db16576151ecef51b9886c"
+  },
+  "hub-metadata.json": {
+    "bytes": 1524,
+    "sha256": "2b9f48d7d87c9a800bdd044c7978705109d9b5952893090013e086738c91a521"
+  }
+}

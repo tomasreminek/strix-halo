@@ -1,13 +1,25 @@
 # Model comparison table · Strix Halo (measured)
 
-> Current worker capacity: **64k**. Earlier 32k settings below are historical. [Full measured context tests and mandatory coexistence policy](halogen-worker-64k.md).
+> Current live Halogen service: **131,072-token single slot** (`HALOGEN_CTX` and KV pool), with Ornith on a separate chat endpoint. Earlier 32k/64k worker studies are historical configurations. C&C conversion remains paused; an enabled worker service is not an active coding loop. [64k worker history](halogen-worker-64k.md) · [coexistence correction](ornith-halogen-coexistence-correction.md).
 
 
-> **Correction:** the previous coexistence failure was caused by systemd `Conflicts=ornith.service`, not demonstrated OOM. Both uncensored servers now pass concurrent generation with a 32k Halogen worker slot. See [corrected evidence](ornith-halogen-coexistence-correction.md).
+> **Correction:** the earlier coexistence failure was caused by systemd `Conflicts=ornith.service`, not demonstrated OOM. Both uncensored services passed a fresh concurrent ~62k Halogen cold prompt and Ornith short response. This is bounded evidence, not a reboot or multi-day soak. [Historical correction](ornith-halogen-coexistence-correction.md).
 
 
 Every number here was measured on **Hilbert** (Ryzen AI MAX+ 395 / Radeon 8060S gfx1151, 124 GiB, one GPU job).
 Backend and method always stated: `llama-bench` (Vulkan unless noted) or `llama-server print_timing`. Do not mix tables.
+
+## Flash-Next: Gufo base vs CIRU Orca vs uncensored Halogen · 2026-09-25
+
+Local engine-reported **output decode** and prompt-prefill measurements on one gfx1151 host. These are different checkpoints/quantizations and different speculation settings, not an engine-only A/B. [Full reproducible report, raw synthetic responses and limits](flash-next-gufo-ciru-halogen-20260925.md) · [evidence manifest](../records/benchmarks/flash-next-september-2026/README.md).
+
+| Tested configuration | ~9.5k or short decode | ~62.4k decode | ~127.5k decode | Cold ~62k prefill | Ornith concurrent |
+|---|---:|---:|---:|---:|---|
+| Gufo, official Unsloth UD-Q4_K_XL, MTP off | 25.74 @9.5k | 22.94 cold / 22.88–22.89 warm | 21.05 cold / 20.98–20.99 warm | 45.32 s | **Not tested** |
+| CIRU v4.4.1 Orca + Q8 MTP4 | 30.94 cold / 36.31 warm @47-token short prompt | 17.24 cold / 19.12 warm | **Not tested** | 207.87 s | 18.94 short / 13.75 cached ~62k; memory pressure |
+| Existing abliterated HGN + Halogen 0.11.0 MTP | 32.91 cold / 36.96 warm @9.6k | 31.41 cold / 34.64 warm | 30.54 cold / 33.25–33.26 warm | 53.05 s | 30.95 cold ~62k + Ornith reply in 1.81 s |
+
+CIRU **without MTP** on the same 47-token short prompt: 23.67 cold / 27.37 warm tok/s. All measured marker values passed; CIRU's long reply stopped naturally at 399 output tokens, Gufo/Halogen produced 420. Gufo wins cold 127.5k request wall time (113.47 s vs Halogen 125.47 s), while Halogen wins decode and cached requests; Gufo weights were retained. CIRU v4.4.1 supersedes the *runtime-specific* historical v3 result below, not the accuracy of that older measurement. The uncensored production pair is Ornith chat/task assignment plus Halogen worker; C&C project execution remains paused. No CIRU 128k result, no Gufo+Ornith result, no actual reboot test.
 
 ## DeepSeek V4.1 Flash Q2 · second pass closed 2026-09-17
 
@@ -46,7 +58,7 @@ Engine-measured context: 7157/622, 31679/564 and 64461/556 prompt/output tokens;
 | **Signal 3.8-27B AP-Q4_K_XL** | Nathanw v0.7.3 Vulkan0 | **190.9** | **183.1** | **11.9** t/s | 19.3 CZ / 29.2 code (probe) | 2026-09-12 measured · MTP acc 0.60–0.90 |
 | **Ornith 1.5-9B Q4_0 ROCMFP4** | Vulkan0 (local build) | **990.7** | **842.8** | **40.7** t/s | 34.2–38.9 (probe) | 2026-09-12 measured · fastest 27B-worker prefill |
 | **Nex N2.5-mini ROCmFP4 STRIX_LEAN** | HaloFPX Vulkan0 | 650 | 581 | **81.6** t/s | 78.5 @8k | **Quality REJECT** (CZ/EN garbage; weights deleted) |
-| **CIRU-STRIX-Orca (Qwen3.8 Flash)** | CIRU v3 ROCm + PLE + MTP depth-6 | ~24 | — | **3.3** t/s decode · MTP acc 0.25–0.32 | — | **REJECT 2026-09-12** (retest: unusable decode, memory pressure) |
+| **CIRU-STRIX-Orca (historical v3)** | CIRU v3 ROCm + PLE + MTP depth-6 | ~24 | — | **3.3** t/s decode · MTP acc 0.25–0.32 | — | **REJECT in v3 2026-09-12**; distinct [v4.4.1 retest](flash-next-gufo-ciru-halogen-20260925.md) |
 
 \* cyjin/heretic numbers measured on qwen38-27b.md three-arm control rows.
 \† GLM short-prompt prefill ~99–103 t/s (server, Unsloth MIX b10715).
@@ -93,4 +105,4 @@ The same sweep records the preceding MiniCPM5 Q8_0 and Bonsai 2 Hermes-agent gat
 |---|---|---|---|
 | **Ornith 1.5 9B Abliterated Q4_0_ROCMFP4_STRIX_LEAN** | ROCmFPX/b10715-derived Strix build | loader PASS · Hermes tool loop PASS · 63k retrieval PASS · 117.8k retrieval PASS | **Current local main candidate** |
 
-Halogen Qwen Flash Next remains the configured delegation worker, but cannot remain resident beside GPU-offloaded Ornith on this 124-GiB UMA host without killing one process. The active policy is Ornith main / Halogen stopped, not a false claim of concurrent worker availability.
+The older coexistence rejection is superseded: a prior stop was a systemd conflict, not demonstrated OOM. A subsequent 2026-09-25 test ran the current abliterated Halogen worker at 62,437 prompt tokens alongside a responding Ornith service. Halogen decoded 420 tokens at 30.95 tok/s after 54.40 s prefill; Ornith replied in 1.81 s. Both services were active afterward. [Full current evidence and caveats](flash-next-gufo-ciru-halogen-20260925.md). Neither a real reboot nor a multi-day soak was performed.

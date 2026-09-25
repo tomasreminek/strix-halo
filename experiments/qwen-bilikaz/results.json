@@ -1,0 +1,326 @@
+{
+  "start": "2026-09-14T14:02:00.939066+02:00",
+  "mode": "passive production observation; NOT controlled A/B",
+  "heads": [
+    {
+      "file": "Qwen3.8-Flash-Next-Uncensored-Q4_K_M-00001-of-00003.gguf",
+      "name": "output.weight",
+      "type": "Q6_K",
+      "shape": [
+        2560,
+        248320
+      ],
+      "bytes": 521472000
+    },
+    {
+      "file": "Qwen3.8-Flash-Next-Uncensored-Q4_K_M-00001-of-00003.gguf",
+      "name": "output_hc_down.weight",
+      "type": "Q4_K",
+      "shape": [
+        10240,
+        320
+      ],
+      "bytes": 1843200
+    },
+    {
+      "file": "Qwen3.8-Flash-Next-Uncensored-Q4_K_M-00001-of-00003.gguf",
+      "name": "output_hc_norm.weight",
+      "type": "F32",
+      "shape": [
+        10240
+      ],
+      "bytes": 40960
+    },
+    {
+      "file": "Qwen3.8-Flash-Next-Uncensored-Q4_K_M-00001-of-00003.gguf",
+      "name": "output_hc_up.weight",
+      "type": "Q5_0",
+      "shape": [
+        320,
+        10240
+      ],
+      "bytes": 2252800
+    },
+    {
+      "file": "mtp-Qwen3.8-Flash-Next-Q8_0.gguf",
+      "name": "output.weight",
+      "type": "Q8_0",
+      "shape": [
+        2560,
+        248320
+      ],
+      "bytes": 675430400
+    },
+    {
+      "file": "mtp-Qwen3.8-Flash-Next-Q8_0.gguf",
+      "name": "output_hc_down.weight",
+      "type": "Q8_0",
+      "shape": [
+        10240,
+        320
+      ],
+      "bytes": 3481600
+    },
+    {
+      "file": "mtp-Qwen3.8-Flash-Next-Q8_0.gguf",
+      "name": "output_hc_norm.weight",
+      "type": "F32",
+      "shape": [
+        10240
+      ],
+      "bytes": 40960
+    },
+    {
+      "file": "mtp-Qwen3.8-Flash-Next-Q8_0.gguf",
+      "name": "output_hc_up.weight",
+      "type": "Q8_0",
+      "shape": [
+        320,
+        10240
+      ],
+      "bytes": 3481600
+    }
+  ],
+  "samples": [
+    {
+      "time": 1789387336.4121652,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480209,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387341.4126666,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480210,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387346.413067,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480211,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387351.4136693,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480211,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387356.4140425,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480226,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387361.414553,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480226,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387366.415021,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480226,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387371.41557,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480226,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387376.415992,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480226,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387381.4164248,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480231,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387386.4169137,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480231,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387391.4174128,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480231,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    },
+    {
+      "time": 1789387396.4178703,
+      "compaction_proactiveness": 20,
+      "counters": {
+        "pswpin": 86480234,
+        "pswpout": 175190715,
+        "compact_migrate_scanned": 83031987963,
+        "compact_free_scanned": 2292233437,
+        "compact_isolated": 591576285,
+        "compact_stall": 199562,
+        "compact_fail": 82056,
+        "compact_success": 117506,
+        "compact_daemon_wake": 5185,
+        "compact_daemon_migrate_scanned": 81422658274,
+        "compact_daemon_free_scanned": 2220783247
+      }
+    }
+  ],
+  "elapsed_seconds": 60.00570511817932,
+  "counter_deltas": {
+    "pswpin": 25,
+    "pswpout": 0,
+    "compact_migrate_scanned": 0,
+    "compact_free_scanned": 0,
+    "compact_isolated": 0,
+    "compact_stall": 0,
+    "compact_fail": 0,
+    "compact_success": 0,
+    "compact_daemon_wake": 0,
+    "compact_daemon_migrate_scanned": 0,
+    "compact_daemon_free_scanned": 0
+  },
+  "sudo_probe": {
+    "exit": 1,
+    "stderr": "sudo: a password is required"
+  },
+  "timing_lines": 25
+}
