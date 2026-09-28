@@ -1,0 +1,38 @@
+{
+  "engine": "gufo-stock",
+  "n": 67500,
+  "trial": 2,
+  "status": 200,
+  "wall_s": 19.45272441499401,
+  "usage": {
+    "completion_tokens": 420,
+    "prompt_tokens": 127525,
+    "total_tokens": 127945,
+    "prompt_tokens_details": {
+      "cached_tokens": 127521
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "reasoning": 0
+  },
+  "timings": {
+    "cache_n": 127521,
+    "prompt_n": 4,
+    "prompt_ms": 140.532,
+    "prompt_per_token_ms": 35.133,
+    "prompt_per_second": 28.463268152449263,
+    "predicted_n": 420,
+    "predicted_ms": 19231.488,
+    "predicted_per_token_ms": 45.89853937947494,
+    "predicted_per_second": 21.787185682147943
+  },
+  "finish": "length",
+  "markers": [
+    true,
+    true,
+    true
+  ],
+  "visible_chars": 1937,
+  "content": "The three exact marker values embedded within the archival text are:\n\n1.  **amber-violet-731**\n2.  **birch-cobalt-482**\n3.  **cedar-silver-956**\n\n***\n\nThe storm had been gathering strength for hours, a bruised purple mass pressing down against the horizon until it finally broke with a violence that shook the very foundations of the old stone arch. Rain did not merely fall here; it hammered, a relentless, deafening percussion against the wet slate of the bridge’s surface, turning the ancient mortar into slick, dark veins that ran with the current. The structure itself was a relic of a forgotten age, built from granite blocks so heavy that no modern crane could lift them, now standing as a solitary witness to the fury of the elements. It spanned a deep, narrow gorge where the river below had swollen into a churning torrent of white foam and black water, roaring with a sound that drowned out the wind.\n\nAlong the length of the bridge, iron lanterns hung from curved brackets, their glass panes fogged with condensation and streaked with grime. They were not electric, but fueled by oil that had been trimmed and lit by a caretaker who had long since passed away, leaving the flames to dance in the drafts that swept through the valley. Each flame was a fragile, trembling eye, casting a warm, amber glow that struggled against the overwhelming cold blue of the storm. The light did not illuminate the path so much as it defined the edges of the void, creating small, isolated islands of visibility in the sea of darkness. When the wind gusted, the flames would lean precariously, threatening to extinguish, only to recover with a sudden flare that sent shadows leaping across the wet stones like startled animals.\n\nThe rain interacted with this light in a mesmerizing, chaotic dance. Droplets caught the glow as they fell, appearing as suspended beads of liquid gold before shattering against the railing. The air itself seemed"
+}

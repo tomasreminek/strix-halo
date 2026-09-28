@@ -1,0 +1,14 @@
+{
+  "n": 5000,
+  "corpus_sha256": "c3b02f0d24e7a7cd2275a2de977fb87fc44f2b341ab12c38174d3510b37fddce",
+  "prompt_sha256": "fdf9a5e4f170d170bc28ff980b4334b491fa9a6951eecc7bc7ac22634448a6d0",
+  "payload_without_prompt": {
+    "model": "gufo-pr91",
+    "max_tokens": 420,
+    "temperature": 0,
+    "stream": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  }
+}

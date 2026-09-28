@@ -1,0 +1,39 @@
+{
+  "engine": "gufo",
+  "n": 33000,
+  "trial": 2,
+  "status": 200,
+  "error": null,
+  "wall_s": 19.00866028002929,
+  "usage": {
+    "completion_tokens": 420,
+    "prompt_tokens": 62397,
+    "total_tokens": 62817,
+    "prompt_tokens_details": {
+      "cached_tokens": 62393
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "reasoning": 0
+  },
+  "timings": {
+    "cache_n": 62393,
+    "prompt_n": 4,
+    "prompt_ms": 121.646,
+    "prompt_per_token_ms": 30.4115,
+    "prompt_per_second": 32.88229781497131,
+    "predicted_n": 420,
+    "predicted_ms": 18843.037,
+    "predicted_per_token_ms": 44.971448687350836,
+    "predicted_per_second": 22.236330587261488
+  },
+  "finish": "length",
+  "markers": [
+    true,
+    true,
+    true
+  ],
+  "visible_chars": 1925,
+  "content": "The three exact marker values embedded in the archival text are:\n1. amber-violet-731\n2. birch-cobalt-482\n3. cedar-silver-956\n\nThe rain did not fall so much as it descended, a heavy, gray curtain that erased the horizon line where the sky met the distant hills. It was a relentless, rhythmic drumming against the stone parapets of the old bridge, a structure that had stood for centuries, weathered by countless storms just like this one. The bridge itself was an arch of dark granite, slick and shining under the downpour, reflecting the dim, flickering light of the lanterns that lined its length. These lanterns were not electric, nor were they gas; they were old oil lamps, housed in glass cases that had yellowed with age, casting a warm, amber glow that struggled against the encroaching blue twilight.\n\nAs the wind picked up, swirling the mist around the base of the bridge, the flames within the lanterns danced wildly. They cast long, distorted shadows that stretched across the wet cobblestones, creating a surreal, shifting pattern that seemed to breathe with the storm. The light from the lanterns pooled on the surface of the river below, breaking apart into shimmering fragments as the raindrops struck the water’s surface. Each drop created a tiny explosion of ripples, disrupting the reflection of the lights, only for them to reform moments later, a testament to the persistence of the light against the chaos of the weather.\n\nWalking across the bridge felt like moving through a dream. The air was thick with the scent of wet stone, damp earth, and the faint, metallic tang of the oil from the lamps. The sound of the rain was all-encompassing, a white noise that drowned out the usual sounds of the city beyond the valley. It was a solitary experience, despite the presence of the lights, which seemed to watch over the traveler like silent sentinels. The bridge connected two sides of a divide, not just ge"
+}

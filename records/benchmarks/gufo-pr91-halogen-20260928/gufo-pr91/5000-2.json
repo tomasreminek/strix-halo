@@ -1,0 +1,39 @@
+{
+  "engine": "gufo",
+  "n": 5000,
+  "trial": 2,
+  "status": 200,
+  "error": null,
+  "wall_s": 19.070639727986418,
+  "usage": {
+    "completion_tokens": 420,
+    "prompt_tokens": 9551,
+    "total_tokens": 9971,
+    "prompt_tokens_details": {
+      "cached_tokens": 9547
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "reasoning": 0
+  },
+  "timings": {
+    "cache_n": 9547,
+    "prompt_n": 4,
+    "prompt_ms": 119.109,
+    "prompt_per_token_ms": 29.77725,
+    "prompt_per_second": 33.58268476773376,
+    "predicted_n": 420,
+    "predicted_ms": 18940.442,
+    "predicted_per_token_ms": 45.20391885441527,
+    "predicted_per_second": 22.1219758229507
+  },
+  "finish": "length",
+  "markers": [
+    true,
+    true,
+    true
+  ],
+  "visible_chars": 1910,
+  "content": "The three exact marker values embedded within the archival text are:\n\n1.  **amber-violet-731**\n2.  **birch-cobalt-482**\n3.  **cedar-silver-956**\n\n***\n\nThe stone arches of the old bridge have stood for centuries, weathered by countless storms and the relentless passage of time. Tonight, the sky is a heavy blanket of charcoal gray, pressing down upon the valley below with a palpable weight. The rain does not fall in gentle drops but arrives in sheets, a silver curtain that blurs the line between the earth and the heavens. Each droplet strikes the moss-covered stones of the bridge with a rhythmic persistence, creating a symphony of soft taps and splashes that echoes through the damp air. The water rushes beneath the arches, swollen and dark, carrying with it the debris of the forest—twigs, leaves, and the occasional lost branch—swirling in turbulent eddies that reflect the dim light from above.\n\nLanterns hang from the iron railings, their glass panes fogged by the humidity and the chill of the evening. Inside each casing, a flame flickers, struggling against the drafts that sneak through the gaps in the metalwork. The light they cast is warm and amber, a stark contrast to the cold, blue-gray tones of the surrounding night. These pools of illumination dance on the wet surface of the bridge, creating elongated reflections that stretch and warp with every ripple in the puddles. The light seems to breathe, expanding and contracting with the wind, offering a sense of comfort and safety to any traveler who might find themselves crossing this span in such inclement weather.\n\nAs the rain intensifies, the sound becomes a roar, masking the distant calls of birds seeking shelter in the dense canopy of the valley walls. The bridge itself seems to groan under the assault, the ancient stones vibrating with the force of the downpour. Yet, it remains steadfast, a testament to the craftsmanship of"
+}

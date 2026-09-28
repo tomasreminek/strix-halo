@@ -1,0 +1,39 @@
+{
+  "engine": "gufo",
+  "n": 5000,
+  "trial": 1,
+  "status": 200,
+  "error": null,
+  "wall_s": 33.041395935055334,
+  "usage": {
+    "completion_tokens": 420,
+    "prompt_tokens": 9551,
+    "total_tokens": 9971,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "reasoning": 0
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 9551,
+    "prompt_ms": 14411.885,
+    "prompt_per_token_ms": 1.5089399015809863,
+    "prompt_per_second": 662.7169173220575,
+    "predicted_n": 420,
+    "predicted_ms": 18616.839,
+    "predicted_per_token_ms": 44.431596658711214,
+    "predicted_per_second": 22.506506072271453
+  },
+  "finish": "length",
+  "markers": [
+    true,
+    true,
+    true
+  ],
+  "visible_chars": 1878,
+  "content": "The three exact marker values embedded within the archival text are:\n\n1.  **amber-violet-731**\n2.  **birch-cobalt-482**\n3.  **cedar-silver-956**\n\n***\n\nThe stone arches of the old bridge have stood for centuries, weathered by countless storms and the relentless passage of time. Tonight, the sky is a heavy blanket of charcoal gray, pressing down upon the valley below with a quiet, suffocating intensity. The rain does not fall in sheets but rather in a fine, persistent mist that clings to the skin and dampens the soul. It is a gentle deluge, the kind that erodes not just rock, but memory, washing away the sharp edges of the day until only the soft, blurred outlines of reality remain.\n\nAlong the length of the bridge, iron lanterns hang from curved brackets, their glass panes fogged with condensation. They flicker with a warm, amber glow, a stark contrast to the cold, blue-gray hue of the surrounding twilight. Each flame dances within its cage, struggling against the drafts that slip through the valley’s narrow throat. The light spills onto the wet cobblestones, creating elongated reflections that stretch and warp with every ripple caused by the falling drops. These pools of light are temporary islands in a sea of darkness, offering a fleeting sense of safety to those who dare to cross.\n\nThe sound of the rain is a constant, rhythmic drumming against the stone parapets and the metal roofs of the nearby houses. It is a soothing noise, a white noise that masks the creaking of the bridge’s ancient timbers and the distant rush of the river far below. The water in the river has risen, swollen by the storm, churning with a muddy brown fury that contrasts with the serene, almost meditative quality of the bridge itself. The bridge remains steadfast, an anchor in the chaos, connecting two sides of a world that feels increasingly disconnected.\n\nAs the night deep"
+}

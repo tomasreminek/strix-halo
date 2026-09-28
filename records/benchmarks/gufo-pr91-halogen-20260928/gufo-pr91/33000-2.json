@@ -1,0 +1,39 @@
+{
+  "engine": "gufo",
+  "n": 33000,
+  "trial": 2,
+  "status": 200,
+  "error": null,
+  "wall_s": 19.464089840010274,
+  "usage": {
+    "completion_tokens": 420,
+    "prompt_tokens": 62397,
+    "total_tokens": 62817,
+    "prompt_tokens_details": {
+      "cached_tokens": 62393
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "reasoning": 0
+  },
+  "timings": {
+    "cache_n": 62393,
+    "prompt_n": 4,
+    "prompt_ms": 121.335,
+    "prompt_per_token_ms": 30.33375,
+    "prompt_per_second": 32.966580129393826,
+    "predicted_n": 420,
+    "predicted_ms": 19296.852,
+    "predicted_per_token_ms": 46.05453937947494,
+    "predicted_per_second": 21.713386204133194
+  },
+  "finish": "length",
+  "markers": [
+    true,
+    true,
+    true
+  ],
+  "visible_chars": 1873,
+  "content": "The three exact marker values embedded within the archival text are:\n\n1.  **amber-violet-731**\n2.  **birch-cobalt-482**\n3.  **cedar-silver-956**\n\n***\n\nThe rain did not fall so much as it descended, a heavy, gray curtain that erased the horizon line where the sky met the distant hills. It was a relentless, rhythmic drumming against the stone parapets of the old bridge, a structure that had stood for centuries, weathered by countless storms just like this one. The bridge itself was an arch of dark granite, slick and shining under the downpour, reflecting the dim, flickering light of the lanterns that lined its length. These lanterns were not electric, nor were they fueled by modern gas; they held small, trembling flames within glass panes that had been polished by generations of hands. Each flame was a tiny, defiant star against the encroaching gloom, casting long, wavering shadows that danced across the wet cobblestones.\n\nAs the wind picked up, swirling through the valley, the lanterns swayed gently on their iron hooks. The light they cast was warm and amber, a stark contrast to the cold, blue-gray hue of the rain-soated world. The water rushing beneath the bridge was turbulent, churning white foam against the central pier, carrying with it leaves and debris from the autumn trees that lined the banks. The sound of the river was a low, constant roar, a bass note beneath the higher pitch of the rain hitting the stone.\n\nA lone figure walked across the bridge, their silhouette barely visible through the mist. They moved slowly, head bowed against the wind, their footsteps echoing softly on the wet surface. The lanterns seemed to lean toward them, as if offering a silent greeting or a warning. The air smelled of wet earth, ozone, and the faint, metallic scent of the iron railings. There was a profound stillness in the motion, a paradox of activity"
+}

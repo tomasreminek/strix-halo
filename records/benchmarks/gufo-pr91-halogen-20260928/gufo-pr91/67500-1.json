@@ -1,0 +1,39 @@
+{
+  "engine": "gufo",
+  "n": 67500,
+  "trial": 1,
+  "status": 200,
+  "error": null,
+  "wall_s": 181.53432143601822,
+  "usage": {
+    "completion_tokens": 420,
+    "prompt_tokens": 127525,
+    "total_tokens": 127945,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "reasoning": 0
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 127525,
+    "prompt_ms": 161180.394,
+    "prompt_per_token_ms": 1.2639121270339149,
+    "prompt_per_second": 791.1942441336879,
+    "predicted_n": 420,
+    "predicted_ms": 19813.624,
+    "predicted_per_token_ms": 47.28788544152744,
+    "predicted_per_second": 21.147065271855364
+  },
+  "finish": "length",
+  "markers": [
+    true,
+    true,
+    true
+  ],
+  "visible_chars": 1947,
+  "content": "The three exact marker values embedded within the archival text are:\n\n1.  **amber-violet-731**\n2.  **birch-cobalt-482**\n3.  **cedar-silver-956**\n\n***\n\nThe iron arches of the old suspension bridge groaned under the weight of the relentless downpour, a symphony of rust and tension that had played for over a century. Rain did not merely fall here; it descended in heavy, gray curtains, blurring the line between the sky and the churning river below. Each droplet struck the wet pavement with a rhythmic persistence, creating a mist that clung to the cold metal railings like a ghostly veil. Along the span, the lanterns flickered to life as the afternoon light failed, their warm, amber glow struggling against the encroaching twilight. These were not modern electric bulbs, but gas-fed flames housed in intricate wrought-iron cages, designed to guide travelers through the foggy nights of the industrial age.\n\nAs the wind picked up, swirling the rain into horizontal sheets, the lanterns danced wildly. Their light fractured across the puddles on the bridge deck, turning the asphalt into a mosaic of shimmering gold and deep shadow. A lone figure walked across the span, their silhouette stark against the glowing orbs. They moved slowly, perhaps respecting the treacherous slickness of the stones, or perhaps simply pausing to listen to the water rushing beneath them. The bridge itself seemed to breathe, expanding and contracting with the temperature drop, a living entity connecting two disparate shores.\n\nThe valley below was a abyss of darkness, save for the occasional reflection of the lanterns on the water’s surface. The rain intensified, drumming against the bridge’s cables with a sound like distant applause. In this moment, the structure was more than a means of transit; it was a sanctuary of light in a world consumed by the storm. The lanterns burned on, defiant and steady, promising safe passage to anyone brave enough to cross"
+}

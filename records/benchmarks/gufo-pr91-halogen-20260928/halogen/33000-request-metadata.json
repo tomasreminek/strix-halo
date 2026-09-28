@@ -1,0 +1,11 @@
+{
+  "n": 33000,
+  "corpus_sha256": "abaf70cc07f2e3044e62b99b8123ef42b7566db0d702c91aa10f570173e9738d",
+  "prompt_sha256": "ca79f390eee530c6601c86ad4bc857838f591ef08a940c5ace330ce7b2f070bb",
+  "payload_without_prompt": {
+    "model": "halogen-qwen3.8-flash-next",
+    "max_tokens": 420,
+    "temperature": 0,
+    "stream": false
+  }
+}

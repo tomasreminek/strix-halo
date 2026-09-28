@@ -15,7 +15,8 @@
 
 | Date tested | Model / tested configuration | Measured result or gate | Outcome and full test |
 |---|---|---|---|
-| **2026-09-20–25** | **Halogen Qwen3.8 Flash-Next Abliterated** · HGN+patched experts+overlay, MTP | 32.91 / 36.96 cold/warm tok/s @9.6k; 31.41 / 34.64 @62.4k; 30.54 / 33.25–33.26 @127.6k. Concurrent Ornith: 30.95 @cold 62k | **Current uncensored worker winner**; [abliterated A/B](docs/qwen38-halogen-abliterated.md) · [matched September measurements](docs/flash-next-gufo-ciru-halogen-20260925.md) |
+| **2026-09-20–28** | **Halogen Qwen3.8 Flash-Next Abliterated** · HGN+patched experts+overlay, MTP | 28 Sep matched HTTP: cold/cached 21.71/11.45 s @9.6k; 66.85/12.27 s @62.4k; 126.11/12.83 s @127.6k. Cold decode 32.64/31.36/30.45 tok/s | **Current uncensored worker winner**; [abliterated A/B](docs/qwen38-halogen-abliterated.md) · [Gufo PR #91 end-to-end A/B](docs/gufo-pr91-halogen-e2e-20260928.md) · [historical native Gufo comparison](docs/flash-next-gufo-ciru-halogen-20260925.md) |
+| 2026-09-28 | Gufo official base UD-Q4_K_XL · `strix-llama.cpp` PR #91 versus fork master | Cold @~127.5k: master 221.88 s → PR 181.53 s; Halogen 126.11 s. PR decode 21.15 tok/s, cached 19.90 s | **PR improves fork prefill but loses full requests to Halogen**; distinct from older native Gufo runtime. [Method/results](docs/gufo-pr91-halogen-e2e-20260928.md) · [18 raw responses](records/benchmarks/gufo-pr91-halogen-20260928/) |
 | 2026-09-21, 25 | Ornith 1.5 9B Abliterated ROCmFP4 Strix Lean | Hermes tool loop, 63k and 117.8k retrieval pass; ~62k simultaneous Halogen control | **Local chat/task candidate**; [agent gates](docs/ornith-abliterated-20260921.md) · [coexistence correction](docs/ornith-halogen-coexistence-correction.md) |
 | 2026-09-24–25 | Gufo + official Unsloth base UD-Q4_K_XL, serial, MTP off | 25.74 @9.5k; 22.94 / 22.88–22.89 @62.4k; 21.05 / 20.98–20.99 @127.5k tok/s | Cold ~127.5k wall **113.47 s** (Halogen 125.47 s); not uncensored; [report](docs/flash-next-gufo-ciru-halogen-20260925.md) · [raw records](records/benchmarks/flash-next-september-2026/README.md) |
 | 2026-09-24–25 | CIRU Orca v4.4.1 + PLE + Q8 MTP4 | 30.94 / 36.31 @47-token short; 17.24 / 19.12 @62.4k tok/s. No MTP: 23.67 / 27.37 short | **Research option**; 128k not tested, deep coexistence memory pressure; [report](docs/flash-next-gufo-ciru-halogen-20260925.md) |
@@ -39,6 +40,10 @@ These methods are **not interchangeable**: `llama-bench` pp/tg, server output de
 ## Ornith + uncensored Halogen: bounded coexistence verified
 
 The earlier OOM claim was incorrect: a systemd conflict stopped the other service. After correction both models generated concurrently, including a cold ~62k Halogen prompt and a short Ornith reply on 2026-09-25. Neither a reboot nor a multi-day soak was tested. [Correction and historical 32k data](docs/ornith-halogen-coexistence-correction.md).
+
+## Latest complete HTTP comparison: Gufo PR #91 vs Halogen · 2026-09-28
+
+Official-base Gufo UD-Q4_K_XL on the PR's `strix-llama.cpp` fork **improved over that fork's stock build**, but the current abliterated Halogen HGN+MTP worker won full cold and cached requests at all tested prompt lengths. Cold wall seconds, with 420 output tokens: ~9.5k **31.02 vs 21.71**, ~62k **96.38 vs 66.85**, ~127.5k **181.53 vs 126.11** (Gufo PR vs Halogen). Cached ~127.5k: **19.90 vs 12.83 s**; cold decode **21.15 vs 30.45 tok/s**. Both passed three-marker retrieval. This is one cold and one cached request per depth, not a general quality or uncensored-behavior benchmark. The **native Gufo container** result below (113.47 s cold at ~127.5k) used a different runtime; it is not the PR #91 llama.cpp result. [Full matrix, methods and caveats](docs/gufo-pr91-halogen-e2e-20260928.md) · [raw synthetic responses](records/benchmarks/gufo-pr91-halogen-20260928/).
 
 ## Latest LLM measurements: Gufo / CIRU / Halogen · 2026-09-24–25
 
@@ -118,6 +123,7 @@ Recipes are MIT. Model weights stay under their own Hugging Face licences.
 - [deepseek v41 single strix halo](docs/deepseek-v41-single-strix-halo.md)
 - [deepseek v41 speed2 20260917](docs/deepseek-v41-speed2-20260917.md)
 - [flash next gufo ciru halogen 20260925](docs/flash-next-gufo-ciru-halogen-20260925.md)
+- [gufo pr91 halogen e2e 20260928](docs/gufo-pr91-halogen-e2e-20260928.md)
 - [glm 53 flash](docs/glm-53-flash.md)
 - [halogen worker 64k](docs/halogen-worker-64k.md)
 - [k2 horizon candidates 20260921](docs/k2-horizon-candidates-20260921.md)
