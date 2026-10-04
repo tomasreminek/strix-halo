@@ -4,6 +4,8 @@ Measured results, acceptance gates, and negative experiments. Start with the [ma
 
 ## Current pair and Flash-Next
 
+- [Strata HIP / Orca IQ3_XXS,4 Oct](strata-halo-orca-20261004.md): actual inference, correct arithmetic/Czech and64-token canary; slow in this tested configuration, no64k/128k gate.
+
 - [Ornith 1.5 9B Abliterated](ornith-abliterated-20260921.md): loader, Hermes tool loop, 63k and 117.8k retrieval.
 - [Ornith + Halogen coexistence correction](ornith-halogen-coexistence-correction.md): earlier systemd conflict, not proven OOM; historical slot configuration.
 - [Halogen 64k worker proof](halogen-worker-64k.md): synthetic code/retrieval and worker policy; 64k setting is historical, current slot is 131,072.

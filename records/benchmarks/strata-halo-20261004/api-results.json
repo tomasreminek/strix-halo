@@ -1,0 +1,186 @@
+[
+  {
+    "name": "arithmetic-repeat",
+    "request": {
+      "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Compute 17 * 19. Reply with only the integer."
+        }
+      ],
+      "max_tokens": 32,
+      "temperature": 0,
+      "stream": false,
+      "reasoning_effort": "none",
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "scope": "8192 configured context; short real prompts. Sole GPU model. CPU Farm QA may overlap; no best-speed claim.",
+    "response": {
+      "id": "chatcmpl-a7f5fa8dca3b47ceb682aa00",
+      "object": "chat.completion",
+      "created": 1791127391,
+      "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "323"
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 27,
+        "completion_tokens": 4,
+        "total_tokens": 31,
+        "prompt_tokens_details": {
+          "cached_tokens": 20
+        }
+      },
+      "timings": {
+        "cache_n": 20,
+        "prompt_n": 7,
+        "prompt_ms": 9837.3,
+        "prompt_per_token_ms": 1405.329,
+        "prompt_per_second": 0.7,
+        "predicted_n": 4,
+        "predicted_ms": 16060.4,
+        "predicted_per_token_ms": 4015.1,
+        "predicted_per_second": 0.2,
+        "draft_n": 6,
+        "draft_n_accepted": 4
+      }
+    },
+    "visible_content": "323",
+    "completion_tokens": 4,
+    "pass": true,
+    "wall_seconds": 25.973
+  },
+  {
+    "name": "czech-translation",
+    "request": {
+      "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Translate into Czech: The dog is sleeping under the tree. Reply with just the translation."
+        }
+      ],
+      "max_tokens": 48,
+      "temperature": 0,
+      "stream": false,
+      "reasoning_effort": "none",
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "scope": "8192 configured context; short real prompts. Sole GPU model. CPU Farm QA may overlap; no best-speed claim.",
+    "response": {
+      "id": "chatcmpl-9d319ff8d29141699d605c43",
+      "object": "chat.completion",
+      "created": 1791127417,
+      "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "Pes spí pod stromem."
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 30,
+        "completion_tokens": 9,
+        "total_tokens": 39,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 30,
+        "prompt_ms": 55503.3,
+        "prompt_per_token_ms": 1850.11,
+        "prompt_per_second": 0.5,
+        "predicted_n": 9,
+        "predicted_ms": 27623.2,
+        "predicted_per_token_ms": 3069.244,
+        "predicted_per_second": 0.3,
+        "draft_n": 8,
+        "draft_n_accepted": 6
+      }
+    },
+    "visible_content": "Pes spí pod stromem.",
+    "completion_tokens": 9,
+    "pass": true,
+    "wall_seconds": 83.2
+  },
+  {
+    "name": "sustained-64",
+    "request": {
+      "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Write eight numbered practical gardening tips, at least 150 words in total. No introduction."
+        }
+      ],
+      "max_tokens": 64,
+      "temperature": 0,
+      "stream": false,
+      "reasoning_effort": "none",
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "scope": "8192 configured context; short real prompts. Sole GPU model. CPU Farm QA may overlap; no best-speed claim.",
+    "response": {
+      "id": "chatcmpl-a1b4f6be1976463cad9dd265",
+      "object": "chat.completion",
+      "created": 1791127501,
+      "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "1. **Test Your Soil**: Before planting, always test your soil’s pH and nutrient levels. Different plants thrive in specific conditions, and knowing your soil’s composition allows you to amend it effectively with compost, lime, or sulfur to create the ideal environment for growth.\n\n2. **Water Deeply but Infrequently"
+          },
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 32,
+        "completion_tokens": 64,
+        "total_tokens": 96,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 32,
+        "prompt_ms": 61362.2,
+        "prompt_per_token_ms": 1917.569,
+        "prompt_per_second": 0.5,
+        "predicted_n": 64,
+        "predicted_ms": 157088.6,
+        "predicted_per_token_ms": 2454.509,
+        "predicted_per_second": 0.4,
+        "draft_n": 48,
+        "draft_n_accepted": 32
+      }
+    },
+    "visible_content": "1. **Test Your Soil**: Before planting, always test your soil’s pH and nutrient levels. Different plants thrive in specific conditions, and knowing your soil’s composition allows you to amend it effectively with compost, lime, or sulfur to create the ideal environment for growth.\n\n2. **Water Deeply but Infrequently",
+    "completion_tokens": 64,
+    "pass": true,
+    "sustained_minimum": 64,
+    "wall_seconds": 218.489
+  }
+]
