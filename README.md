@@ -11,11 +11,13 @@
 
 ## All LLM tests · results and evidence
 
-**Winner for our present uncensored chat/worker setup: Halogen Qwen3.8 Flash-Next Abliterated** (native HGN checkpoint, abliterated expert patch + Ae55667 overlay, Halogen 0.11.0 with MTP). It is **uncensored/abliterated**, not the official aligned quality-overlay result. Its current endpoint is `:18081`; Ornith 9B Abliterated on `:18083` handles local chat/task assignment. “Winner” here means the preferred **tested operational worker configuration**, not a universal quality or cold-prefill victory; a comprehensive coding/quality leaderboard was not run across all candidates. The historical aligned Halogen quality-profile throughput is a separate row. Dates below are *test dates*, not model release dates.
+**Latest measured Strata candidate (2026-10-06): OrcaRouter Qwen3.8 Flash-Next Uncensored IQ3_XXS, Strata server v0.1.40.1 / stock v0.1.40 HIP engine, gfx1151 fast mode, prefill 16384, MTP4 with an 8192-token draft attention window.** Verified real 64k/128k context fixtures and bounded lifecycle; **not yet qualified as the long-term game-coding worker**. Fast mode changes numerics. Historical Halogen results use different weights/quantization and are not a current matched A/B. At the latest runtime readback, Strata and Halogen were stopped; no chat routing or permanent worker replacement was made. Dates below are test dates, not release dates.
 
 | Date tested | Model / tested configuration | Measured result or gate | Outcome and full test |
 |---|---|---|---|
-| **2026-09-20–28** | **Halogen Qwen3.8 Flash-Next Abliterated** · HGN+patched experts+overlay, MTP | 28 Sep matched HTTP: cold/cached 21.71/11.45 s @9.6k; 66.85/12.27 s @62.4k; 126.11/12.83 s @127.6k. Cold decode 32.64/31.36/30.45 tok/s | **Current uncensored worker winner**; [abliterated A/B](docs/qwen38-halogen-abliterated.md) · [Gufo PR #91 end-to-end A/B](docs/gufo-pr91-halogen-e2e-20260928.md) · [historical native Gufo comparison](docs/flash-next-gufo-ciru-halogen-20260925.md) |
+| **2026-10-06** | **Strata server v0.1.40.1 · Orca Uncensored IQ3_XXS · HIP fast · prefill 16384 · MTP4/window8192** | At **30k**, three independent-process medians: **1301 tok/s prefill / 44.33 tok/s decode / 32.65 s request**. At **126k + 420 output**: **1272 / 42.44 tok/s / 109.23 s**; cached decode **43.43 tok/s**. Growing history: 126,450 input, 126,420 cached, 27 output in **1.12 s** | **39/39 context records, 17/17 short checks passed**; server suite 452 tests, 10 skips, no failures. Clean teardown; multi-file game coding and soak pending. [Report](docs/strata-v01401-20261006.md) · [JSON](docs/strata-v01401-20261006-summary.json) |
+| **2026-10-06** | **Strata v0.1.40 · Orca Qwen3.8 Flash-Next Uncensored IQ3_XXS · HIP gfx1151 + MTP4** | New-prefix decode **43.6 / 41.8 / 41.5 / 38.7 tok/s** at actual **7.6k / 30k / 62k / 126k** prompts; cached **44.0 / 42.4 / 42.4 / 39.4**. New-prefix prefill **324.3 / 312.2 / 297.4 / 287.1 tok/s** | **Historical first run**: inference completed, followed by unclean reboot of unknown cause. Independent retest completed cleanly; NTFS access recovered after Windows chkdsk. Superseded for speed by the tuned row above. [Full report](docs/strata-v0140-strix-halo-20261006.md) · [machine-readable results](docs/strata-v0140-strix-halo-20261006-summary.json) |
+| **2026-09-20–28** | **Halogen Qwen3.8 Flash-Next Abliterated** · HGN+patched experts+overlay, MTP | 28 Sep matched HTTP: cold/cached 21.71/11.45 s @9.6k; 66.85/12.27 s @62.4k; 126.11/12.83 s @127.6k. Cold decode 32.64/31.36/30.45 tok/s | **Historical preferred uncensored worker**; [abliterated A/B](docs/qwen38-halogen-abliterated.md) · [Gufo PR #91 end-to-end A/B](docs/gufo-pr91-halogen-e2e-20260928.md) · [historical native Gufo comparison](docs/flash-next-gufo-ciru-halogen-20260925.md) |
 | 2026-09-28 | Gufo official base UD-Q4_K_XL · `strix-llama.cpp` PR #91 versus fork master | Cold @~127.5k: master 221.88 s → PR 181.53 s; Halogen 126.11 s. PR decode 21.15 tok/s, cached 19.90 s | **PR improves fork prefill but loses full requests to Halogen**; distinct from older native Gufo runtime. [Method/results](docs/gufo-pr91-halogen-e2e-20260928.md) · [18 raw responses](records/benchmarks/gufo-pr91-halogen-20260928/) |
 | 2026-09-21, 25 | Ornith 1.5 9B Abliterated ROCmFP4 Strix Lean | Hermes tool loop, 63k and 117.8k retrieval pass; ~62k simultaneous Halogen control | **Local chat/task candidate**; [agent gates](docs/ornith-abliterated-20260921.md) · [coexistence correction](docs/ornith-halogen-coexistence-correction.md) |
 | 2026-09-24–25 | Gufo + official Unsloth base UD-Q4_K_XL, serial, MTP off | 25.74 @9.5k; 22.94 / 22.88–22.89 @62.4k; 21.05 / 20.98–20.99 @127.5k tok/s | Cold ~127.5k wall **113.47 s** (Halogen 125.47 s); not uncensored; [report](docs/flash-next-gufo-ciru-halogen-20260925.md) · [raw records](records/benchmarks/flash-next-september-2026/README.md) |
@@ -37,7 +39,13 @@ These methods are **not interchangeable**: `llama-bench` pp/tg, server output de
 
 ## Measured tests and interpretation
 
-## Ornith + uncensored Halogen: bounded coexistence verified
+### Latest Strata tuning and hotfix validation · 2026-10-06
+
+Prefill tuning improved the 126k-input + 420-output request from **445.30 s** after storage recovery to **109.23 s** in the selected fast configuration. This is a configuration improvement, not an engine speedup from the Python-only v0.1.40.1 hotfix. Depth 2/6 speculation lost at 30k; lookup-chain and MTP Q4 alone did not win whole-request time. Only the selected candidate received three additional independent 30k trials; deep-context figures are single new-prefix samples. A short growing-history retrieval passed with substantial prefix reuse, not a sustained decode result. General coding quality, multi-hour agent stability and a matched current Halogen comparison remain untested.
+
+[Original run and clean retest](docs/strata-v0140-strix-halo-20261006.md) · [Prefill sweep](docs/strata-v0140-optimization-20261006.md) · [Fast-mode combinations](docs/strata-v0140-optimization-followup-20261006.md) · [16384 screening](docs/strata-v0140-optimization-final-20261006.md) · [v0.1.40.1 final matrix](docs/strata-v01401-20261006.md).
+
+## Historical Ornith + uncensored Halogen: bounded coexistence verified
 
 The earlier OOM claim was incorrect: a systemd conflict stopped the other service. After correction both models generated concurrently, including a cold ~62k Halogen prompt and a short Ornith reply on 2026-09-25. Neither a reboot nor a multi-day soak was tested. [Correction and historical 32k data](docs/ornith-halogen-coexistence-correction.md).
 
@@ -59,7 +67,7 @@ Gufo won **cold ~127.5k request wall time** (113.47 s vs Halogen 125.47 s); Halo
 
 ## Historical performance reference: native Halogen quality overlay (2026-09-16)
 
-**44.66 tok/s short serving · 41.37 @~32k · 40.08 @~64k · 38.03 @~126k** (MTP decode, prompts actually filled, 256 generated tokens). This was the **aligned quality-profile winner in that historical sweep**, not the currently resident uncensored expert-patched worker. Czech with diacritics, sandbox Python, OpenAI tool calls, strict JSON, Responses API and vision OCR passed; serial-vs-MTP byte identity remained under review. Engine is closed source (`halogen-flash-server:0.11.0`). [Exact recipe and evidence](docs/qwen38-halogen.md). Current abliterated worker has a [separate A/B](docs/qwen38-halogen-abliterated.md) and [latest comparison](docs/flash-next-gufo-ciru-halogen-20260925.md).
+**44.66 tok/s short serving · 41.37 @~32k · 40.08 @~64k · 38.03 @~126k** (MTP decode, prompts actually filled, 256 generated tokens). This was the **aligned quality-profile winner in that historical sweep**, not the uncensored expert-patched worker. Czech with diacritics, sandbox Python, OpenAI tool calls, strict JSON, Responses API and vision OCR passed; serial-vs-MTP byte identity remained under review. Engine is closed source (`halogen-flash-server:0.11.0`). [Exact recipe and evidence](docs/qwen38-halogen.md). Current abliterated worker has a [separate A/B](docs/qwen38-halogen-abliterated.md) and [latest comparison](docs/flash-next-gufo-ciru-halogen-20260925.md).
 
 ### DeepSeek V4.1 detail (user stopped the overnight run)
 
@@ -140,3 +148,9 @@ Recipes are MIT. Model weights stay under their own Hugging Face licences.
 - [qwen38 halogen abliterated](docs/qwen38-halogen-abliterated.md)
 - [qwen38 halogen](docs/qwen38-halogen.md)
 - [signal 38 flash next 2026 09 20](docs/signal-38-flash-next-2026-09-20.md)
+- [strata halo orca 20261004](docs/strata-halo-orca-20261004.md)
+- [strata v0140 optimization 20261006](docs/strata-v0140-optimization-20261006.md)
+- [strata v0140 optimization final 20261006](docs/strata-v0140-optimization-final-20261006.md)
+- [strata v0140 optimization followup 20261006](docs/strata-v0140-optimization-followup-20261006.md)
+- [strata v0140 strix halo 20261006](docs/strata-v0140-strix-halo-20261006.md)
+- [strata v01401 20261006](docs/strata-v01401-20261006.md)

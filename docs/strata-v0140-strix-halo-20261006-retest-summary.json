@@ -1,0 +1,473 @@
+{
+  "verified_at": "2026-10-06T11:02:13.209100+02:00",
+  "state": {
+    "status": "finished",
+    "started_at": "2026-10-06T10:43:44.655461+02:00",
+    "source": "1735d6471df29b42c26170efaac1f1446a58640f",
+    "tag": "v0.1.40",
+    "arm": "OFFICIAL_GFX1151_RETEST_READONLY_DATA_NO_HALOGEN",
+    "official_gfx1151_support": true,
+    "local_source_patches": false,
+    "contexts": {
+      "8192": {
+        "status": "MEASURED",
+        "load_to_health_seconds": 15.023652503999983,
+        "health": {
+          "status": "ok",
+          "max_context": 8192,
+          "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+          "images": false,
+          "api_key": false,
+          "loaded": true,
+          "service": "strata"
+        },
+        "generation_ready": true,
+        "short_quality_results": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/retry-readonly-20261006/context-8192/short-suite.json",
+        "results_path": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/retry-readonly-20261006/context-8192/results.json",
+        "quality_pass": true
+      },
+      "32768": {
+        "status": "MEASURED",
+        "load_to_health_seconds": 10.006188768999891,
+        "health": {
+          "status": "ok",
+          "max_context": 32768,
+          "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+          "images": false,
+          "api_key": false,
+          "loaded": true,
+          "service": "strata"
+        },
+        "generation_ready": true,
+        "results_path": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/retry-readonly-20261006/context-32768/results.json",
+        "quality_pass": true
+      },
+      "65536": {
+        "status": "MEASURED",
+        "load_to_health_seconds": 10.008497276999833,
+        "health": {
+          "status": "ok",
+          "max_context": 65536,
+          "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+          "images": false,
+          "api_key": false,
+          "loaded": true,
+          "service": "strata"
+        },
+        "generation_ready": true,
+        "results_path": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/retry-readonly-20261006/context-65536/results.json",
+        "quality_pass": true
+      },
+      "131072": {
+        "status": "MEASURED",
+        "load_to_health_seconds": 10.00827150699979,
+        "health": {
+          "status": "ok",
+          "max_context": 131072,
+          "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+          "images": false,
+          "api_key": false,
+          "loaded": true,
+          "service": "strata"
+        },
+        "generation_ready": true,
+        "results_path": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/retry-readonly-20261006/context-131072/results.json",
+        "quality_pass": true
+      }
+    },
+    "kernel_checks": [
+      {
+        "command": [
+          "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/hip_intrinsics"
+        ],
+        "exit": 0,
+        "wall_seconds": 0.26403008100010084,
+        "log": "kernel-hip_intrinsics.log"
+      },
+      {
+        "command": [
+          "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/hip_native_qsa_score"
+        ],
+        "exit": 0,
+        "wall_seconds": 0.11388978200011479,
+        "log": "kernel-hip_native_qsa_score.log"
+      },
+      {
+        "command": [
+          "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/hip_prefill_native_batch"
+        ],
+        "exit": 0,
+        "wall_seconds": 0.16403804399988076,
+        "log": "kernel-hip_prefill_native_batch.log"
+      },
+      {
+        "command": [
+          "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/hip_prefill_mmq_parity"
+        ],
+        "exit": 0,
+        "wall_seconds": 0.5145604360000107,
+        "log": "kernel-hip_prefill_mmq_parity.log"
+      },
+      {
+        "command": [
+          "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/hip_prefill_hcd_exact_parity"
+        ],
+        "exit": 0,
+        "wall_seconds": 1.4655017889999726,
+        "log": "kernel-hip_prefill_hcd_exact_parity.log"
+      },
+      {
+        "command": [
+          "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/hip_prefill_hipblaslt_gemm"
+        ],
+        "exit": 0,
+        "wall_seconds": 0.4143124740000985,
+        "log": "kernel-hip_prefill_hipblaslt_gemm.log"
+      }
+    ],
+    "paused_units": [],
+    "routing_changed": false,
+    "data_readonly": true,
+    "halogen_restore_allowed": false,
+    "verifying_file": "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/strata",
+    "command": [
+      "/home/tomasreminek/Projekty/strata-halo-0140/build-halo/hip_prefill_hipblaslt_gemm"
+    ],
+    "routing_config_sha256_before": "adc4034636f0b9a46865a5852afd4e7abea1592011a1697d88d28d6c7a59c062",
+    "baseline_memory": {
+      "available": 122371776512,
+      "swap_used": 12288
+    },
+    "server_config": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/retry-readonly-20261006/config-131072.json",
+    "server_pid": 29574,
+    "test_verdict": "MATRIX_COMPLETED",
+    "halogen_restore_suppressed_by_user": true,
+    "routing_config_sha256_after": "adc4034636f0b9a46865a5852afd4e7abea1592011a1697d88d28d6c7a59c062",
+    "restored_units": [],
+    "routing_unchanged": true,
+    "elapsed_seconds": 1071.5607984560002,
+    "finished_at": "2026-10-06T11:01:36.216259+02:00"
+  },
+  "depth_total": 12,
+  "depth_pass": 12,
+  "short_total": 17,
+  "short_pass": 17,
+  "minimum_host_available_gib": 55.41108703613281,
+  "maximum_host_swap_growth_bytes": 360448,
+  "depth_results": [
+    {
+      "name": "depth-repeat-1",
+      "configured_context": 131072,
+      "prompt_tokens": 126000,
+      "completion_tokens": 420,
+      "cached_tokens": 0,
+      "regime": "new-prefix",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 126000,
+        "prompt_ms": 433671.7,
+        "prompt_per_token_ms": 3.442,
+        "prompt_per_second": 290.5,
+        "predicted_n": 420,
+        "predicted_ms": 10790.2,
+        "predicted_per_token_ms": 25.691,
+        "predicted_per_second": 38.9,
+        "draft_n": 389,
+        "draft_n_accepted": 201
+      },
+      "decode_tokens_per_second": 38.924209004467016,
+      "prefill_tokens_per_second": 290.54236188342475,
+      "wall_seconds": 444.73336821199973
+    },
+    {
+      "name": "depth-repeat-2",
+      "configured_context": 131072,
+      "prompt_tokens": 126000,
+      "completion_tokens": 420,
+      "cached_tokens": 125993,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 125993,
+        "prompt_n": 7,
+        "prompt_ms": 63.9,
+        "prompt_per_token_ms": 9.129,
+        "prompt_per_second": 109.5,
+        "predicted_n": 420,
+        "predicted_ms": 10592.1,
+        "predicted_per_token_ms": 25.219,
+        "predicted_per_second": 39.7,
+        "draft_n": 386,
+        "draft_n_accepted": 202
+      },
+      "decode_tokens_per_second": 39.65219361599683,
+      "prefill_tokens_per_second": 109.54616588419405,
+      "wall_seconds": 10.955043122000006
+    },
+    {
+      "name": "depth-repeat-3",
+      "configured_context": 131072,
+      "prompt_tokens": 126000,
+      "completion_tokens": 420,
+      "cached_tokens": 125993,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 125993,
+        "prompt_n": 7,
+        "prompt_ms": 64.5,
+        "prompt_per_token_ms": 9.214,
+        "prompt_per_second": 108.5,
+        "predicted_n": 420,
+        "predicted_ms": 10607.8,
+        "predicted_per_token_ms": 25.257,
+        "predicted_per_second": 39.6,
+        "draft_n": 388,
+        "draft_n_accepted": 202
+      },
+      "decode_tokens_per_second": 39.59350666490696,
+      "prefill_tokens_per_second": 108.52713178294573,
+      "wall_seconds": 10.96958929199991
+    },
+    {
+      "name": "depth-repeat-1",
+      "configured_context": 32768,
+      "prompt_tokens": 29999,
+      "completion_tokens": 420,
+      "cached_tokens": 0,
+      "regime": "new-prefix",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 29999,
+        "prompt_ms": 96222.7,
+        "prompt_per_token_ms": 3.208,
+        "prompt_per_second": 311.8,
+        "predicted_n": 420,
+        "predicted_ms": 9794.2,
+        "predicted_per_token_ms": 23.32,
+        "predicted_per_second": 42.9,
+        "draft_n": 386,
+        "draft_n_accepted": 218
+      },
+      "decode_tokens_per_second": 42.882522309121725,
+      "prefill_tokens_per_second": 311.76635035184006,
+      "wall_seconds": 106.0857257749999
+    },
+    {
+      "name": "depth-repeat-2",
+      "configured_context": 32768,
+      "prompt_tokens": 29999,
+      "completion_tokens": 420,
+      "cached_tokens": 29992,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 29992,
+        "prompt_n": 7,
+        "prompt_ms": 59.4,
+        "prompt_per_token_ms": 8.486,
+        "prompt_per_second": 117.8,
+        "predicted_n": 420,
+        "predicted_ms": 9659.5,
+        "predicted_per_token_ms": 22.999,
+        "predicted_per_second": 43.5,
+        "draft_n": 384,
+        "draft_n_accepted": 218
+      },
+      "decode_tokens_per_second": 43.48051141363425,
+      "prefill_tokens_per_second": 117.84511784511784,
+      "wall_seconds": 9.787664854000013
+    },
+    {
+      "name": "depth-repeat-3",
+      "configured_context": 32768,
+      "prompt_tokens": 29999,
+      "completion_tokens": 420,
+      "cached_tokens": 29992,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 29992,
+        "prompt_n": 7,
+        "prompt_ms": 59.8,
+        "prompt_per_token_ms": 8.543,
+        "prompt_per_second": 117.1,
+        "predicted_n": 420,
+        "predicted_ms": 9661.0,
+        "predicted_per_token_ms": 23.002,
+        "predicted_per_second": 43.5,
+        "draft_n": 384,
+        "draft_n_accepted": 218
+      },
+      "decode_tokens_per_second": 43.47376048028155,
+      "prefill_tokens_per_second": 117.05685618729098,
+      "wall_seconds": 9.792974956999842
+    },
+    {
+      "name": "depth-repeat-1",
+      "configured_context": 65536,
+      "prompt_tokens": 61999,
+      "completion_tokens": 420,
+      "cached_tokens": 0,
+      "regime": "new-prefix",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 61999,
+        "prompt_ms": 205632.3,
+        "prompt_per_token_ms": 3.317,
+        "prompt_per_second": 301.5,
+        "predicted_n": 420,
+        "predicted_ms": 10015.1,
+        "predicted_per_token_ms": 23.845,
+        "predicted_per_second": 41.9,
+        "draft_n": 409,
+        "draft_n_accepted": 220
+      },
+      "decode_tokens_per_second": 41.93667561981408,
+      "prefill_tokens_per_second": 301.50418976007177,
+      "wall_seconds": 215.79608106599994
+    },
+    {
+      "name": "depth-repeat-2",
+      "configured_context": 65536,
+      "prompt_tokens": 61999,
+      "completion_tokens": 420,
+      "cached_tokens": 61992,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 61992,
+        "prompt_n": 7,
+        "prompt_ms": 62.7,
+        "prompt_per_token_ms": 8.957,
+        "prompt_per_second": 111.6,
+        "predicted_n": 420,
+        "predicted_ms": 9841.9,
+        "predicted_per_token_ms": 23.433,
+        "predicted_per_second": 42.7,
+        "draft_n": 405,
+        "draft_n_accepted": 221
+      },
+      "decode_tokens_per_second": 42.674686798280824,
+      "prefill_tokens_per_second": 111.64274322169058,
+      "wall_seconds": 10.063366755000061
+    },
+    {
+      "name": "depth-repeat-3",
+      "configured_context": 65536,
+      "prompt_tokens": 61999,
+      "completion_tokens": 420,
+      "cached_tokens": 61992,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 61992,
+        "prompt_n": 7,
+        "prompt_ms": 62.8,
+        "prompt_per_token_ms": 8.971,
+        "prompt_per_second": 111.5,
+        "predicted_n": 420,
+        "predicted_ms": 9839.6,
+        "predicted_per_token_ms": 23.428,
+        "predicted_per_second": 42.7,
+        "draft_n": 405,
+        "draft_n_accepted": 221
+      },
+      "decode_tokens_per_second": 42.68466197812919,
+      "prefill_tokens_per_second": 111.46496815286625,
+      "wall_seconds": 10.047190197000418
+    },
+    {
+      "name": "depth-repeat-1",
+      "configured_context": 8192,
+      "prompt_tokens": 7600,
+      "completion_tokens": 420,
+      "cached_tokens": 0,
+      "regime": "new-prefix",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 7600,
+        "prompt_ms": 23230.0,
+        "prompt_per_token_ms": 3.057,
+        "prompt_per_second": 327.2,
+        "predicted_n": 420,
+        "predicted_ms": 9573.3,
+        "predicted_per_token_ms": 22.794,
+        "predicted_per_second": 43.9,
+        "draft_n": 356,
+        "draft_n_accepted": 210
+      },
+      "decode_tokens_per_second": 43.872019052991135,
+      "prefill_tokens_per_second": 327.16315109771847,
+      "wall_seconds": 32.826699596000026
+    },
+    {
+      "name": "depth-repeat-2",
+      "configured_context": 8192,
+      "prompt_tokens": 7600,
+      "completion_tokens": 420,
+      "cached_tokens": 7593,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 7593,
+        "prompt_n": 7,
+        "prompt_ms": 58.8,
+        "prompt_per_token_ms": 8.4,
+        "prompt_per_second": 119.0,
+        "predicted_n": 420,
+        "predicted_ms": 9429.7,
+        "predicted_per_token_ms": 22.452,
+        "predicted_per_second": 44.5,
+        "draft_n": 356,
+        "draft_n_accepted": 210
+      },
+      "decode_tokens_per_second": 44.540123227674265,
+      "prefill_tokens_per_second": 119.04761904761905,
+      "wall_seconds": 9.513670059999868
+    },
+    {
+      "name": "depth-repeat-3",
+      "configured_context": 8192,
+      "prompt_tokens": 7600,
+      "completion_tokens": 420,
+      "cached_tokens": 7593,
+      "regime": "identical cached repeat",
+      "pass": true,
+      "retrieval_pass": true,
+      "timings": {
+        "cache_n": 7593,
+        "prompt_n": 7,
+        "prompt_ms": 60.6,
+        "prompt_per_token_ms": 8.657,
+        "prompt_per_second": 115.5,
+        "predicted_n": 420,
+        "predicted_ms": 9436.7,
+        "predicted_per_token_ms": 22.468,
+        "predicted_per_second": 44.5,
+        "draft_n": 356,
+        "draft_n_accepted": 210
+      },
+      "decode_tokens_per_second": 44.50708404421037,
+      "prefill_tokens_per_second": 115.51155115511551,
+      "wall_seconds": 9.51778390200002
+    }
+  ],
+  "lifecycle": "clean controlled teardown; no backend restored; both API ports closed",
+  "ntfs_status": "read-only force mount; not repaired; MFT/MFTMirr inconsistency remains"
+}

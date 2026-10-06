@@ -1,0 +1,504 @@
+[
+  {
+    "arm": "control",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 42.5260472039124,
+        "prefill_tokens_per_second": 1302.8146076443024,
+        "wall_seconds": 32.971357322000586
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.84682841274481,
+        "prefill_tokens_per_second": 116.86143572621035,
+        "wall_seconds": 9.707719449999786
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.904580711254205,
+        "prefill_tokens_per_second": 116.66666666666667,
+        "wall_seconds": 9.694178126000224
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/control"
+  },
+  {
+    "arm": "mtp_window",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.83630272098193,
+        "prefill_tokens_per_second": 1309.6397061070536,
+        "wall_seconds": 32.557105611000225
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.17975086594522,
+        "prefill_tokens_per_second": 116.47254575707154,
+        "wall_seconds": 9.429194702999666
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.17829290593234,
+        "prefill_tokens_per_second": 117.84511784511784,
+        "wall_seconds": 9.42338225200001
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/mtp_window"
+  },
+  {
+    "arm": "spec2",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 38.94803219703995,
+        "prefill_tokens_per_second": 1305.985093859924,
+        "wall_seconds": 33.82833490899975
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 39.563296564587084,
+        "prefill_tokens_per_second": 81.68028004667445,
+        "wall_seconds": 10.769674891999784
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 39.55174686882004,
+        "prefill_tokens_per_second": 81.39534883720931,
+        "wall_seconds": 10.773029052999846
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/spec2"
+  },
+  {
+    "arm": "spec6",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 40.23412428512582,
+        "prefill_tokens_per_second": 1287.521781302844,
+        "wall_seconds": 33.80982865699934
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 41.133723777251085,
+        "prefill_tokens_per_second": 116.86143572621035,
+        "wall_seconds": 10.342172585000299
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 41.109566783470044,
+        "prefill_tokens_per_second": 117.25293132328308,
+        "wall_seconds": 10.346236835999662
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/spec6"
+  },
+  {
+    "arm": "lookup3",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 42.44396386199648,
+        "prefill_tokens_per_second": 1300.577909381381,
+        "wall_seconds": 33.03228630000012
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.728135932033986,
+        "prefill_tokens_per_second": 116.86143572621035,
+        "wall_seconds": 9.733040154000264
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.87431054654856,
+        "prefill_tokens_per_second": 116.47254575707154,
+        "wall_seconds": 9.703260860000228
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/lookup3"
+  },
+  {
+    "arm": "mtp_q4",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 42.153015446069226,
+        "prefill_tokens_per_second": 1300.758367407112,
+        "wall_seconds": 33.09616064799957
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 42.95049444200149,
+        "prefill_tokens_per_second": 117.64705882352942,
+        "wall_seconds": 9.906484221000028
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.00282589998771,
+        "prefill_tokens_per_second": 117.25293132328308,
+        "wall_seconds": 9.897580811999433
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/mtp_q4"
+  },
+  {
+    "arm": "combined",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 44.523597506678534,
+        "prefill_tokens_per_second": 1297.2260059241962,
+        "wall_seconds": 32.628628464999565
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.64175568620207,
+        "prefill_tokens_per_second": 116.86143572621035,
+        "wall_seconds": 9.333482074999665
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.69538585401412,
+        "prefill_tokens_per_second": 115.13157894736842,
+        "wall_seconds": 9.323114393999276
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/combined"
+  },
+  {
+    "arm": "mtp_window",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 44.06071986823747,
+        "prefill_tokens_per_second": 1301.4129477552049,
+        "wall_seconds": 32.65355290000025
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.23132592401137,
+        "prefill_tokens_per_second": 115.32125205930807,
+        "wall_seconds": 9.416280942000412
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.221098872702605,
+        "prefill_tokens_per_second": 117.25293132328308,
+        "wall_seconds": 9.420386011999653
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/mtp_window-independent-1"
+  },
+  {
+    "arm": "mtp_window",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 44.3290481920081,
+        "prefill_tokens_per_second": 1290.096459427264,
+        "wall_seconds": 32.798952797999846
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.22499434687571,
+        "prefill_tokens_per_second": 117.64705882352942,
+        "wall_seconds": 9.41618239699983
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.21233650896173,
+        "prefill_tokens_per_second": 116.47254575707154,
+        "wall_seconds": 9.417728043999887
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/mtp_window-independent-2"
+  },
+  {
+    "arm": "mtp_window",
+    "contexts": [
+      32768
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 44.33559937507917,
+        "prefill_tokens_per_second": 1310.7498175812364,
+        "wall_seconds": 32.42824340399966
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.2439943983626,
+        "prefill_tokens_per_second": 117.05685618729098,
+        "wall_seconds": 9.413958009999988
+      },
+      {
+        "prompt_tokens": 29999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 45.24935627403872,
+        "prefill_tokens_per_second": 110.58451816745657,
+        "wall_seconds": 9.41735903999961
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/mtp_window-independent-3"
+  },
+  {
+    "arm": "mtp_window",
+    "contexts": [
+      8192,
+      65536,
+      131072
+    ],
+    "exit": 0,
+    "rows": [
+      {
+        "prompt_tokens": 61999,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 42.56095336535538,
+        "prefill_tokens_per_second": 1314.780491735835,
+        "wall_seconds": 57.175605316000656
+      },
+      {
+        "prompt_tokens": 61999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.79333715656118,
+        "prefill_tokens_per_second": 112.72141706924315,
+        "wall_seconds": 9.80638411200016
+      },
+      {
+        "prompt_tokens": 61999,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.798360689928465,
+        "prefill_tokens_per_second": 112.17948717948718,
+        "wall_seconds": 9.827893073000268
+      },
+      {
+        "prompt_tokens": 7600,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 44.10560141137924,
+        "prefill_tokens_per_second": 1215.5721186142478,
+        "wall_seconds": 15.797493652999947
+      },
+      {
+        "prompt_tokens": 7600,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 44.75035693737082,
+        "prefill_tokens_per_second": 119.2504258943782,
+        "wall_seconds": 9.467694361999747
+      },
+      {
+        "prompt_tokens": 7600,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 44.77325544208259,
+        "prefill_tokens_per_second": 119.2504258943782,
+        "wall_seconds": 9.468601880999813
+      },
+      {
+        "prompt_tokens": 126000,
+        "completion_tokens": 420,
+        "regime": "new-prefix",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 42.44010387720663,
+        "prefill_tokens_per_second": 1271.8613792226304,
+        "wall_seconds": 109.23460981399967
+      },
+      {
+        "prompt_tokens": 126000,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.43868939268575,
+        "prefill_tokens_per_second": 108.19165378670787,
+        "wall_seconds": 10.004299958000047
+      },
+      {
+        "prompt_tokens": 126000,
+        "completion_tokens": 420,
+        "regime": "identical cached repeat",
+        "pass": true,
+        "decode_valid": true,
+        "decode_tokens_per_second": 43.42746063093897,
+        "prefill_tokens_per_second": 110.41009463722398,
+        "wall_seconds": 10.01247757300007
+      }
+    ],
+    "directory": "/home/tomasreminek/Projekty/strata-halo-0140/bench/official-halo-20261006/update01401-20261006-125423/mtp_window-validation"
+  }
+]
