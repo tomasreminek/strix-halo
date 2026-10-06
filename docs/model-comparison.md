@@ -11,7 +11,7 @@ Backend and method always stated: `llama-bench`, server/native-engine timing or 
 
 ## Strata HIP / Orca IQ3_XXS · 2026-10-04
 
-**MEASURED, not selected for interactive speed.** Experimental gfx1151 Strata0.1.38, MTP4, mmap and4096 GPU cache slots:64 generated tokens in157.0886s native decode (**0.4074tok/s**),218.489s total. Correct arithmetic/Czech. Capacity8192 but actual prompts27–32 tokens; no filled8k/64k/128k or main-agent gate. CPU browser QA overlapped; one sample/case, not an optimized ceiling or matched engine A/B. Full pinned-arena arm pressure-aborted, mmap completed. [Full report and raw responses](strata-halo-orca-20261004.md).
+**MEASURED, not selected for interactive speed.** Experimental gfx1151 Strata0.1.38, MTP4, mmap and4096 GPU cache slots:64 generated tokens in157.0886s native decode (**0.4074tok/s**),218.489s total. Correct arithmetic/Czech. Capacity8192 but actual prompts27–32 tokens; no filled8k/64k/128k or main-agent gate. CPU browser QA overlapped; one sample/case, not an optimized ceiling or matched engine A/B. Full pinned-arena arm pressure-aborted, mmap completed. [Full report and raw responses](strata-strix-halo.md).
 
 ## Flash-Next: Gufo base vs CIRU Orca vs uncensored Halogen · 2026-09-25
 
