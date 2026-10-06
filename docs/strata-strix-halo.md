@@ -1,5 +1,24 @@
 # Strata on Strix Halo — consolidated benchmark report
 
+## Unsloth UD-IQ4_XS: Halogen vs Strata · 2026-10-06
+
+Same original Unsloth weights (`766911a6b7369840a91dbcd95f9f997acaab6cd6`), projection OFF, temperature 0, 420 output tokens per depth request. Strata server v0.1.40.1 / stock v0.1.40 HIP engine, SDK 7.14.1, MTP4/window8192/lookup3; Halogen 0.16.3 with its own native MTP head. These are separate measured sessions, not fresh interleaved repeated A/B. Draft heads, cache and runtime numerics differ. Both passed 17/17 short and 9/9 depth fixtures; no multi-file game-coding or long-term stability winner established.
+
+| Actual input / output | Strata prefill / decode (tok/s) | Halogen prefill / decode (tok/s) | Strata / Halogen full request (s) | Strata / Halogen cached request (s) |
+|---|---|---|---|---|
+| 7,600 / 420 | 1189 / 43.88 | 1411 / 33.84 | 15.99 / 17.81 | 9.54–9.54 / 11.31–11.31 |
+| 61,999 / 420 | 1171 / 42.13 | 1674 / 34.40 | 63.05 / 49.33 | 10.03–10.05 / 11.25–11.25 |
+| 126,000 / 420 | 1294 / 42.71 | 1702 / 34.98 | 107.46 / 86.22 | 9.91–9.93 / 11.27–11.29 |
+
+**Assessment:** Halogen wins observed new-prefix prefill; Strata wins observed decode and cached-request time. Strata + Unsloth is our provisional choice for iterative game coding, not a proven better programmer. Halogen can finish large new-input requests sooner. Original Unsloth is aligned; optional Strata refusal-direction projection is not a separate uncensored checkpoint. Both inference servers were stopped after testing; no production routing switch.
+
+### Additional Unsloth experiments
+
+Full-residency tuning improved earlier bounded-cache decode from approximately 24–26 to 41–44 tok/s. Actual full cache: 24,576 slots / 55.43 GiB. `STRATA_UNBUFFERED_LOAD=1` is ignored without resident-budget mode; do not attribute the gain to it. MTP2/6 and min-p0.2/0.8 did not beat the selected MTP4/min-p0.5. Full-vocabulary MTP head screening gave 30.27 tok/s on new prefix and 41.55 cached; not promoted.
+
+ROCm 10.1 isolated build: stock decode 42.92/42.30/41.02 tok/s at 7.6k/62k/126k, slower prefill 849/931/891 tok/s. Both stock and projection passed 17/17 + 9/9. Old hipBLASLt tuning IDs caused one HCD kernel test to SKIP77; remaining five passed. Not adopted; SDK7.14.1 retained. Projection off/on functionality does not establish broad non-refusal or coding quality. Negative and earlier measurements are retained below.
+
+
 **Test date: 2026-10-06. Latest tested server: v0.1.40.1; stock HIP engine v0.1.40.** Ryzen AI Max+ 395 / gfx1151, 128 GB class UMA. Model: OrcaRouter Qwen3.8 Flash-Next Uncensored IQ3_XXS.
 
 ## Current conclusion

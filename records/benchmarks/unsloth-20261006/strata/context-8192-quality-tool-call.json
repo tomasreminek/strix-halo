@@ -1,0 +1,127 @@
+{
+  "name": "quality-tool-call",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the weather in Prague in Celsius? Use the tool."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 128,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "description": "Get current weather",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "celsius",
+                  "fahrenheit"
+                ]
+              }
+            },
+            "required": [
+              "city",
+              "unit"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": "auto"
+  },
+  "started_at": "2026-10-06T17:08:55+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-800740c8ec474cb4a3ab056d",
+    "object": "chat.completion",
+    "created": 1791299335,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": null,
+          "tool_calls": [
+            {
+              "id": "call_0cc4b8bcd45d42cda66b41f2",
+              "type": "function",
+              "function": {
+                "name": "get_weather",
+                "arguments": "{\"city\":\"Prague\",\"unit\":\"celsius\"}"
+              }
+            }
+          ]
+        },
+        "finish_reason": "tool_calls"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 299,
+      "completion_tokens": 40,
+      "total_tokens": 339,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 299,
+      "prompt_ms": 1532.9,
+      "prompt_per_token_ms": 5.127,
+      "prompt_per_second": 195.1,
+      "predicted_n": 40,
+      "predicted_ms": 586.8,
+      "predicted_per_token_ms": 14.67,
+      "predicted_per_second": 68.2,
+      "draft_n": 36,
+      "draft_n_accepted": 29
+    }
+  },
+  "wall_seconds": 2.1246575090008264,
+  "visible_content": "",
+  "prompt_tokens": 299,
+  "completion_tokens": 40,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 299,
+    "prompt_ms": 1532.9,
+    "prompt_per_token_ms": 5.127,
+    "prompt_per_second": 195.1,
+    "predicted_n": 40,
+    "predicted_ms": 586.8,
+    "predicted_per_token_ms": 14.67,
+    "predicted_per_second": 68.2,
+    "draft_n": 36,
+    "draft_n_accepted": 29
+  },
+  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "decode_valid": false,
+  "decode_tokens_per_second": 68.1663258350375,
+  "prefill_tokens_per_second": 195.0551242742514,
+  "end_to_end_output_tokens_per_second": 18.826563731116835,
+  "pass": true,
+  "validated_arguments": {
+    "city": "Prague",
+    "unit": "celsius"
+  }
+}

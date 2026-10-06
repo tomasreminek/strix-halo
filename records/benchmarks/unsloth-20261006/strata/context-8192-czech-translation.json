@@ -1,0 +1,83 @@
+{
+  "name": "czech-translation",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Translate into Czech: The dog is sleeping under the tree. Reply with just the translation."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 48,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:08:45+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-a9cb170c4bb24dc0b36f9335",
+    "object": "chat.completion",
+    "created": 1791299325,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Pes spí pod stromem."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 30,
+      "completion_tokens": 9,
+      "total_tokens": 39,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 30,
+      "prompt_ms": 339.3,
+      "prompt_per_token_ms": 11.31,
+      "prompt_per_second": 88.4,
+      "predicted_n": 9,
+      "predicted_ms": 301.5,
+      "predicted_per_token_ms": 33.5,
+      "predicted_per_second": 29.9,
+      "draft_n": 8,
+      "draft_n_accepted": 6
+    }
+  },
+  "wall_seconds": 0.644344676999026,
+  "visible_content": "Pes spí pod stromem.",
+  "prompt_tokens": 30,
+  "completion_tokens": 9,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 30,
+    "prompt_ms": 339.3,
+    "prompt_per_token_ms": 11.31,
+    "prompt_per_second": 88.4,
+    "predicted_n": 9,
+    "predicted_ms": 301.5,
+    "predicted_per_token_ms": 33.5,
+    "predicted_per_second": 29.9,
+    "draft_n": 8,
+    "draft_n_accepted": 6
+  },
+  "content_sha256": "b00bc7cf0ef198e72f8201b71441a8da5168e13109763d7cbf782cb7c9eafeb0",
+  "decode_valid": true,
+  "decode_tokens_per_second": 29.850746268656717,
+  "prefill_tokens_per_second": 88.41732979664015,
+  "end_to_end_output_tokens_per_second": 13.967679599553215,
+  "pass": true
+}

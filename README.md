@@ -9,28 +9,23 @@
 | OS | Pop!_OS / Linux 7.0.11, x86_64 |
 | Rule | **One GPU-heavy job at a time.** Unload the LLM before ComfyUI, and vice versa. |
 
-## Leading uncensored Flash-Next configurations · Halogen vs Strata
+## Unsloth UD-IQ4_XS: Halogen vs Strata · 2026-10-06
 
-**Two leading tested candidates for our local uncensored worker role — not a universal model leaderboard or a proven game-coding quality ranking.** Strata is the latest optimized performance candidate; Halogen is the historically preferred operational worker. Neither has won a matched long-term game-coding comparison.
+Same original Unsloth weights (`766911a6b7369840a91dbcd95f9f997acaab6cd6`), projection OFF, temperature 0, 420 output tokens per depth request. Strata server v0.1.40.1 / stock v0.1.40 HIP engine, SDK 7.14.1, MTP4/window8192/lookup3; Halogen 0.16.3 with its own native MTP head. These are separate measured sessions, not fresh interleaved repeated A/B. Draft heads, cache and runtime numerics differ. Both passed 17/17 short and 9/9 depth fixtures; no multi-file game-coding or long-term stability winner established.
 
-| Metric / gate | Optimized Strata | Historical uncensored Halogen |
-|---|---|---|
-| Tested version / date | Server **v0.1.40.1**, unchanged v0.1.40 HIP engine · **2026-10-06** | Native HGN + abliterated experts/overlay, MTP · **2026-09-28** comparison |
-| Model / settings | OrcaRouter Flash-Next Uncensored **IQ3_XXS**; gfx1151 fast, prefill **16384**, MTP **4**, draft window **8192** | Qwen3.8 Flash-Next Abliterated **HGN + expert patch + overlay**; historical MTP configuration |
-| Actual long input / generated output | **126,000 / 420 tokens** | **~127,600 / 420 tokens** |
-| New-prefix long-context decode | **42.44 tok/s** | **30.45 tok/s** |
-| New-prefix full request | **109.23 s** | **126.11 s** |
-| Identical cached full request | **10.00–10.01 s** | **12.83 s** |
-| ~62k input: decode / full request | **42.56 tok/s / 57.18 s** at 61,999 input | **31.36 tok/s / 66.85 s** at ~62,400 input |
-| Long-context / quality evidence | Filled 64k/128k retrieval; **39/39** context records and **17/17** short fixtures; three independent 30k trials | Historical filled-context retrieval, tools and operational gates; see reports |
-| Long-term game-coding winner? | **Not established**; multi-file coding and soak pending | **Not established** in a matched comparison with Strata |
-| Report | [Single consolidated Strata report](docs/strata-strix-halo.md) | [Halogen abliterated](docs/qwen38-halogen-abliterated.md) · [28 Sep HTTP measurements](docs/gufo-pr91-halogen-e2e-20260928.md) |
+| Actual input / output | Strata prefill / decode (tok/s) | Halogen prefill / decode (tok/s) | Strata / Halogen full request (s) | Strata / Halogen cached request (s) |
+|---|---|---|---|---|
+| 7,600 / 420 | 1189 / 43.88 | 1411 / 33.84 | 15.99 / 17.81 | 9.54–9.54 / 11.31–11.31 |
+| 61,999 / 420 | 1171 / 42.13 | 1674 / 34.40 | 63.05 / 49.33 | 10.03–10.05 / 11.25–11.25 |
+| 126,000 / 420 | 1294 / 42.71 | 1702 / 34.98 | 107.46 / 86.22 | 9.91–9.93 / 11.27–11.29 |
 
-**Interpretation:** optimized Strata has better observed long-context decode and request times in these retained measurements. This is **not a controlled contemporary engine A/B**: checkpoint format, quantization, prompt lengths, runtime versions and test dates differ. Deep-context rows are single new-prefix measurements; cached requests are a different regime. Strata fast mode changes numerics, so short fixture passes do not establish unchanged general coding quality. The aligned Halogen quality-overlay result elsewhere is a different configuration and is not included in this uncensored comparison. At the latest readback both inference services were stopped; this table does not announce a production switch.
+**Assessment:** Halogen wins observed new-prefix prefill; Strata wins observed decode and cached-request time. Strata + Unsloth is our provisional choice for iterative game coding, not a proven better programmer. Halogen can finish large new-input requests sooner. Original Unsloth is aligned; optional Strata refusal-direction projection is not a separate uncensored checkpoint. Both inference servers were stopped after testing; no production routing switch.
+
+[Full consolidated report](docs/strata-strix-halo.md) · [Raw requests, responses and configurations](records/benchmarks/unsloth-20261006/)
 
 ## All LLM tests · results and evidence
 
-**Latest measured Strata candidate (2026-10-06): OrcaRouter Qwen3.8 Flash-Next Uncensored IQ3_XXS, Strata server v0.1.40.1 / stock v0.1.40 HIP engine, gfx1151 fast mode, prefill 16384, MTP4 with an 8192-token draft attention window.** Verified real 64k/128k context fixtures and bounded lifecycle; **not yet qualified as the long-term game-coding worker**. Fast mode changes numerics. Historical Halogen results use different weights/quantization and are not a current matched A/B. At the latest runtime readback, Strata and Halogen were stopped; no chat routing or permanent worker replacement was made. Dates below are test dates, not release dates.
+**Historical Orca measurement (weights removed locally on 2026-10-06): OrcaRouter Qwen3.8 Flash-Next Uncensored IQ3_XXS, Strata server v0.1.40.1 / stock v0.1.40 HIP engine, gfx1151 fast mode, prefill 16384, MTP4 with an 8192-token draft attention window.** Verified real 64k/128k context fixtures and bounded lifecycle; **not yet qualified as the long-term game-coding worker**. Fast mode changes numerics. Historical Halogen results use different weights/quantization and are not a current matched A/B. At the latest runtime readback, Strata and Halogen were stopped; no chat routing or permanent worker replacement was made. Dates below are test dates, not release dates.
 
 | Date tested | Model / tested configuration | Measured result or gate | Outcome and full test |
 |---|---|---|---|

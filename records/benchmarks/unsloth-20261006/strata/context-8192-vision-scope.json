@@ -1,0 +1,4 @@
+{
+  "status": "BLOCKED_UNCONFIGURED",
+  "reason": "This exact text-only Strata config has no validated gfx1151 vision encoder. No vision pass claimed."
+}

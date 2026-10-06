@@ -1,0 +1,9 @@
+{
+  "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+  "input": "Reply with the single word READY.",
+  "temperature": 0,
+  "max_output_tokens": 32,
+  "reasoning": {
+    "effort": "none"
+  }
+}

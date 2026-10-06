@@ -1,0 +1,46 @@
+{
+  "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the weather in Prague in Celsius? Use the tool."
+    }
+  ],
+  "temperature": 0,
+  "max_tokens": 128,
+  "reasoning_effort": "none",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "stream": false,
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get current weather",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string"
+            },
+            "unit": {
+              "type": "string",
+              "enum": [
+                "celsius",
+                "fahrenheit"
+              ]
+            }
+          },
+          "required": [
+            "city",
+            "unit"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto"
+}

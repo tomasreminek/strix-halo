@@ -1,0 +1,82 @@
+{
+  "name": "ready-canary",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Reply with the single word READY."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 16,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:08:44+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-657990e6159640ccaa3bb4cd",
+    "object": "chat.completion",
+    "created": 1791299324,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "READY"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 19,
+      "completion_tokens": 2,
+      "total_tokens": 21,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 19,
+      "prompt_ms": 244.2,
+      "prompt_per_token_ms": 12.853,
+      "prompt_per_second": 77.8,
+      "predicted_n": 2,
+      "predicted_ms": 106.8,
+      "predicted_per_token_ms": 53.4,
+      "predicted_per_second": 18.7,
+      "draft_n": 3,
+      "draft_n_accepted": 3
+    }
+  },
+  "wall_seconds": 0.3619713820007746,
+  "visible_content": "READY",
+  "prompt_tokens": 19,
+  "completion_tokens": 2,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 19,
+    "prompt_ms": 244.2,
+    "prompt_per_token_ms": 12.853,
+    "prompt_per_second": 77.8,
+    "predicted_n": 2,
+    "predicted_ms": 106.8,
+    "predicted_per_token_ms": 53.4,
+    "predicted_per_second": 18.7,
+    "draft_n": 3,
+    "draft_n_accepted": 3
+  },
+  "content_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+  "decode_valid": true,
+  "decode_tokens_per_second": 18.726591760299627,
+  "prefill_tokens_per_second": 77.8050778050778,
+  "end_to_end_output_tokens_per_second": 5.525298682302238
+}

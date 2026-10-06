@@ -1,0 +1,10 @@
+{
+  "engine": "Halogen 0.16.3",
+  "image_digest": "sha256:e9fa5329241fa9f4510a175cc9e53c2fd34b8a12d25e33306f28de0c05e605b4",
+  "weights": "same original Unsloth UD-IQ4_XS",
+  "projection": false,
+  "draft": "Halogen native MTP, not Strata draft",
+  "context": 131072,
+  "pool": 262144,
+  "timing_note": "Use native timings if returned, otherwise label end-to-end and retain container logs"
+}

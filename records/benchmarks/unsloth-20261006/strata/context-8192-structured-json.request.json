@@ -1,0 +1,19 @@
+{
+  "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Return JSON only with answer equal to Prague and confidence equal to 1.0."
+    }
+  ],
+  "temperature": 0,
+  "max_tokens": 128,
+  "reasoning_effort": "none",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "stream": false,
+  "response_format": {
+    "type": "json_object"
+  }
+}

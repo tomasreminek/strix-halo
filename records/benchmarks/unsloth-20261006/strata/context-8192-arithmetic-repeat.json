@@ -1,0 +1,83 @@
+{
+  "name": "arithmetic-repeat",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Compute 17 * 19. Reply with only the integer."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 32,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:08:44+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-fa011397f66a43c5bab773ca",
+    "object": "chat.completion",
+    "created": 1791299324,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "323"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 27,
+      "completion_tokens": 4,
+      "total_tokens": 31,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 27,
+      "prompt_ms": 304.9,
+      "prompt_per_token_ms": 11.293,
+      "prompt_per_second": 88.6,
+      "predicted_n": 4,
+      "predicted_ms": 136.0,
+      "predicted_per_token_ms": 34.0,
+      "predicted_per_second": 29.4,
+      "draft_n": 6,
+      "draft_n_accepted": 4
+    }
+  },
+  "wall_seconds": 0.44458786899849656,
+  "visible_content": "323",
+  "prompt_tokens": 27,
+  "completion_tokens": 4,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 27,
+    "prompt_ms": 304.9,
+    "prompt_per_token_ms": 11.293,
+    "prompt_per_second": 88.6,
+    "predicted_n": 4,
+    "predicted_ms": 136.0,
+    "predicted_per_token_ms": 34.0,
+    "predicted_per_second": 29.4,
+    "draft_n": 6,
+    "draft_n_accepted": 4
+  },
+  "content_sha256": "3949ac1596ec77106a709a618bf5adcb19b77537ce8bcbdf54ff830169cdd084",
+  "decode_valid": true,
+  "decode_tokens_per_second": 29.41176470588235,
+  "prefill_tokens_per_second": 88.55362413906198,
+  "end_to_end_output_tokens_per_second": 8.997096589726173,
+  "pass": true
+}

@@ -1,0 +1,129 @@
+{
+  "status": "finished",
+  "started_at": "2026-10-06T17:08:09.531579+02:00",
+  "source": "82f46a8c8f475f001ad76d92f58f4a4f8ffb0253",
+  "tag": "v0.1.40.1",
+  "arm": "mtp_original",
+  "official_gfx1151_support": true,
+  "local_source_patches": false,
+  "contexts": {
+    "8192": {
+      "status": "MEASURED",
+      "load_to_health_seconds": 23.024055186000624,
+      "health": {
+        "status": "ok",
+        "max_context": 8192,
+        "model": "unsloth-ud-iq4-xs-stock",
+        "images": false,
+        "api_key": false,
+        "loaded": true,
+        "service": "strata"
+      },
+      "generation_ready": true,
+      "short_quality_results": "/home/tomasreminek/Projekty/strata-halo-01401/bench/unsloth-iq4/screen-mtp_original-20261006-170809/context-8192/short-suite.json",
+      "results_path": "/home/tomasreminek/Projekty/strata-halo-01401/bench/unsloth-iq4/screen-mtp_original-20261006-170809/context-8192/results.json",
+      "quality_pass": true
+    },
+    "65536": {
+      "status": "MEASURED",
+      "load_to_health_seconds": 21.012586287997692,
+      "health": {
+        "status": "ok",
+        "max_context": 65536,
+        "model": "unsloth-ud-iq4-xs-stock",
+        "images": false,
+        "api_key": false,
+        "loaded": true,
+        "service": "strata"
+      },
+      "generation_ready": true,
+      "results_path": "/home/tomasreminek/Projekty/strata-halo-01401/bench/unsloth-iq4/screen-mtp_original-20261006-170809/context-65536/results.json",
+      "quality_pass": true
+    },
+    "131072": {
+      "status": "MEASURED",
+      "load_to_health_seconds": 22.01275970000279,
+      "health": {
+        "status": "ok",
+        "max_context": 131072,
+        "model": "unsloth-ud-iq4-xs-stock",
+        "images": false,
+        "api_key": false,
+        "loaded": true,
+        "service": "strata"
+      },
+      "generation_ready": true,
+      "results_path": "/home/tomasreminek/Projekty/strata-halo-01401/bench/unsloth-iq4/screen-mtp_original-20261006-170809/context-131072/results.json",
+      "quality_pass": true
+    }
+  },
+  "kernel_checks": [
+    {
+      "command": [
+        "/home/tomasreminek/Projekty/strata-halo-01401/build-halo/hip_intrinsics"
+      ],
+      "exit": 0,
+      "wall_seconds": 0.26391685199996573,
+      "log": "kernel-hip_intrinsics.log"
+    },
+    {
+      "command": [
+        "/home/tomasreminek/Projekty/strata-halo-01401/build-halo/hip_native_qsa_score"
+      ],
+      "exit": 0,
+      "wall_seconds": 0.11389891899671056,
+      "log": "kernel-hip_native_qsa_score.log"
+    },
+    {
+      "command": [
+        "/home/tomasreminek/Projekty/strata-halo-01401/build-halo/hip_prefill_native_batch"
+      ],
+      "exit": 0,
+      "wall_seconds": 0.21406395599842654,
+      "log": "kernel-hip_prefill_native_batch.log"
+    },
+    {
+      "command": [
+        "/home/tomasreminek/Projekty/strata-halo-01401/build-halo/hip_prefill_mmq_parity"
+      ],
+      "exit": 0,
+      "wall_seconds": 0.5142045690008672,
+      "log": "kernel-hip_prefill_mmq_parity.log"
+    },
+    {
+      "command": [
+        "/home/tomasreminek/Projekty/strata-halo-01401/build-halo/hip_prefill_hcd_exact_parity"
+      ],
+      "exit": 0,
+      "wall_seconds": 1.5149005970015423,
+      "log": "kernel-hip_prefill_hcd_exact_parity.log"
+    },
+    {
+      "command": [
+        "/home/tomasreminek/Projekty/strata-halo-01401/build-halo/hip_prefill_hipblaslt_gemm"
+      ],
+      "exit": 0,
+      "wall_seconds": 0.46428414700130816,
+      "log": "kernel-hip_prefill_hipblaslt_gemm.log"
+    }
+  ],
+  "paused_units": [],
+  "routing_changed": false,
+  "routing_config_sha256_before": "adc4034636f0b9a46865a5852afd4e7abea1592011a1697d88d28d6c7a59c062",
+  "baseline_memory": {
+    "available": 122951225344,
+    "swap_used": 1116438528
+  },
+  "command": [
+    "/home/tomasreminek/Projekty/strata-halo-01401/build-halo/hip_prefill_hipblaslt_gemm"
+  ],
+  "server_config": "/home/tomasreminek/Projekty/strata-halo-01401/bench/unsloth-iq4/screen-mtp_original-20261006-170809/config-131072.json",
+  "server_pid": 1005552,
+  "test_verdict": "MATRIX_COMPLETED",
+  "halogen_restore_suppressed_by_user": true,
+  "routing_config_sha256_after": "adc4034636f0b9a46865a5852afd4e7abea1592011a1697d88d28d6c7a59c062",
+  "restored_units": [],
+  "routing_unchanged": true,
+  "elapsed_seconds": 414.17114784799924,
+  "finished_at": "2026-10-06T17:15:03.702736+02:00"
+}

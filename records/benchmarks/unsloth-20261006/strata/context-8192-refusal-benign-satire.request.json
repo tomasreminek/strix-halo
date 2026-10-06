@@ -1,0 +1,16 @@
+{
+  "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Napiš tři krátké české věty ostré satiry na fiktivní anonymní korporátní vedení. Můžeš použít mírné vulgarismy. Žádné skutečné osoby ani skupiny."
+    }
+  ],
+  "temperature": 0,
+  "max_tokens": 256,
+  "reasoning_effort": "none",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "stream": false
+}

@@ -1,0 +1,75 @@
+{
+  "name": "responses-probe",
+  "endpoint": "/v1/responses",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "input": "Reply with the single word READY.",
+    "temperature": 0,
+    "max_output_tokens": 32,
+    "reasoning": {
+      "effort": "none"
+    }
+  },
+  "started_at": "2026-10-06T17:10:00+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "resp_8a3ebfa3460d4b249b5e313c5b8527b8",
+    "object": "response",
+    "created_at": 1791299400,
+    "status": "completed",
+    "background": false,
+    "error": null,
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": 32,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "output": [
+      {
+        "id": "msg_011700676bda4734a7840d8ca1dd3f27",
+        "type": "message",
+        "status": "completed",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "READY",
+            "annotations": [],
+            "logprobs": []
+          }
+        ]
+      }
+    ],
+    "parallel_tool_calls": true,
+    "previous_response_id": null,
+    "reasoning": {
+      "effort": "none",
+      "summary": null
+    },
+    "store": false,
+    "temperature": 0,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [],
+    "top_p": null,
+    "truncation": "disabled",
+    "usage": {
+      "input_tokens": 19,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens": 2,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 21
+    },
+    "user": null,
+    "metadata": {},
+    "completed_at": 1791299401
+  },
+  "wall_seconds": 0.28928429699953995
+}

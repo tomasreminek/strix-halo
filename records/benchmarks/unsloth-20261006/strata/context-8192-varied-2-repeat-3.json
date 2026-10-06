@@ -1,0 +1,85 @@
+{
+  "name": "varied-2-repeat-3",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Write at least 400 words of original prose about a bridge, lanterns and rain."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 256,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:09:26+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-246fd108a681432aaaa3a474",
+    "object": "chat.completion",
+    "created": 1791299366,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "The rain did not fall so much as it descended, a heavy, silver curtain that blurred the edges of the world and turned the cobblestones into slick, obsidian mirrors. It was the kind of autumn downpour that smelled of wet earth, decaying leaves, and the faint, metallic tang of old iron. In this deluge, the ancient stone bridge stood as a silent sentinel, its arches spanning the swollen river like the ribs of some slumbering leviathan. The water beneath churned with a muddy urgency, carrying away the debris of the day in a relentless, brown torrent, but the bridge remained unmoved, its moss-covered stones holding fast against the current’s pull.\n\nAlong the length of the bridge, a row of paper lanterns hung from wrought-iron hooks, their frames rusted by decades of exposure to the elements. Usually, they were mere decorations, bright and cheerful against the grey sky. But tonight, under the weight of the storm, they transformed into something far more profound. As the wind whipped through the arches, the lanterns swayed violently, their paper skins straining against the gusts. Inside each one, a small flame flickered, dancing a desperate, beautiful dance against the encroaching darkness."
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 32,
+      "completion_tokens": 256,
+      "total_tokens": 288,
+      "prompt_tokens_details": {
+        "cached_tokens": 25
+      }
+    },
+    "timings": {
+      "cache_n": 25,
+      "prompt_n": 7,
+      "prompt_ms": 55.4,
+      "prompt_per_token_ms": 7.914,
+      "prompt_per_second": 126.4,
+      "predicted_n": 256,
+      "predicted_ms": 5530.1,
+      "predicted_per_token_ms": 21.602,
+      "predicted_per_second": 46.3,
+      "draft_n": 218,
+      "draft_n_accepted": 129
+    }
+  },
+  "wall_seconds": 5.59225867799978,
+  "visible_content": "The rain did not fall so much as it descended, a heavy, silver curtain that blurred the edges of the world and turned the cobblestones into slick, obsidian mirrors. It was the kind of autumn downpour that smelled of wet earth, decaying leaves, and the faint, metallic tang of old iron. In this deluge, the ancient stone bridge stood as a silent sentinel, its arches spanning the swollen river like the ribs of some slumbering leviathan. The water beneath churned with a muddy urgency, carrying away the debris of the day in a relentless, brown torrent, but the bridge remained unmoved, its moss-covered stones holding fast against the current’s pull.\n\nAlong the length of the bridge, a row of paper lanterns hung from wrought-iron hooks, their frames rusted by decades of exposure to the elements. Usually, they were mere decorations, bright and cheerful against the grey sky. But tonight, under the weight of the storm, they transformed into something far more profound. As the wind whipped through the arches, the lanterns swayed violently, their paper skins straining against the gusts. Inside each one, a small flame flickered, dancing a desperate, beautiful dance against the encroaching darkness.",
+  "prompt_tokens": 32,
+  "completion_tokens": 256,
+  "cached_tokens": 25,
+  "timings": {
+    "cache_n": 25,
+    "prompt_n": 7,
+    "prompt_ms": 55.4,
+    "prompt_per_token_ms": 7.914,
+    "prompt_per_second": 126.4,
+    "predicted_n": 256,
+    "predicted_ms": 5530.1,
+    "predicted_per_token_ms": 21.602,
+    "predicted_per_second": 46.3,
+    "draft_n": 218,
+    "draft_n_accepted": 129
+  },
+  "content_sha256": "aa832af19c57d61f25c607dce21228558f2a7022cd79eb3ed959b5d0b8648543",
+  "decode_valid": true,
+  "decode_tokens_per_second": 46.292110450082276,
+  "prefill_tokens_per_second": 126.35379061371842,
+  "end_to_end_output_tokens_per_second": 45.77756765922087,
+  "regime": "identical cached repeat",
+  "sustained_minimum": 256,
+  "pass": true
+}

@@ -1,0 +1,85 @@
+{
+  "name": "varied-3-repeat-2",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain at least ten concrete steps for testing a small REST API, with examples. At least 400 words."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 256,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:09:38+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-7365fe8cb41c46b980ef5fa3",
+    "object": "chat.completion",
+    "created": 1791299378,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Testing a small REST API is a critical process that ensures reliability, security, and performance before deployment. To achieve comprehensive coverage, developers should follow a structured approach that moves from basic connectivity to complex integration scenarios. Here are ten concrete steps for testing a small REST API, complete with practical examples.\n\nFirst, begin with **Unit Testing** of individual controller methods. This isolates business logic from the HTTP layer. For example, if you have a `UserService` with a `createUser` method, you should mock the database repository and verify that the method correctly formats the user object and calls the save function, without actually hitting the database.\n\nSecond, perform **Integration Testing** for individual endpoints. Use tools like Postman or Insomnia to manually verify that endpoints respond correctly. For instance, send a `POST` request to `/api/users` with a valid JSON payload and assert that the server returns a `201 Created` status code along with the newly created user ID.\n\nThird, implement **Automated Integration Tests** using a framework like Jest or Pytest. Write scripts that spin up a test database, send HTTP requests to your API, and assert responses. For example, a test case might create a user, fetch it via `GET /api/users"
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 37,
+      "completion_tokens": 256,
+      "total_tokens": 293,
+      "prompt_tokens_details": {
+        "cached_tokens": 30
+      }
+    },
+    "timings": {
+      "cache_n": 30,
+      "prompt_n": 7,
+      "prompt_ms": 55.4,
+      "prompt_per_token_ms": 7.914,
+      "prompt_per_second": 126.4,
+      "predicted_n": 256,
+      "predicted_ms": 5223.0,
+      "predicted_per_token_ms": 20.402,
+      "predicted_per_second": 49.0,
+      "draft_n": 247,
+      "draft_n_accepted": 145
+    }
+  },
+  "wall_seconds": 5.282421568001155,
+  "visible_content": "Testing a small REST API is a critical process that ensures reliability, security, and performance before deployment. To achieve comprehensive coverage, developers should follow a structured approach that moves from basic connectivity to complex integration scenarios. Here are ten concrete steps for testing a small REST API, complete with practical examples.\n\nFirst, begin with **Unit Testing** of individual controller methods. This isolates business logic from the HTTP layer. For example, if you have a `UserService` with a `createUser` method, you should mock the database repository and verify that the method correctly formats the user object and calls the save function, without actually hitting the database.\n\nSecond, perform **Integration Testing** for individual endpoints. Use tools like Postman or Insomnia to manually verify that endpoints respond correctly. For instance, send a `POST` request to `/api/users` with a valid JSON payload and assert that the server returns a `201 Created` status code along with the newly created user ID.\n\nThird, implement **Automated Integration Tests** using a framework like Jest or Pytest. Write scripts that spin up a test database, send HTTP requests to your API, and assert responses. For example, a test case might create a user, fetch it via `GET /api/users",
+  "prompt_tokens": 37,
+  "completion_tokens": 256,
+  "cached_tokens": 30,
+  "timings": {
+    "cache_n": 30,
+    "prompt_n": 7,
+    "prompt_ms": 55.4,
+    "prompt_per_token_ms": 7.914,
+    "prompt_per_second": 126.4,
+    "predicted_n": 256,
+    "predicted_ms": 5223.0,
+    "predicted_per_token_ms": 20.402,
+    "predicted_per_second": 49.0,
+    "draft_n": 247,
+    "draft_n_accepted": 145
+  },
+  "content_sha256": "8a89bd3a52ed3298671d31edb96f9e4a5123197752441e98eabfaacf10b397c0",
+  "decode_valid": true,
+  "decode_tokens_per_second": 49.01397664177676,
+  "prefill_tokens_per_second": 126.35379061371842,
+  "end_to_end_output_tokens_per_second": 48.46262205779787,
+  "regime": "identical cached repeat",
+  "sustained_minimum": 256,
+  "pass": true
+}

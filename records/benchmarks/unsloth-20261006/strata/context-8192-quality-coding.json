@@ -1,0 +1,88 @@
+{
+  "name": "quality-coding",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return only Python code defining dedupe_keep_order(items). It must preserve first occurrence order, work with hashable values, and contain no imports."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 256,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:08:54+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-7d522a54ef5d4e9faeced601",
+    "object": "chat.completion",
+    "created": 1791299334,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "```python\ndef dedupe_keep_order(items):\n    seen = set()\n    result = []\n    for item in items:\n        if item not in seen:\n            seen.add(item)\n            result.append(item)\n    return result\n```"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 41,
+      "completion_tokens": 55,
+      "total_tokens": 96,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 41,
+      "prompt_ms": 398.5,
+      "prompt_per_token_ms": 9.72,
+      "prompt_per_second": 102.9,
+      "predicted_n": 55,
+      "predicted_ms": 746.1,
+      "predicted_per_token_ms": 13.565,
+      "predicted_per_second": 73.7,
+      "draft_n": 42,
+      "draft_n_accepted": 42
+    }
+  },
+  "wall_seconds": 1.1484896920010215,
+  "visible_content": "```python\ndef dedupe_keep_order(items):\n    seen = set()\n    result = []\n    for item in items:\n        if item not in seen:\n            seen.add(item)\n            result.append(item)\n    return result\n```",
+  "prompt_tokens": 41,
+  "completion_tokens": 55,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 41,
+    "prompt_ms": 398.5,
+    "prompt_per_token_ms": 9.72,
+    "prompt_per_second": 102.9,
+    "predicted_n": 55,
+    "predicted_ms": 746.1,
+    "predicted_per_token_ms": 13.565,
+    "predicted_per_second": 73.7,
+    "draft_n": 42,
+    "draft_n_accepted": 42
+  },
+  "content_sha256": "37dd1d7cd8f922780b6699107500e2e9a1719b9c30ff954b3491e616a8a57616",
+  "decode_valid": true,
+  "decode_tokens_per_second": 73.71665996515213,
+  "prefill_tokens_per_second": 102.8858218318695,
+  "end_to_end_output_tokens_per_second": 47.88898009539217,
+  "coding_test": {
+    "pass": true,
+    "exit": 0,
+    "stderr": ""
+  },
+  "pass": true
+}

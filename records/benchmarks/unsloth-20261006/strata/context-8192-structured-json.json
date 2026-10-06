@@ -1,0 +1,86 @@
+{
+  "name": "structured-json",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return JSON only with answer equal to Prague and confidence equal to 1.0."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 128,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false,
+    "response_format": {
+      "type": "json_object"
+    }
+  },
+  "started_at": "2026-10-06T17:08:57+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-25ae1ebfced647838897063f",
+    "object": "chat.completion",
+    "created": 1791299337,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"answer\":\"Prague\",\"confidence\":1.0}"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 100,
+      "completion_tokens": 16,
+      "total_tokens": 116,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 100,
+      "prompt_ms": 737.0,
+      "prompt_per_token_ms": 7.37,
+      "prompt_per_second": 135.7,
+      "predicted_n": 16,
+      "predicted_ms": 237.6,
+      "predicted_per_token_ms": 14.85,
+      "predicted_per_second": 67.3,
+      "draft_n": 12,
+      "draft_n_accepted": 12
+    }
+  },
+  "wall_seconds": 0.9793932190004853,
+  "visible_content": "{\"answer\":\"Prague\",\"confidence\":1.0}",
+  "prompt_tokens": 100,
+  "completion_tokens": 16,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 100,
+    "prompt_ms": 737.0,
+    "prompt_per_token_ms": 7.37,
+    "prompt_per_second": 135.7,
+    "predicted_n": 16,
+    "predicted_ms": 237.6,
+    "predicted_per_token_ms": 14.85,
+    "predicted_per_second": 67.3,
+    "draft_n": 12,
+    "draft_n_accepted": 12
+  },
+  "content_sha256": "6b68369647abc88c9cf33332935382153c3fc9ff3e037ab1c3b35122c157ed3f",
+  "decode_valid": true,
+  "decode_tokens_per_second": 67.34006734006734,
+  "prefill_tokens_per_second": 135.68521031207598,
+  "end_to_end_output_tokens_per_second": 16.336645679790102,
+  "pass": true
+}

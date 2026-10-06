@@ -1,0 +1,16 @@
+{
+  "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Reply with the single word READY."
+    }
+  ],
+  "temperature": 0,
+  "max_tokens": 16,
+  "reasoning_effort": "none",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "stream": false
+}

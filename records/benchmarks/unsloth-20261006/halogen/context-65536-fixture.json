@@ -1,0 +1,12 @@
+{
+  "capacity": 65536,
+  "target_prompt_tokens": 62000,
+  "locally_framed_prompt_tokens": 61999,
+  "prompt_sha256": "9c5fd3d30f8d23330c02a5ee17375499ad040a9fed16bf4da88eedaffce5b344",
+  "source_sha256": "e4c3b195d68a870213e3180ff721df10b94ae162bbb7de6dc30b6c90f84ad4d5",
+  "markers": [
+    "amber-violet-731",
+    "birch-cobalt-482",
+    "cedar-silver-956"
+  ]
+}

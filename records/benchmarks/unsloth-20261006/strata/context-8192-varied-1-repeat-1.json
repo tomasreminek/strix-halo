@@ -1,0 +1,85 @@
+{
+  "name": "varied-1-repeat-1",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Write eight numbered practical gardening tips, at least 150 words in total. No introduction."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 256,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:08:58+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-936facfa258c406da1cea6c9",
+    "object": "chat.completion",
+    "created": 1791299338,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "1. Test your soil pH before planting to ensure it matches the specific needs of your chosen plants, as most vegetables prefer a slightly acidic to neutral range between 6.0 and 7.0.\n2. Water deeply but infrequently to encourage strong root growth, aiming for early morning sessions to reduce evaporation and prevent fungal diseases that thrive in damp evening conditions.\n3. Apply a thick layer of organic mulch around your plants to retain moisture, suppress weeds, and regulate soil temperature, keeping it a few inches away from stems to prevent rot.\n4. Practice crop rotation annually to prevent the buildup of soil-borne pests and diseases, ensuring you do not plant the same family of vegetables in the same spot two years in a row.\n5. Deadhead spent flowers regularly to encourage continuous blooming throughout the growing season, directing the plant’s energy toward producing new buds rather than setting seed.\n6. Compost your kitchen scraps and yard waste to create nutrient-rich humus, which improves soil structure and provides essential nutrients without relying on synthetic fertilizers.\n7. Group plants with similar water and sunlight requirements together in your garden beds to simplify maintenance and ensure each plant receives the optimal conditions for healthy growth.\n8. Prune dead or dise"
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 32,
+      "completion_tokens": 256,
+      "total_tokens": 288,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 32,
+      "prompt_ms": 326.3,
+      "prompt_per_token_ms": 10.197,
+      "prompt_per_second": 98.1,
+      "predicted_n": 256,
+      "predicted_ms": 5406.9,
+      "predicted_per_token_ms": 21.121,
+      "predicted_per_second": 47.3,
+      "draft_n": 242,
+      "draft_n_accepted": 140
+    }
+  },
+  "wall_seconds": 5.73785307000071,
+  "visible_content": "1. Test your soil pH before planting to ensure it matches the specific needs of your chosen plants, as most vegetables prefer a slightly acidic to neutral range between 6.0 and 7.0.\n2. Water deeply but infrequently to encourage strong root growth, aiming for early morning sessions to reduce evaporation and prevent fungal diseases that thrive in damp evening conditions.\n3. Apply a thick layer of organic mulch around your plants to retain moisture, suppress weeds, and regulate soil temperature, keeping it a few inches away from stems to prevent rot.\n4. Practice crop rotation annually to prevent the buildup of soil-borne pests and diseases, ensuring you do not plant the same family of vegetables in the same spot two years in a row.\n5. Deadhead spent flowers regularly to encourage continuous blooming throughout the growing season, directing the plant’s energy toward producing new buds rather than setting seed.\n6. Compost your kitchen scraps and yard waste to create nutrient-rich humus, which improves soil structure and provides essential nutrients without relying on synthetic fertilizers.\n7. Group plants with similar water and sunlight requirements together in your garden beds to simplify maintenance and ensure each plant receives the optimal conditions for healthy growth.\n8. Prune dead or dise",
+  "prompt_tokens": 32,
+  "completion_tokens": 256,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 32,
+    "prompt_ms": 326.3,
+    "prompt_per_token_ms": 10.197,
+    "prompt_per_second": 98.1,
+    "predicted_n": 256,
+    "predicted_ms": 5406.9,
+    "predicted_per_token_ms": 21.121,
+    "predicted_per_second": 47.3,
+    "draft_n": 242,
+    "draft_n_accepted": 140
+  },
+  "content_sha256": "3f17aacb261cbae0ab1291cff01a8a132947f4c39ed931a390b1f1a6cbbeda60",
+  "decode_valid": true,
+  "decode_tokens_per_second": 47.3469085797777,
+  "prefill_tokens_per_second": 98.06926141587495,
+  "end_to_end_output_tokens_per_second": 44.61599083783585,
+  "regime": "first varied/new prefix",
+  "sustained_minimum": 256,
+  "pass": true
+}

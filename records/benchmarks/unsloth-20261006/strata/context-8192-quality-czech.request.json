@@ -1,0 +1,16 @@
+{
+  "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Česky a věcně vysvětli rozdíl mezi transakcí a idempotencí v distribuovaném systému. Uveď jeden konkrétní příklad každého pojmu."
+    }
+  ],
+  "temperature": 0,
+  "max_tokens": 256,
+  "reasoning_effort": "none",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "stream": false
+}

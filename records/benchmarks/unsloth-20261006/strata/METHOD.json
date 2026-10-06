@@ -1,0 +1,17 @@
+{
+  "model": "original Unsloth UD-IQ4_XS",
+  "projection": false,
+  "sdk": "7.14.1",
+  "compat_bf16": true,
+  "fast_environment": {
+    "STRATA_PF_FUSED": "1",
+    "STRATA_PF_GEMM": "1",
+    "STRATA_HC_UPMIX": "1",
+    "STRATA_PA_FAST": "1",
+    "STRATA_HIP_WMMA": "1",
+    "STRATA_SELECT_WMMA": "1",
+    "STRATA_HC_Q8": "1",
+    "STRATA_PF_SWITCH_MIN_T": "4096"
+  },
+  "halogen_restore": false
+}

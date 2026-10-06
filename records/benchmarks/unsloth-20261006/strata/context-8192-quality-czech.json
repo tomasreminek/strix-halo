@@ -1,0 +1,83 @@
+{
+  "name": "quality-czech",
+  "endpoint": "/v1/chat/completions",
+  "request": {
+    "model": "orcarouter-qwen3.8-flash-next-uncensored-iq3_xxs",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Česky a věcně vysvětli rozdíl mezi transakcí a idempotencí v distribuovaném systému. Uveď jeden konkrétní příklad každého pojmu."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 256,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "stream": false
+  },
+  "started_at": "2026-10-06T17:08:46+0200",
+  "status": "MEASURED",
+  "response": {
+    "id": "chatcmpl-8a7fad9e42fe4930bf30a0d1",
+    "object": "chat.completion",
+    "created": 1791299326,
+    "model": "unsloth-ud-iq4-xs-stock",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Zde je věcné vysvětlení rozdílů mezi těmito dvěma koncepty v kontextu distribuovaných systémů.\n\n### 1. Transakce (Transaction)\n\n**Definice:**\nTransakce je logická jednotka práce, která seskupuje několik operací (např. čtení a zápis do databáze) tak, aby byly provedeny buď **všechny**, nebo **žádná**. Klíčovou vlastností transakcí je dodržení vlastností ACID:\n*   **A**tomicity (Atomárnost): Vše nebo nic.\n*   **C**onsistency (Konzistence): Systém přechází z jednoho platného stavu do druhého.\n*   **I**solation (Izolace): Transakce se navzájem neruší.\n*   **D**urability (Trvalost): Po potvrzení (commit) jsou změny trvalé.\n\nV distribuovaných systémech je transakce složitější, protože data mohou být rozložena na více uzlech. Často se používají protokoly jako **Two-Phase Commit ("
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 55,
+      "completion_tokens": 256,
+      "total_tokens": 311,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 55,
+      "prompt_ms": 533.0,
+      "prompt_per_token_ms": 9.691,
+      "prompt_per_second": 103.2,
+      "predicted_n": 256,
+      "predicted_ms": 7906.6,
+      "predicted_per_token_ms": 30.885,
+      "predicted_per_second": 32.4,
+      "draft_n": 217,
+      "draft_n_accepted": 116
+    }
+  },
+  "wall_seconds": 8.443256051999924,
+  "visible_content": "Zde je věcné vysvětlení rozdílů mezi těmito dvěma koncepty v kontextu distribuovaných systémů.\n\n### 1. Transakce (Transaction)\n\n**Definice:**\nTransakce je logická jednotka práce, která seskupuje několik operací (např. čtení a zápis do databáze) tak, aby byly provedeny buď **všechny**, nebo **žádná**. Klíčovou vlastností transakcí je dodržení vlastností ACID:\n*   **A**tomicity (Atomárnost): Vše nebo nic.\n*   **C**onsistency (Konzistence): Systém přechází z jednoho platného stavu do druhého.\n*   **I**solation (Izolace): Transakce se navzájem neruší.\n*   **D**urability (Trvalost): Po potvrzení (commit) jsou změny trvalé.\n\nV distribuovaných systémech je transakce složitější, protože data mohou být rozložena na více uzlech. Často se používají protokoly jako **Two-Phase Commit (",
+  "prompt_tokens": 55,
+  "completion_tokens": 256,
+  "cached_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 55,
+    "prompt_ms": 533.0,
+    "prompt_per_token_ms": 9.691,
+    "prompt_per_second": 103.2,
+    "predicted_n": 256,
+    "predicted_ms": 7906.6,
+    "predicted_per_token_ms": 30.885,
+    "predicted_per_second": 32.4,
+    "draft_n": 217,
+    "draft_n_accepted": 116
+  },
+  "content_sha256": "2164e80ff0b80a89646a0a8158d235f0c5168474d97136c3d829d1ad7922f23e",
+  "decode_valid": true,
+  "decode_tokens_per_second": 32.37801330533984,
+  "prefill_tokens_per_second": 103.18949343339587,
+  "end_to_end_output_tokens_per_second": 30.32005643597202,
+  "pass": true
+}
