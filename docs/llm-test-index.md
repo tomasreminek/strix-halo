@@ -7,6 +7,7 @@ Measured results, acceptance gates, and negative experiments. Start with the [ma
 - [Strata HIP / Orca IQ3_XXS,4 Oct](strata-strix-halo.md): actual inference, correct arithmetic/Czech and64-token canary; slow in this tested configuration, no64k/128k gate.
 
 - [Ornith 1.5 9B Abliterated](ornith-abliterated-20260921.md): loader, Hermes tool loop, 63k and 117.8k retrieval.
+- [Halogen V2 abliterated · flash_serve 0.18.0, 11 Oct](halogen-v2-0180-20261011.md): sustained decode ~45 tok/s, MTP-accepted 65–81 tok/s, prefill 3.2–3.5k tok/s, cache reuse 13×, 96k/192k prefill + exact marker recall PASS. Port 8730 is raw TCP (engine); OpenAI API on 8731.
 - [Ornith + Halogen coexistence correction](ornith-halogen-coexistence-correction.md): earlier systemd conflict, not proven OOM; historical slot configuration.
 - [Halogen 64k worker proof](halogen-worker-64k.md): synthetic code/retrieval and worker policy; 64k setting is historical, current slot is 131,072.
 - [Gufo PR #91 versus Halogen complete HTTP test, 28 Sep](gufo-pr91-halogen-e2e-20260928.md): fork stock/PR A/B and current abliterated HGN worker; cold, cached, decode, three marker depths. [18 synthetic response records](../records/benchmarks/gufo-pr91-halogen-20260928/).

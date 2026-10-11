@@ -7,6 +7,11 @@
 
 
 Every number here was measured on **Hilbert** (Ryzen AI MAX+ 395 / Radeon 8060S gfx1151, 124 GiB, one GPU job).
+
+## Halogen V2 abliterated · flash_serve 0.18.0 · 2026-10-11
+
+**MEASURED.** halogen-flash-server **0.18.0** (`halogen-v2-abliterated.hgn`, 88.7 GiB), 262k ctx, 4 slots, 512k KV pool, MTP depth-2. Sustained decode **~45 tok/s** (found at 60-tok and 12.9k-token prompts, 1 000+-token generation). **MTP accepted arms 65–81 tok/s** at 13k prompts (1 024-tok generation, 3× varied prompts + 3× identical probes at 83.5–83.6 tok/s with bitwise-identical hash). Prefill ~**3 200–3 500 tok/s** across 26k–192k-token prompts. Prompt-cache reuse: first turn 3.86 s, follow-ups 0.30 s (~13× warmer). Long context: 96k-tok prefill 27.6 s, 192k-tok prefill 61.1 s, both answered; exact marker recall at 96k PASS; JSON gate PASS; 17×23 PASS. OpenAI API lives on **port 8731** (`serve_api.py`, second container); engine port 8730 is raw TCP, not HTTP. Tokenizer fix: broken `config.json`/'special_tokens_map.json` in the halogen-v2-tokenizer dir replaced in `/mnt/data/AI-Models/halogen-v2-tok-fixed/`. [Full report + raw arms](halogen-v2-0180-20261011.md).
+
 Backend and method always stated: `llama-bench`, server/native-engine timing or end-to-end request wall time. Do not mix tables.
 
 ## Strata HIP / Orca IQ3_XXS · 2026-10-04
