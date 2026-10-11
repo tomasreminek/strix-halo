@@ -56,6 +56,7 @@ Engine-measured context: 7157/622, 31679/564 and 64461/556 prompt/output tokens;
 
 | Model (quant) | Backend / runtime | pp512 | pp16k | tg64 / decode | Server decode (prose) | Verdict |
 |---|---|---:|---:|---|---|---|
+| **Qwen3.8 Flash-Next V2 abliterated native HGN** | **flash_serve 0.18.0 ROCm** · MTP depth-2, 262k ctx, 512k KV pool | — | 3 200–3 500 (server prefill, 26k–192k prompts) | **45** sustained · **65–81 MTP accepted** · 83.5 cached ident. | 15.7 @~96k sustained · 96k/192k prefill PASS · marker recall PASS | **Current Halogen V2 winner** · fastest uncensored sustained decode on this box |
 | **Qwen3.8-Flash-Next Abliterated native HGN** | **Halogen 0.11.0 ROCm** · patched experts + 727-tensor overlay | — | — | **40.68** warm 3-prompt mean (36.91–46.20 on sustained rows) | retrieval PASS 8k/16k/32k/60k/123.7k · 2×26.5k PASS | **Preferred main candidate** · no material speed regression; broad quality benchmark still needed |
 | **Qwen3.8-Flash-Next native HGN** | **Halogen 0.11.0 ROCm** · quality overlay | — | — | **44.66** short serving | **40.08 @64k · 38.03 @~126k** | **Aligned performance reference** · identity review required |
 | **Qwen3.8-Flash-Next Orca Q4_K_M + MTP7** | Nathanw **v0.7.6** Vulkan | — | — | **35.26** varied | **27.69 @64k · 25.89 sustained @126k** | **Uncensored winner / fallback** |
