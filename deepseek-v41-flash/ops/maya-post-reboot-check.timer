@@ -1,0 +1,9 @@
+[Unit]
+Description=Run the post-reboot health verification 2 minutes after boot
+
+[Timer]
+OnBootSec=120s
+Unit=maya-post-reboot-check.service
+
+[Install]
+WantedBy=timers.target

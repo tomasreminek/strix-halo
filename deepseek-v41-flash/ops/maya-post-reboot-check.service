@@ -1,0 +1,15 @@
+[Unit]
+Description=Post-reboot health verification (GPU/KFD, Strata :18087, DSH :18095, Hermes)
+After=basic.target
+Wants=basic.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/tomasreminek/.local/bin/maya-post-reboot-check.sh
+TimeoutStartSec=1200
+# read-only health check: never starts a second Maya engine, never touches the
+# Hermes gateway, never restarts Strata on its own
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=%h/.hermes/logs

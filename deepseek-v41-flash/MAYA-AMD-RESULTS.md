@@ -563,15 +563,199 @@ manual pack + direct engine launch. `DS4_SKIP_UNPICKED=1` (PR #297) is also
 absent from this tree.
 
 **EXL3 model:** `vcruz305/DSV4.1-Flash-1017-SAGE-EXL3-1.62bpw` —
-**326.59 GB**, **17 shards**, `quant_method: exl3`. **Not downloaded yet.**
-Per the upstream docs, the EXL3 shards must sit beside the original 1017
-Engram shards, and the packer indexes the weights without copying them.
+**326.57 GB**, **17 shards**, `quant_method: exl3`. **Not downloaded yet.**
+
+> **Correction (2026-10-22).** An earlier version of this section said "the
+> EXL3 shards must sit beside the original 1017 Engram shards". That is
+> **wrong** and is retracted. The upstream EXL3 pack is **self-contained**:
+> its `model.safetensors.index.json` (190 552 tensors) carries 8 `engram.*`
+> tensors of its own, and they occupy shards **16 and 17** — 6 tensors each,
+> **101.5 GB per shard**. There is **no second 161 GB download**; the
+> 326.57 GB figure is the whole model. See `EXL3-DISK-PLAN.md` for the
+> full census and the space plan.
+
+**Space:** EXL3 needs 326.57 GB on one filesystem. `/mnt/data` is at 98 %
+and cannot hold it; `/mnt/c` has 197.13 GB free and would need Maya-S
+deleted (317 GB) first. The unmounted **1.9 TB exFAT** disk (`/dev/sda1`)
+is the clean answer — no deletions required. Full analysis and the
+recommended sequence are in **`EXL3-DISK-PLAN.md`**.
+
+**Resident footprint:** the model card states **~112.9 GiB** resident —
+the *same order* as Maya-XS's 120.6 GB, i.e. **tighter**, not looser. On
+this 124 GB box the EXL3 test and the Maya-XS test are mutually exclusive
+and both compete with production Strata.
 
 **Decision:** the EXL3 model is **not** downloaded until capacity, access, the
 correct build/load procedure and an isolated test are all confirmed. The
 NVIDIA Spark recipe (`vcruz305/DSV4.1-Flash-1017-EXL3-Spark-recipe`) is
 included as a **source of build/quantisation know-how**; its runtime is
 NVIDIA-only and must not be assumed to transfer to AMD.
+
+---
+
+## 8.5 Project Maya v1.1.22 — what changed, what was verified, what was not
+
+Recorded 2026-10-22. This section covers the move to the official upstream
+release `v1.1.22` and the start of the Maya-XS campaign. It is deliberately
+split into **verified** (measured on this box or read directly out of the
+pinned source) and **not verified** (upstream claims, or blocked by the
+GPU fault of §5.5).
+
+### 8.5.1 The release itself — verified
+
+| Item | Value | How it was checked |
+|---|---|---|
+| Upstream release | <https://github.com/mw00/project-maya/releases/tag/v1.1.22> | GitHub release page + API |
+| Tag → commit | `v1.1.22` → `ffe2e5e53fd5254e7f3492a20e8ad2b51b26a197` | `git fetch origin tag v1.1.22` |
+| Local checkout | `ffe2e5e5`, worktree clean | `git log --oneline -1`, `git status --short` |
+| HIP build | `[100%] Built target maya-ds4` | `cmake --build build-hip --target maya-ds4 -j16` |
+| Build log | `~/.hermes/logs/maya-build-122.log` | — |
+| ROCm used | **7.14.1**, gfx1151, at `/mnt/data/toolchains/strata-rocm-7.14.1-gfx1151/install` | `build-hip/CMakeCache.txt` |
+
+Two build notes that cost time and are worth recording:
+
+- **`make all` fails on this tree** (`gmake: *** [Makefile:146: all] Error 2`).
+  A **targeted** `cmake --build build-hip --target maya-ds4 -j16` succeeds.
+  Use the targeted form.
+- The built binary needs
+  `LD_LIBRARY_PATH=/mnt/data/toolchains/strata-rocm-7.14.1-gfx1151/install/lib`.
+  There is **no system ROCm** (`/opt/rocm` does not exist on this box), so a
+  bare `./maya-ds4` fails with
+  `libhipblas.so.3: cannot open shared object file`.
+
+The v1.1.21 engine binary was preserved at
+`~/.hermes/cache/scratch/maya-ds4-v1.1.21` for A/B.
+
+### 8.5.2 What v1.1.22 adds (upstream claims, read from `CHANGELOG.md`)
+
+- **Maya-XS** — DeepSeek-V4.1-Flash in **120.6 GB** of memory. All 384
+  experts per layer kept at ~1.6 bits (`IQ1_S`), requantised with error
+  feedback on the quantized model itself. Its own **2-bit DSpark drafter**
+  (`4.25 GB`). The **Engram tables (161 GB, Q6_K) stay on the SSD**, as with
+  Maya-S. Install line: `./setup.sh --setup --model DeepSeek-V4.1-Flash-1017
+  --ds4-quant maya-xs`.
+- **DeepSeek tensor parallel** over several GPUs (#344). On **one** GPU,
+  drafting decodes **~1.85x faster** than v1.1.21 (Maya-S with DSpark on a
+  Ryzen AI Max, same drafts kept).
+- **AMD fixes**: a 2-GPU DeepSeek hang with hipBLASLt (#367, #366); the packed
+  sparse attention LDS swizzle, opt-in via `DS4_HIP_ATTN_SWIZZLE=1` (#348);
+  `--bench` takes the DeepSeek engine on HIP (#350).
+- **Windows**: 1 ms engine timer (`MAYA_DS4_TIMER_MS=0` leaves it), 64 Engram
+  readers (#361), unbuffered Engram reads (`DS4_EG_DIRECT=0` = before).
+- **Prompt report**: `DS4_PREFILL_STATS=1` (#364) shows which experts a
+  prompt found resident and the bytes it streamed.
+- **GLM**: a prompt's lending keeps more recently used experts in RAM — 40 %
+  fewer disk reads after a fresh prompt (#352).
+
+Source-level confirmation that the flags exist in the pinned tree
+(`src/ds4/ds4_main.cpp`): `--pack` (686), `--vram-experts` (691),
+`--dspark` (696), `--dspark-conf` (700), `--serve` (724).
+
+### 8.5.3 The Maya-XS download set — verified
+
+Source: `peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF`, revision
+**`c273fcbdda76a1db074c2f414cb70edbfca2f2ef`** (pinned, not `main`).
+
+```text
+Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00001-of-00005.gguf  47781530400
+Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00002-of-00005.gguf  47775748128
+Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00003-of-00005.gguf  19784230848
+Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00004-of-00005.gguf  80641295472
+Maya-XS/DeepSeek-V4.1-Flash-1017-Maya-XS-IQ1_S-00005-of-00005.gguf  80643503412
+dspark/dspark-xs2.bin                                                4251725568
+dspark/dspark-xs2.json                                                    99146
+                                                    total bytes ≈ 280.88 GB
+```
+
+**All of it goes on one filesystem** (`/mnt/data/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF/Maya-XS`).
+An earlier plan to split the shards with symlinks across `/mnt/data` and
+`/mnt/c` was dropped on purpose — both are NTFS3 on the *same* physical 2 TB
+NVMe, and a split adds a failure mode for no gain.
+
+Note the drafter is **`dspark-xs2.bin`** (4.25 GB), *not* the older
+`dspark-xs.bin` (3.4 GB). The two are not interchangeable.
+
+### 8.5.4 The download itself — verified, with two real bugs found and fixed
+
+`~/.local/bin/xs-dl-chunked.py` replaces a naive 3-stream `curl` loop. It
+splits every file into 64 MB byte-range chunks, fetches them from a global
+thread pool, writes each chunk with `pwrite()` at its own offset, and
+persists the set of completed ranges per file in
+`~/.hermes/state/xs-dl/*.json` so an interrupted run resumes instead of
+restarting. A SHA256 pass runs over every file at the end.
+
+**Measured on this box:**
+
+| Variant | Aggregate throughput |
+|---|---|
+| 3 sequential `curl` streams | **≈10 MB/s** (≈8 h ETA) |
+| 8 parallel 100 MB range streams | ≈17 MB/s |
+| 16 parallel 50 MB range streams | ≈19 MB/s |
+| chunked downloader, 24–48 workers | **19 MB/s** sustained, confirmed independently at the network interface (12 MB/s on `/sys/class/net/*/statistics/rx_bytes` over 30 s) |
+
+Two bugs were found and fixed while building it — both are easy to repeat:
+
+1. **One-byte `pwrite` loop.** The write loop advanced the offset by the
+   *return value* of a single-byte `pwrite`, so every chunk cost millions of
+   syscalls. Fixed to write the whole buffer in one call, looping only on a
+   short write.
+2. **`tuple` vs `list` in the range state.** `norm()` sorted a mix of tuples
+   (freshly appended) and lists (loaded from JSON), raising
+   `TypeError: '<' not supported between instances of 'tuple' and 'list'`
+   and losing every chunk. Fixed by coercing to `(int, int)` inside `norm()`.
+
+A third, subtler trap: the preallocated file size is **not** a validity
+signal. A chunked run `ftruncate()`s each file to its full size, so the file
+looks complete before a single byte is fetched. The persisted range set is
+the only truth; the on-disk prefix is adopted **only** on the very first run,
+where an earlier sequential download left a contiguous head.
+
+**Safety rule observed:** only one writer per file. The old 3-stream
+downloader was stopped (`systemctl --user stop maya-xs-download.service`)
+before the chunked one was started; they must never run at the same time.
+
+### 8.5.5 Disk capacity — verified, and it is tight
+
+`/mnt/data` and `/mnt/c` are **NTFS3** mount points on the *same* physical
+2 TB NVMe.
+
+```text
+/mnt/data   583 G total   567 G used   17 G free   98 %   ← NTFS3
+/mnt/c      1.1 T total   841 G used  184 G free   83 %   ← NTFS3
+/            291 G total   233 G used   43 G free   85 %
+```
+
+**NTFS3 `ftruncate` is not sparse** — the preallocated 276.6 GB of XS shards
+occupies real space from the first second of the download. The XS set fits on
+`/mnt/data` with roughly **12 GB** to spare, and nothing else large can be
+placed on `/mnt/data` while it is there.
+
+`/mnt/data/AI-Models/FastH3-V2` was deleted to make room (≈22 GB, per the
+operator's explicit go-ahead). `Maya-S` was **kept**.
+
+### 8.5.6 What was NOT verified — and why
+
+| Claim / step | Status | Reason |
+|---|---|---|
+| **Maya-S GPU test on the v1.1.22 engine** | **NOT RUN** | GPU wedged: `/dev/kfd` returns `EINVAL` on both `O_RDWR` and `O_RDONLY`; engine reports `no CUDA device` (§5.5). Needs a clean reboot, which the operator must perform. |
+| **Maya-XS GPU test** | **NOT RUN** | Same GPU fault, plus the download is still in flight. |
+| **v1.1.22 "1.85x faster drafting on one GPU"** | **NOT MEASURED** | Upstream release-note figure on different hardware. Nothing on this box has reproduced it. |
+| **`DS4_HIP_ATTN_SWIZZLE=1` speedup** | **NOT MEASURED** | GPU fault. |
+| **XS download completion + SHA256** | **IN PROGRESS** | 19.77 / 280.88 GB (7.0 %) at 17:25; the verifier has not run yet. |
+| **Whether the v1.1.21-era Maya-S pack is readable by the v1.1.22 engine** | **NOT YET ANSWERED** | Needs either a diff of the pack-reading code or a live load. Under audit. |
+| **Exact `--ds4-quant maya-xs` install command sequence** | **PARTIALLY RESOLVED** | `setup.sh` is a 5-line wrapper around `maya.sh`. The literal pack/drafter invocations are still being read out of `tools/ds4/pack_gguf.py` (the *new* packer — the older `tools/ds4/pack.py` is the wrong tool for the XS flow). |
+| **XS fits in this box's RAM** | **BY DECLARATION ONLY** | Upstream says 120.6 GB. This box has **124 GB** physical, ≈113 GB available, and must also keep Hermes/Telegram and DSH alive. The old `MemoryMax=80G` is **not** sufficient; a new explicit cgroup limit is required. |
+
+### 8.5.7 Current state at the time of writing
+
+```text
+Maya-XS download   active, 19.77 / 280.88 GB, 19 MB/s, ETA ≈ 4 h
+Strata :18087      inactive (GPU fault, §5.5) — must stay off until Maya tests are done
+DSH :18095         active
+Hermes / Telegram  active, untouched
+ComfyUI            inactive and disabled
+GPU                wedged — /dev/kfd EINVAL, "no CUDA device"
+```
 
 ---
 

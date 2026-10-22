@@ -1,0 +1,23 @@
+[Unit]
+Description=Maya-XS GGUF chunked download (peasantsmith/DeepSeek-V4.1-Flash-1017-Maya-GGUF @ c273fcbdda76a1db074c2f414cb70edbfca2f2ef)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/tomasreminek/.local/bin/xs-dl-chunked.py
+Restart=on-failure
+RestartSec=30
+TimeoutStartSec=infinity
+TimeoutStopSec=60
+KillMode=mixed
+Nice=5
+IOSchedulingClass=idle
+IOSchedulingPriority=7
+Environment=XS_DEST=/mnt/data/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF
+Environment=XS_STATE=/home/tomasreminek/.hermes/state/xs-dl
+Environment=XS_CHUNK=67108864
+Environment=XS_WORKERS=48
+
+[Install]
+WantedBy=default.target
