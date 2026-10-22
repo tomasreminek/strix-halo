@@ -25,6 +25,42 @@ The base URL defaults to `http://127.0.0.1:$PORT` (`PORT` from your `.env`, else
 8000) and can be overridden with `--base` or `$BENCH_BASE`, so a bench can never
 silently measure a closed port while the server runs somewhere else.
 
+## bench_maya.py — the same harness against Project Maya
+
+`bench_maya.py` measures a **Project Maya** server (DeepSeek-V4.1-Flash-1017, the
+Maya-S GGUF on the AMD box) with the same rules as `bench.py`, so a row from the
+two is comparable. The prompts, the seed handling, the token verification and the
+TTFT / TPOT / decode-tok/s formulas are unchanged; only the API surface differs.
+
+```bash
+python3 bench/bench_maya.py --base http://127.0.0.1:18091 --workload prose  --runs 3 --out results/maya-prose.json
+python3 bench/bench_maya.py --base http://127.0.0.1:18091 --workload random --isl 1024 --osl 128
+python3 bench/bench_maya.py --base http://127.0.0.1:18091 --workload mario   --label maya
+```
+
+What the port changes:
+
+1. **Prompt length** comes from Maya's `POST /api/tokens` (the same chat template
+   and tokenizer, nothing run) instead of `/v1/debug/prompt`. It answers with
+   `{"tokens": N}`.
+2. **Engine stats** are not in the SSE stream — Maya has no `x_engine_stats`. They
+   are read from `GET /metrics` after each run (`--metrics-endpoint`): the expert
+   tiers, the VRAM/RAM split of the routed experts, the Engram lookups, the totals
+   and the hardware. `expert_hit_rate` is the VRAM hit rate, `nvme_gb` the storage
+   read per token, `engram_rows` the Engram lookups. Maya publishes **no acceptance
+   length**, so `accept_len_mean` stays `null`; the whole raw `/metrics` snapshot is
+   kept in `metrics_raw` so nothing is lost.
+3. **`ignore_eos` does not exist on Maya.** The run is capped with `max_tokens`
+   instead, and the `finish_reason` says whether the cap was hit (`length`) or the
+   model ended the answer itself (`stop`). `--fixed-len` writes a warning into the
+   JSON when the model stopped by itself, because then the output length is *not*
+   pinned and two configs are compared on two different amounts of work.
+4. **Thinking** is switched with `chat_template_kwargs.enable_thinking` — on
+   Maya's DeepSeek path the top-level `enable_thinking` is ignored, and the
+   server's own default (`reasoning_effort: high` in the run config) would
+   otherwise turn thinking on for every request. `--effort` takes Maya's enum
+   (`none|low|high|max`); a 1-100 number is mapped onto it.
+
 ## Workloads
 
 | workload | prompt | default osl | what it is for |
