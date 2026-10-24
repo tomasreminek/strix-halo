@@ -1,0 +1,16 @@
+{
+ "label": "ms-safe128-16000",
+ "target_tokens": 16000,
+ "prompt_tokens": 15524,
+ "warmup_s": 8.1,
+ "turns": {
+  "turn1": {
+   "ttft_s": 37.97,
+   "total_s": 95.82,
+   "output_tokens": 680,
+   "prefill_tok_s": 408.8,
+   "decode_tok_s": 11.76,
+   "finish": "stop"
+  }
+ }
+}

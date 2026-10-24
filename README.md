@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | CPU / iGPU | AMD Ryzen AI MAX+ 395 · Radeon 8060S · `gfx1151` |
-| Memory | 128 GB class unified. **This box reports 124 GiB** (`free -h`). That 4 GiB gap matters for 110+ GiB MoE. |
+| Memory | 128 GB class unified. Measured `MemTotal` **131,004,904 kB = 124.9 GiB** (`free -h` shows 125Gi). `GTT` **128 GiB**, `VRAM` carveout only **0.5 GiB** — the iGPU maps the same physical RAM, so GTT and RAM do **not** add up. That gap matters for 110+ GiB MoE. |
 | OS | Pop!_OS / Linux 7.0.11, x86_64 |
 | Rule | **One GPU-heavy job at a time.** Unload the LLM before ComfyUI, and vice versa. |
 
@@ -23,12 +23,28 @@ Same original Unsloth weights (`766911a6b7369840a91dbcd95f9f997acaab6cd6`), proj
 
 [Full consolidated report](docs/strata-strix-halo.md) · [Raw requests, responses and configurations](records/benchmarks/unsloth-20261006/)
 
+## Project Maya v1.1.26 · Maya-S / Maya-XS · 2026-10-23/24
+
+Engine `v1.1.26` (`f26d8ba`), HIP build `build-hip/maya-ds4` on ROCm 7.14.1 `gfx1151`, shared flags `--mmap-experts on --vram-experts 0.5 --max-context 131072 --tp 1`, DSpark drafter on, `maya-ramguard.py` tripwire. Prompts actually filled (token counts read back from `/api/tokens`), temperature 0. The two packs ran as **separate sessions, not an interleaved A/B**. **Both completed all four depths, including 120,867 filled tokens on the 131,072-token slot.**
+
+| Actual input | Maya-S prefill / decode (tok/s) | Maya-XS prefill / decode (tok/s) |
+|---|---|---|
+| 8,037 | 307.1 / 9.11 | *withdrawn* / 11.3 |
+| 15,524 | 408.8 / 11.76 | *withdrawn* / 13.1 |
+| 63,526 | **516.4** / 12.74 | 196 / **15.2** |
+| 120,867 | **495.8** / 15.31 | 222 / **17.0** |
+
+**The result is split, not a clean win.** Maya-S (`339.5 GB`, `ntfs3`, 4,743/15,744 experts in GTT) prefills **2.2–2.6× faster**; Maya-XS (`258 GB`, `ntfs-3g`, 7,972/15,744 experts) decodes **~11 % faster** at 64k/120k and peaks **11.8 GiB lower** in cgroup memory (44.93 vs 56.73 GiB). Maya-XS prefill at 8k/15.5k is **withdrawn** — a 0.2 s TTFT is warm KV-cache reuse, not prefill; its 64k/120k prefill is valid (real TTFT 324.4 s / 544.0 s), and its 15.5k request hit the 1,024-token generation cap (`finish=length`). Neither pack froze, OOM'd or failed a request; `MemAvailable` never dropped below **46.1 GiB** on either. **Neither replaces Strata:** Qwen3.8 Flash-Next UD-IQ4_XS decodes 36–49 tok/s on the same box, so Maya's value is the 671B-class model, not throughput. The Maya-XS pack was deleted on 2026-10-24 to free disk for the GSQ-RCO download — these are its only measurements.
+
+[Full report, configs, memory profile and evidence](docs/deepseek-v41-flash.md) · [Frozen raw logs and summary.json](records/benchmarks/maya-20261024/) · [v1.1.21 baseline and GPU-reset causal analysis](deepseek-v41-flash/MAYA-AMD-RESULTS.md)
+
 ## All LLM tests · results and evidence
 
 **Historical Orca measurement (weights removed locally on 2026-10-06): OrcaRouter Qwen3.8 Flash-Next Uncensored IQ3_XXS, Strata server v0.1.40.1 / stock v0.1.40 HIP engine, gfx1151 fast mode, prefill 16384, MTP4 with an 8192-token draft attention window.** Verified real 64k/128k context fixtures and bounded lifecycle; **not yet qualified as the long-term game-coding worker**. Fast mode changes numerics. Historical Halogen results use different weights/quantization and are not a current matched A/B. At the latest runtime readback, Strata and Halogen were stopped; no chat routing or permanent worker replacement was made. Dates below are test dates, not release dates.
 
 | Date tested | Model / tested configuration | Measured result or gate | Outcome and full test |
 |---|---|---|---|
+| **2026-10-23/24** | **Project Maya v1.1.26 · Maya-S (IQ2 `339.5 GB`, `ntfs3`) / Maya-XS (`258 GB`, `ntfs-3g`)** · `build-hip/maya-ds4`, ROCm 7.14.1 `gfx1151`, `--mmap-experts on --vram-experts 0.5 --max-context 131072 --tp 1`, DSpark drafter | Maya-S prefill **307.1 / 408.8 / 516.4 / 495.8 tok/s**, decode **9.11 / 11.76 / 12.74 / 15.31 tok/s** at **8,037 / 15,524 / 63,526 / 120,867** filled tokens. Maya-XS decode **11.3 / 13.1 / 15.2 / 17.0 tok/s**, prefill **196 / 222 tok/s** at 64k/120k (8k/15.5k withdrawn — warm KV reuse) | **Both packs passed 120k** on the 131,072 slot. Peak cgroup **56.73 GiB (S) / 44.93 GiB (XS)**, GTT 63.67 / 63.82 GiB, `MemAvailable` floor 46.4 / 46.1 GiB, **no freeze / OOM / failed request**. XS decodes ~11 % faster, S prefills 2.2–2.6× faster — split result, neither beats Strata's 36–49 tok/s. XS pack deleted 2026-10-24. [Report](docs/deepseek-v41-flash.md) · [Frozen logs](records/benchmarks/maya-20261024/) |
 | **2026-10-06** | **Strata server v0.1.40.1 · Orca Uncensored IQ3_XXS · HIP fast · prefill 16384 · MTP4/window8192** | At **30k**, three independent-process medians: **1301 tok/s prefill / 44.33 tok/s decode / 32.65 s request**. At **126k + 420 output**: **1272 / 42.44 tok/s / 109.23 s**; cached decode **43.43 tok/s**. Growing history: 126,450 input, 126,420 cached, 27 output in **1.12 s** | **39/39 context records, 17/17 short checks passed**; server suite 452 tests, 10 skips, no failures. Clean teardown; multi-file game coding and soak pending. [Report](docs/strata-strix-halo.md) · [JSON](records/benchmarks/strata-20261006/strata-v01401-20261006-summary.json) |
 | **2026-10-06** | **Strata v0.1.40 · Orca Qwen3.8 Flash-Next Uncensored IQ3_XXS · HIP gfx1151 + MTP4** | New-prefix decode **43.6 / 41.8 / 41.5 / 38.7 tok/s** at actual **7.6k / 30k / 62k / 126k** prompts; cached **44.0 / 42.4 / 42.4 / 39.4**. New-prefix prefill **324.3 / 312.2 / 297.4 / 287.1 tok/s** | **Historical first run**: inference completed, followed by unclean reboot of unknown cause. Independent retest completed cleanly; NTFS access recovered after Windows chkdsk. Superseded for speed by the tuned row above. [Full report](docs/strata-strix-halo.md) · [machine-readable results](records/benchmarks/strata-20261006/strata-v0140-strix-halo-20261006-summary.json) |
 | **2026-09-20–28** | **Halogen Qwen3.8 Flash-Next Abliterated** · HGN+patched experts+overlay, MTP | 28 Sep matched HTTP: cold/cached 21.71/11.45 s @9.6k; 66.85/12.27 s @62.4k; 126.11/12.83 s @127.6k. Cold decode 32.64/31.36/30.45 tok/s | **Historical preferred uncensored worker**; [abliterated A/B](docs/qwen38-halogen-abliterated.md) · [Gufo PR #91 end-to-end A/B](docs/gufo-pr91-halogen-e2e-20260928.md) · [historical native Gufo comparison](docs/flash-next-gufo-ciru-halogen-20260925.md) |
@@ -102,7 +118,6 @@ Separate Hilbert dashboard (publication may lag this README):
 [strix-halo.html](http://hilbertkb.31.97.126.27.sslip.io/strix-halo.html)
 
 ## DeepSeek V4.1 Flash Q2 · second pass 2026-09-17
-| **2026-10-22** | **Project Maya v1.1.22 / v1.1.23 · Maya-S (IQ2) / Maya-XS (280.88 GB GGUF)** · `build-hip/maya-ds4` HIP 7.14.1, `LD_LIBRARY_PATH=/mnt/data/toolchains/strata-rocm-7.14.1-gfx1151/install/lib`. `v1.1.22` clean checkout `ffe2e5e`; `v1.1.23` tag `8ceadd7` (fix: `long-row top-k merge` for `>32k` tokens). **GPU test BLOCKED**: `amdgpu` reset `-110`, `/dev/kfd` `EINVAL`, `no CUDA device`. Maya-XS download `30.77/280.88 GB` (`11%` → `~4.5 h` @ `10 MB/s`) via chunked `xs-dl-chunked.py` (`48` → `24` workers, connection resets fixed). Disk: `/mnt/data` freed `154 GB` (`ComfyUI` `87 GB` + `ngram` `48 GB` + `Qwen-Image` `18 GB`). `Strata` `:18087` off; `DSH` `:18095`; `Hermes` alive. | **Verified**: clean HIP build (`[100%] Built target maya-ds4`), `v1.1.23` binary `--help` OK, `Maya-S` pack intact (`339.5 GB`, SHA verified). **Not verified**: GPU test (needs host reboot), Maya-XS GPU (download in progress, `dspark` `0%`), `v1.1.23` runtime benchmark, EXL3 `326.57 GB` (self-contained, `17` shards; resident `~112.9 GiB`; no `deepseek_v41.py` in upstream `exllamav3`). [Full results / evidence](deepseek-v41-flash/MAYA-AMD-RESULTS.md) · [EXL3 disk plan](deepseek-v41-flash/EXL3-DISK-PLAN.md) · [Ops scripts](deepseek-v41-flash/ops/) |
 
 No replicated useful acceleration certified. Cache24 is a working lower-residency fallback, not a speed winner; repeated cache80 pressure aborts qualify the earlier practical recommendation. Prefix reuse is a single exploratory observation, not a general decode gain. [Second-pass report](docs/deepseek-v41-speed2-20260917.md), [single-Strix-Halo deep dive + exact DeepSeek guides](docs/deepseek-v41-single-strix-halo.md), [comparison table](docs/model-comparison.md). The model-authored Tapper coding trial was stopped by the user after repair03 was rejected as unplayable on a physical phone; **no accepted mobile build exists yet** (details and exact timings in the deep dive).
 
@@ -142,6 +157,7 @@ Recipes are MIT. Model weights stay under their own Hugging Face licences.
 ## All docs
 
 - [00 hardware](docs/00-hardware.md)
+- [deepseek v41 flash — Project Maya v1.1.26](docs/deepseek-v41-flash.md)
 - [deepseek v41 night 20260917](docs/deepseek-v41-night-20260917.md)
 - [deepseek v41 single strix halo](docs/deepseek-v41-single-strix-halo.md)
 - [deepseek v41 speed2 20260917](docs/deepseek-v41-speed2-20260917.md)

@@ -1,0 +1,292 @@
+{
+ "campaign": "Project Maya v1.1.26 - Maya-S / Maya-XS on Strix Halo",
+ "test_dates": [
+  "2026-10-23",
+  "2026-10-24"
+ ],
+ "engine": {
+  "version": "1.1.26",
+  "commit": "f26d8ba",
+  "build": "build-hip/maya-ds4",
+  "toolchain": "ROCm 7.14.1 gfx1151",
+  "flags": "--mmap-experts on --vram-experts 0.5 --max-context 131072 --tp 1"
+ },
+ "host": {
+  "cpu_igpu": "AMD Ryzen AI MAX+ 395 / Radeon 8060S / gfx1151",
+  "mem_total_kb": 131004904,
+  "mem_total_gib": 124.94,
+  "gtt_total_gib": 128.0,
+  "vram_carveout_gib": 0.5,
+  "os": "Pop!_OS / Linux 7.0.11"
+ },
+ "runs": {
+  "maya-s": {
+   "pack": {
+    "size_gb": 339.5,
+    "fs": "ntfs3",
+    "expert_pool": "4743/15744 (30.1%)",
+    "experts_gb": 55.47,
+    "dense_gb": 9.75,
+    "prompt_chunks": 16384,
+    "port": 18091,
+    "dspark_acceptance": 0.82
+   },
+   "preflight_avail_mib": 115642,
+   "after_load_avail_mib": 48074,
+   "after_load_gtt_mib": 64915,
+   "peak_cgroup_bytes": 60912115712,
+   "peak_cgroup_gib": 56.73,
+   "memavailable_floor_mib": 47526,
+   "memavailable_floor_gib": 46.41,
+   "gtt_max_mib": 65202,
+   "gtt_max_gib": 63.67,
+   "guard_exit": 0,
+   "failed": 0,
+   "requests_from_log": [
+    {
+     "prompt_chars": 27954,
+     "prompt_tokens": 8037,
+     "prefill_s": 26.2,
+     "prefill_tok_s_log": 307,
+     "decode_s": 59.7,
+     "output_tokens": 544,
+     "decode_tok_s_log": 9.1,
+     "finish": "stop"
+    },
+    {
+     "prompt_chars": 54357,
+     "prompt_tokens": 15524,
+     "prefill_s": 38.0,
+     "prefill_tok_s_log": 409,
+     "decode_s": 57.8,
+     "output_tokens": 680,
+     "decode_tok_s_log": 11.8,
+     "finish": "stop"
+    },
+    {
+     "prompt_chars": 205570,
+     "prompt_tokens": 63526,
+     "prefill_s": 123.0,
+     "prefill_tok_s_log": 516,
+     "decode_s": 56.4,
+     "output_tokens": 718,
+     "decode_tok_s_log": 12.7,
+     "finish": "stop"
+    },
+    {
+     "prompt_chars": 393248,
+     "prompt_tokens": 120867,
+     "prefill_s": 243.8,
+     "prefill_tok_s_log": 496,
+     "decode_s": 40.8,
+     "output_tokens": 624,
+     "decode_tok_s_log": 15.3,
+     "finish": "stop"
+    }
+   ],
+   "requests_from_bench_json": [
+    {
+     "label": "ms-safe128-120000",
+     "target_tokens": 120000,
+     "prompt_tokens": 120867,
+     "warmup_s": 4.0,
+     "turns": {
+      "turn1": {
+       "ttft_s": 243.76,
+       "total_s": 284.53,
+       "output_tokens": 624,
+       "prefill_tok_s": 495.8,
+       "decode_tok_s": 15.31,
+       "finish": "stop"
+      }
+     }
+    },
+    {
+     "label": "ms-safe128-16000",
+     "target_tokens": 16000,
+     "prompt_tokens": 15524,
+     "warmup_s": 8.1,
+     "turns": {
+      "turn1": {
+       "ttft_s": 37.97,
+       "total_s": 95.82,
+       "output_tokens": 680,
+       "prefill_tok_s": 408.8,
+       "decode_tok_s": 11.76,
+       "finish": "stop"
+      }
+     }
+    },
+    {
+     "label": "ms-safe128-64000",
+     "target_tokens": 64000,
+     "prompt_tokens": 63526,
+     "warmup_s": 4.0,
+     "turns": {
+      "turn1": {
+       "ttft_s": 123.01,
+       "total_s": 179.38,
+       "output_tokens": 718,
+       "prefill_tok_s": 516.4,
+       "decode_tok_s": 12.74,
+       "finish": "stop"
+      }
+     }
+    },
+    {
+     "label": "ms-safe128-8000",
+     "target_tokens": 8000,
+     "prompt_tokens": 8037,
+     "warmup_s": 6.3,
+     "turns": {
+      "turn1": {
+       "ttft_s": 26.17,
+       "total_s": 85.86,
+       "output_tokens": 544,
+       "prefill_tok_s": 307.1,
+       "decode_tok_s": 9.11,
+       "finish": "stop"
+      }
+     }
+    }
+   ]
+  },
+  "maya-xs": {
+   "pack": {
+    "size_gb": 258.0,
+    "fs": "ntfs-3g",
+    "expert_pool": "7972/15744 (50.6%)",
+    "experts_gb": 52.45,
+    "prompt_chunks": 8192,
+    "port": 17866
+   },
+   "preflight_avail_mib": 116732,
+   "after_load_avail_mib": 47243,
+   "after_load_gtt_mib": 65067,
+   "peak_cgroup_bytes": 48240259072,
+   "peak_cgroup_gib": 44.93,
+   "memavailable_floor_mib": 47243,
+   "memavailable_floor_gib": 46.14,
+   "gtt_max_mib": 65350,
+   "gtt_max_gib": 63.82,
+   "guard_exit": 0,
+   "failed": 0,
+   "requests_from_log": [
+    {
+     "prompt_chars": 27954,
+     "prompt_tokens": 8037,
+     "prefill_s": 0.2,
+     "prefill_tok_s_log": 37207,
+     "decode_s": 62.6,
+     "output_tokens": 710,
+     "decode_tok_s_log": 11.3,
+     "finish": "stop"
+    },
+    {
+     "prompt_chars": 54357,
+     "prompt_tokens": 15524,
+     "prefill_s": 0.2,
+     "prefill_tok_s_log": 74462,
+     "decode_s": 78.1,
+     "output_tokens": 1024,
+     "decode_tok_s_log": 13.1,
+     "finish": "length"
+    },
+    {
+     "prompt_chars": 205570,
+     "prompt_tokens": 63526,
+     "prefill_s": 324.4,
+     "prefill_tok_s_log": 196,
+     "decode_s": 48.7,
+     "output_tokens": 740,
+     "decode_tok_s_log": 15.2,
+     "finish": "stop"
+    },
+    {
+     "prompt_chars": 393248,
+     "prompt_tokens": 120867,
+     "prefill_s": 544.0,
+     "prefill_tok_s_log": 222,
+     "decode_s": 44.7,
+     "output_tokens": 758,
+     "decode_tok_s_log": 17.0,
+     "finish": "stop"
+    }
+   ],
+   "requests_from_bench_json": [
+    {
+     "label": "xs-safe128-120000",
+     "target_tokens": 120000,
+     "prompt_tokens": 120867,
+     "warmup_s": 1.9,
+     "turns": {
+      "turn1": {
+       "ttft_s": 543.96,
+       "total_s": 588.61,
+       "output_tokens": 758,
+       "prefill_tok_s": 222.2,
+       "decode_tok_s": 16.97,
+       "finish": "stop"
+      }
+     }
+    },
+    {
+     "label": "xs-safe128-16000",
+     "target_tokens": 16000,
+     "prompt_tokens": 15524,
+     "warmup_s": 8.4,
+     "turns": {
+      "turn1": {
+       "ttft_s": 0.21,
+       "total_s": 78.34,
+       "output_tokens": 1024,
+       "prefill_tok_s": 74462.0,
+       "decode_tok_s": 13.11,
+       "finish": "length"
+      }
+     }
+    },
+    {
+     "label": "xs-safe128-64000",
+     "target_tokens": 64000,
+     "prompt_tokens": 63526,
+     "warmup_s": 2.0,
+     "turns": {
+      "turn1": {
+       "ttft_s": 324.45,
+       "total_s": 373.12,
+       "output_tokens": 740,
+       "prefill_tok_s": 195.8,
+       "decode_tok_s": 15.2,
+       "finish": "stop"
+      }
+     }
+    },
+    {
+     "label": "xs-safe128-8000",
+     "target_tokens": 8000,
+     "prompt_tokens": 8037,
+     "warmup_s": 9.7,
+     "turns": {
+      "turn1": {
+       "ttft_s": 0.22,
+       "total_s": 62.8,
+       "output_tokens": 710,
+       "prefill_tok_s": 37206.6,
+       "decode_tok_s": 11.35,
+       "finish": "stop"
+      }
+     }
+    }
+   ]
+  }
+ },
+ "notes": [
+  "Maya-XS prefill at 8k and 15.5k is withdrawn: TTFT 0.2 s is warm KV-cache reuse.",
+  "Maya-XS 64k/120k prefill is valid (TTFT 324.4 s / 544.0 s).",
+  "Maya-XS 15.5k request hit the 1024-token generation cap (finish=length).",
+  "Separate sessions, not an interleaved A/B.",
+  "Maya-XS pack deleted 2026-10-24 on user instruction; measurements preserved here."
+ ],
+ "cross_check_mismatches": 0
+}

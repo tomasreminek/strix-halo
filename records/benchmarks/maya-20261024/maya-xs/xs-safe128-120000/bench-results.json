@@ -1,0 +1,16 @@
+{
+ "label": "xs-safe128-120000",
+ "target_tokens": 120000,
+ "prompt_tokens": 120867,
+ "warmup_s": 1.9,
+ "turns": {
+  "turn1": {
+   "ttft_s": 543.96,
+   "total_s": 588.61,
+   "output_tokens": 758,
+   "prefill_tok_s": 222.2,
+   "decode_tok_s": 16.97,
+   "finish": "stop"
+  }
+ }
+}

@@ -1,19 +1,140 @@
-# Project Maya v1.1.22 / v1.1.23 — DeepSeek V4.1 Flash / Maya-XS
+# Project Maya v1.1.26 — Maya-S / Maya-XS on Strix Halo (measured)
 
-Reference: `strix-halo/deepseek-v41-flash/MAYA-AMD-RESULTS.md`
+**Test dates:** 2026-10-23 / 2026-10-24 · **Engine:** Project Maya `v1.1.26` (`f26d8ba`), HIP build `build-hip/maya-ds4`, ROCm 7.14.1 `gfx1151`
+**Status:** supersedes the v1.1.22 / v1.1.23 entry (GPU-blocked) and the v1.1.21 baseline report. Only v1.1.26 results are current.
+**Correction notice:** an earlier summary of this campaign claimed Maya-XS never finished 64k/120k. That was wrong — the XS run completed at 23:58 on 2026-10-23. All four depths below are from the raw run logs, not from an estimate.
 
-## Verified
-- `v1.1.22` build (`ffe2e5e5`) and `v1.1.23` (`8ceadd7`) on HIP 7.14.1 (`gfx1151`)
-- `LD_LIBRARY_PATH=/mnt/data/toolchains/strata-rocm-7.14.1-gfx1151/install/lib` required
-- Maya-S pack: `339.5 GB`, SHA `VERSHOVEDNO`, `5` GGUF shards (`IO1_S` `Q2`)
-- Maya-XS download: `280.88 GB` (`5` GGUF `276.63 GB` + `dspark` `4.25 GB`), chunked downloader (`19 MB/s`), `11%` complete (`30.77 GB`)
-- `Strata` `:18087` disabled; `DSH` `:18095`; `Hermes` active
-- Disk freed: `ComfyUI` `87 GB`, `ngram` `48 GB`, `Qwen-Image` `18 GB` → `/mnt/data` `170 GB` free
-- CA fix: `pip 26.2.2`, `certifi 2026.10.19` (eMudhra `intermediate` removed)
+---
 
-## Not verified / blocked
-- GPU/KFD reset (`amdgpu` `-110`, `/dev/kfd` `EINVAL`) — needs host reboot (user-controlled)
-- Maya-S GPU test with `v1.1.22`/`v1.1.23` (reboot required)
-- Maya-XS GPU test (download in progress, `dspark` `0%`)
-- `v1.1.23` `1.85x` drafting speed claim and HIP attention swizzle
-- EXL3 `326.57 GB` load (`self-contained`, `17` shards; `deepseek_v41.py` missing in upstream `exllamav3`)
+## Box and memory model
+
+| | |
+|---|---|
+| CPU / iGPU | AMD Ryzen AI MAX+ 395 · Radeon 8060S · `gfx1151`, wave64 |
+| RAM | `MemTotal` **131,004,904 kB = 124.9 GiB** (`free -h` reports 125Gi) |
+| GTT | **128 GiB** — the iGPU maps the same physical RAM, so GTT and RAM do **not** add up |
+| VRAM carveout | **0.5 GiB** only (BIOS UMA); there is no separate VRAM pool |
+| Idle `MemAvailable` | **115,642 MiB = 112.9 GiB** (S run preflight) / **116,732 MiB** (XS preflight) |
+| OS | Pop!_OS / Linux 7.0.11 |
+| Toolchain | `/home/tomasreminek/toolchains/strata-rocm-7.14.1-gfx1151/install`, `LD_LIBRARY_PATH=<toolchain>/lib` required |
+
+## What was run
+
+Both packs were loaded through `~/.local/bin/maya-run27.sh` as systemd units, with `maya-ramguard.py` as a tripwire (`MemAvailable < 10 GiB`, `GTT > 114 GiB`). Engine flags were identical; only the pack differed. These are **separate sessions, not an interleaved A/B**.
+
+| | Maya-S | Maya-XS |
+|---|---|---|
+| Pack | `/mnt/c/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF/Maya-S/maya-ds4` · **339.5 GB**, 6/6 shards, IQ2 | `/mnt/data/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF/Maya-XS/maya-ds4` · **258 GB** (280.88 GB GGUF download) |
+| Filesystem | `ntfs3` | `ntfs-3g` (FUSE) |
+| Expert pool | **4,743 / 15,744 in GTT (30.1 %)**, 55.47 GB; dense 9.75 GB | **7,972 / 15,744 (50.6 %)**, 52.45 GB |
+| Prompt chunks | 16384 | 8192 |
+| DSpark drafter | acceptance **82 %** (344/420 kept; position 1: 81 %, 4: 93 %) | — |
+| Port | 18091 | 17866 |
+| Shared flags | `--vram-experts 0.5 --mmap-experts on --max-context 131072 --tp 1`, reserve 4096 MiB, temperature 0 | same |
+
+Prompts were actually filled — input token counts read back from `/api/tokens` (27,954 / 54,357 / 205,570 / 393,248 characters), not a configured slot size.
+
+## Measured results
+
+### Maya-S — complete, all four depths valid
+
+| Actual input | Prefill tok/s | TTFT | Decode tok/s | Generated | Whole request | Finish |
+|---|---:|---:|---:|---:|---:|---|
+| 8,037 | **307.1** | 26.17 s | **9.11** | 544 | 85.86 s | stop |
+| 15,524 | **408.8** | 37.97 s | **11.76** | 680 | 95.82 s | stop |
+| 63,526 | **516.4** | 123.01 s | **12.74** | 718 | 179.38 s | stop |
+| 120,867 | **495.8** | 243.76 s | **15.31** | 624 | 284.53 s | stop |
+
+Prefill **grows** with context (307.1 → 516.4 tok/s) as chunking amortises and the page cache warms. Decode **also grows** (9.11 → 15.31 tok/s), the opposite of the v1.1.24 direction (12.4 → 9.8); the plausible cause is the v1.1.26 expert-copy/prefetch work plus more experts resident after a long prefill, but this was not isolated as a controlled experiment.
+
+### Maya-XS — complete, two depths withdrawn
+
+| Actual input | Prefill tok/s | TTFT | Decode tok/s | Generated | Finish |
+|---|---:|---:|---:|---:|---|
+| 8,037 | **withdrawn** | 0.2 s | **11.3** | 710 | stop |
+| 15,524 | **withdrawn** | 0.2 s | **13.1** | 1,024 | length (cap) |
+| 63,526 | **196** | 324.4 s | **15.2** | 740 | stop |
+| 120,867 | **222** | 544.0 s | **17.0** | 758 | stop |
+
+**Which XS numbers are valid and which are not:** the 8k and 15.5k "prefill" of 0.2 s / 37,207 / 74,462 tok/s is **warm KV-cache reuse, not prefill** — the engine kept the warm-up context. At 64k and 120k the TTFT is a real 324.4 s and 544.0 s, so **those two prefill figures stand**, as do all four decode figures. The 15.5k request hit the 1,024-token generation cap (`finish=length`), so its decode average is over a truncated stream.
+
+### Maya-S vs Maya-XS at long context
+
+| Depth | Prefill S / XS | Decode S / XS | Peak cgroup S / XS |
+|---|---|---|---|
+| 63,526 | **516.4 / 196** (2.6×) | 12.74 / **15.2** | 56.7 / 44.9 GiB |
+| 120,867 | **495.8 / 222** (2.2×) | 15.31 / **17.0** | 56.7 / 44.9 GiB |
+
+**The result is split, not a clean win.** Maya-S prefills 2.2–2.6× faster; Maya-XS decodes ~11 % faster and used 11.8 GiB less cgroup memory. That also weakens the filesystem hypothesis for decode: XS sat on `ntfs-3g` (FUSE) and still decoded faster, while its much slower prefill is consistent with FUSE being slow at bulk sequential reads.
+
+## Memory and lifecycle
+
+| Metric | Maya-S | Maya-XS |
+|---|---|---|
+| Peak cgroup memory | **56.73 GiB** (60,912,115,712 B) | **44.93 GiB** (48,240,259,072 B) |
+| `MemAvailable` floor | **46.41 GiB** (47,526 MiB) | **46.14 GiB** (47,243 MiB) |
+| GTT used (steady) | **63.67 GiB** (65,202 MiB) | **63.82 GiB** (65,350 MiB) |
+| Ramguard tripwire | exit 0, never triggered | exit 0, never triggered |
+| Freezes / OOM kills | **0** | **0** |
+| Failed requests | **0** | **0** |
+
+No freeze occurred at any depth on either pack. `--vram-experts 0.5` + `MemoryMax` + ramguard held the box stable across all eight measured requests.
+
+## Findings
+
+1. **Both packs really do run 120k on this box.** 120,867 filled tokens on a configured 131,072-token slot, no OOM, no freeze, on both `339.5 GB` and `258 GB` packs.
+2. **Maya-S is the prefill choice, Maya-XS the decode choice.** S: 495.8 tok/s prefill / 15.31 tok/s decode at 120k. XS: 222 tok/s / 17.0 tok/s. Neither dominates.
+3. **Maya-XS was cheaper in memory** (44.93 vs 56.73 GiB peak cgroup) despite a larger expert pool — it keeps more experts resident and streams less.
+4. **Neither is a Strata replacement.** Strata + Qwen3.8 Flash-Next UD-IQ4_XS decodes **36–49 tok/s** on the same box (two streams: 21.5 + 21.4). Maya's value is the 671B-class model, not throughput.
+5. **The XS campaign is closed by deletion, not by a verdict.** The pack was removed on 2026-10-24 (user instruction) to make room for the GSQ-RCO download. Its measurements are preserved here and in the evidence files; re-testing would require a fresh 280.88 GB download.
+
+## Not verified
+
+- Any Maya result on `v1.1.23` — that build never got GPU access (see historical section).
+- A `v1.1.26`-versus-`v1.1.23` A/B — only `v1.1.26` was measured.
+- Coding quality or multi-file game-code output from either pack — these runs measured throughput only.
+- A multi-hour soak; each depth is a single request.
+- Maya versus a contemporaneous Strata run on the same day (the 36–49 tok/s Strata figure is a separate session).
+- Maya-XS prefill at 8k/15.5k — withdrawn, would need a KV flush or engine restart between depths.
+
+## Next: DeepSeek-V4.1-Flash-1017 GSQ-RCO
+
+The successor pack is being downloaded from `ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF`:
+
+| | |
+|---|---|
+| Backbone IQ2_XXS (4 shards) | **138.24 GB** = 128.7 GiB |
+| Engram IQ4_NL | **110.60 GB** — memory-mapped, one row read per token, not resident |
+| Total download | **248.84 GB** |
+| Reported quality | task average **93.54**, **100.0 %** of the base model (IQ1_M: 92.32) |
+
+Residency arithmetic: the 128.7 GiB backbone does **not** fit in the 112.9 GiB of free RAM, so roughly **17 GB must stream from disk** during inference — against the ~155 GB streamed by Maya-S. Strata engine 0.1.48 does not yet load GSQ/Engram; the run waits on a new engine.
+
+## Historical
+
+### v1.1.22 / v1.1.23 — GPU test blocked (2026-10-22)
+
+- `v1.1.22` clean checkout `ffe2e5e5`; `v1.1.23` tag `8ceadd7` (fix: long-row top-k merge for `>32k` tokens).
+- Clean HIP build (`[100%] Built target maya-ds4`), binary `--help` OK, Maya-S pack intact and SHA verified.
+- **No inference result:** `amdgpu` reset `-110`, `/dev/kfd` `EINVAL`, `no CUDA device`. Required a host reboot, which the user controlled.
+- Maya-XS download at the time: 30.77 / 280.88 GB (11 %) via `xs-dl-chunked.py` (48 → 24 workers after connection resets).
+- Disk freed to make room: ComfyUI 87 GB, ngram 48 GB, Qwen-Image 18 GB → `/mnt/data` 170 GB free.
+- EXL3 `326.57 GB` (17 shards, resident ~112.9 GiB) audited but not loaded — upstream `exllamav3` has no `deepseek_v41.py`.
+
+### v1.1.21 baseline and causal analysis
+
+Full earlier results, the GPU-reset causal chain and the upstream EXL3 audit are in **[MAYA-AMD-RESULTS.md](../deepseek-v41-flash/MAYA-AMD-RESULTS.md)** (39 KB). That report covers engine `v1.1.21` (`451f9cb`) and is historical for throughput purposes.
+
+## Evidence
+
+| What | Where |
+|---|---|
+| S run log (all four depths, guard, peak cgroup) | `records/benchmarks/maya-20261024/maya-s/run.log` |
+| S per-depth results | `records/benchmarks/maya-20261024/maya-s/ms-safe128-*/bench-results.json` |
+| XS run log | `records/benchmarks/maya-20261024/maya-xs/run.log` |
+| Machine-readable summary | `records/benchmarks/maya-20261024/summary.json` |
+| Engine configs | `~/.hermes/state/maya-ms-safe128.json`, `~/.hermes/state/maya-xs-safe128.json` |
+| Bench harness | `~/.local/bin/maya-ds4-bench.py`, `maya-run27.sh`, `maya-ramguard.py` |
+| Consolidated markdown (local) | `~/Projekty/maya-bench-results/MAYA-v1.1.26-strix-halo.md` |
+
+Strata restore snapshot taken before the Maya campaign: `~/.hermes/state/strata-restore-20261023/{unit.service,config.json,settings.json}`.
