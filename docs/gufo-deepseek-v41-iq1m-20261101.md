@@ -136,6 +136,47 @@ Greedy, seed 42, three fixtures ([`quality.txt`](../records/benchmarks/gufo-iq1m
 
 IQ1_M is a 1.6-bit-class quantization; this is the price. The runtime is usable for generation, editing and tool-style work under supervision, and is **not** trustworthy as a factual authority without a check.
 
+### Thinking on versus off — same decode speed, different latency
+
+The QA gate in the previous section is only the visible part of a larger question: what does
+reasoning cost in throughput? Measured 2026-11-01 against the running server on `:18092`,
+streaming, `temperature: 0`, token counts from the SSE deltas, three tasks in both modes.
+Raw numbers: [`records/benchmarks/gufo-iq1m-20261101/reasoning-on-vs-off.csv`](../records/benchmarks/gufo-iq1m-20261101/reasoning-on-vs-off.csv).
+
+| Task | Mode | Reasoning tok | Answer tok | Seconds | tok/s | First answer token |
+|---|---|---|---|---|---|---|
+| France capital | thinking on | 43 | 3 | 3.4 | 13.66 | 3.2 s |
+| France capital | thinking off | 0 | 3 | 0.4 | 7.53 | 0.3 s |
+| Train Prague–Brno | thinking on | 49 | 68 | 6.3 | 18.68 | 3.4 s |
+| Train Prague–Brno | thinking off | 0 | 95 | 4.2 | 22.37 | 0.3 s |
+| Longest common subsequence | thinking on | 442 | 247 | 28.9 | 23.82 | 19.2 s |
+| Longest common subsequence | thinking off | 0 | 150 | 6.6 | 22.68 | 0.4 s |
+
+**Decode speed does not change.** Thinking does not generate slower — it generates *more tokens*,
+through the same autoregressive loop. Means: 18.72 tok/s with thinking, 17.53 tok/s without; the
+spread is noise, and the long generation confirms it (23.82 versus 22.68, both at the ~24 tok/s
+ceiling that the serving bench reports).
+
+The short generations read low for a different reason: prefill and first-token latency are inside
+the divisor. Three answer tokens in 0.4 s is 7.53 tok/s as arithmetic, not as a decode rate.
+
+**What actually costs is time to first answer token.** The model must finish the whole reasoning
+block before it emits the first word the user sees:
+
+- trivial question — 3.2 s instead of 0.3 s
+- word problem — 3.4 s instead of 0.3 s
+- code — **19.2 s instead of 0.4 s**, total wall 28.9 s versus 6.6 s (4.4×)
+
+**Reasoning length is self-selected.** 43 tokens for a one-word fact, 49 for an arithmetic word
+problem, 442 for an algorithmic problem. Nothing sets that budget; the model decides how hard the
+task is. Also worth noting: with thinking on the word-problem *answer* got shorter (68 versus 95
+tokens) because the working was done in the reasoning block instead of being written out.
+
+**Tool calling works on this server.** Verified against `:18092`: a `tools` request returned
+`finish_reason: "tool_calls"` with `get_weather({"city": "Praha"})` in 39 tokens at 22.18 tok/s.
+This is what makes the two slots usable as an agent backend rather than a chat toy — the same
+endpoint can serve a tool-calling harness.
+
 ## 6. Throughput — the matrix
 
 `gufo bench`, `-p 2048 -n 128`, streamed experts from SSD, own systemd scope. `stream_warm` is the first run after the page cache is warm; `stream` is a cold-cache repeat.

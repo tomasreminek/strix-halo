@@ -1,0 +1,7 @@
+task,mode,reasoning_tokens,answer_tokens,total_tokens,seconds,tok_per_s,first_answer_token_s
+trivial_france_capital,thinking_on,43,3,46,3.4,13.66,3.2
+trivial_france_capital,thinking_off,0,3,3,0.4,7.53,0.3
+word_problem_train_brno,thinking_on,49,68,117,6.3,18.68,3.4
+word_problem_train_brno,thinking_off,0,95,95,4.2,22.37,0.3
+code_longest_common_subseq,thinking_on,442,247,689,28.9,23.82,19.2
+code_longest_common_subseq,thinking_off,0,150,150,6.6,22.68,0.4
