@@ -8,7 +8,7 @@ This document is the **replication recipe**, not just a result table. Every numb
 
 ## Why this exists
 
-Earlier DeepSeek V4.1 work on this box ([single host](deepseek-v41-single-strix-halo.md), [overnight](deepseek-v41-night-20260917.md), [second pass](deepseek-v41-speed2-20260917.md), [Project Maya](deepseek-v41-flash.md)) topped out at 7.12 tok/s of HTTP completion through the `ds4` Q2 streaming path. This run uses a **different runtime** (the `franzmoca/gufo` fork, branch `feat/ds41`) and a **different quantization** (ISTA IQ1_M). **The numbers are not comparable** — different decoder, different weights, different measurement method. Do not put these in the same table as the `ds4` rows.
+Earlier DeepSeek V4.1 work on this box ([single host](deepseek-v41-single-strix-halo.md), [overnight](deepseek-v41-night-20260917.md), [second pass](deepseek-v41-speed2-20260917.md), [Project Maya](maya-v1126-20261024.md)) topped out at 7.12 tok/s of HTTP completion through the `ds4` Q2 streaming path. This run uses a **different runtime** (the `franzmoca/gufo` fork, branch `feat/ds41`) and a **different quantization** (ISTA IQ1_M). **The numbers are not comparable** — different decoder, different weights, different measurement method. Do not put these in the same table as the `ds4` rows.
 
 ## What was actually run
 
@@ -222,7 +222,7 @@ Recorded so nobody repeats it:
 - **DSpark drafter** — `drafter-src/` holds `dspark.json` + `dspark.bin` (16 GB) but the engine expects GGUF and will not load the `.bin`. Speculative decoding with DSpark is unavailable.
 - **Resident (no streaming)** — needs **114.00 GiB**, box offers **102.21 GiB** (111.2 GiB `MemAvailable` minus 9.13 GiB `CmaFree`). `ds41_expert_available_memory()` reads `/proc/meminfo` directly and has no override; the only route is `kho=off` in GRUB plus a reboot, worth roughly +14 % prefill / +6 % decode. **Not worth it.** The authors' quoted 1228/24.5 tok/s is a resident configuration this machine cannot reach.
 - **Maya-S as the backbone** — closed. Layers 0–3 are `IQ2_S`/`IQ3_S` and `gufo` has no table-indexed kernel for `IQ3_S` (type 21); `v41_decode.cpp:1295` fails with "no table-indexed kernel for this shape". Only its two Engram tables are usable here.
-- **AtomicChat uncensored IQ1_M** — *not* a drop-in: 4 shards vs 6, 81 keys vs 77, `engram_gate` (F32) becomes `engram_q`+`engram_k` (BF16), `engram_kv`→`engram_wkv`, 40× `exp_probs_b_vl.bias` missing, Engram constants as I64. The `q⊙k == engram_gate` equivalence is bit-exact (verified, layer 14), so a port is real work rather than impossible — roughly a day. See [DeepSeek V4.1 uncensored](../deepseek-v41-flash/RESULTS.md) notes.
+- **AtomicChat uncensored IQ1_M** — *not* a drop-in: 4 shards vs 6, 81 keys vs 77, `engram_gate` (F32) becomes `engram_q`+`engram_k` (BF16), `engram_kv`→`engram_wkv`, 40× `exp_probs_b_vl.bias` missing, Engram constants as I64. The `q⊙k == engram_gate` equivalence is bit-exact (verified, layer 14), so a port is real work rather than impossible — roughly a day. Source: `AtomicChat/DeepSeek-V4.1-Flash-1017-Uncensored-GSQ-RCO-GGUF` on Hugging Face (MIT); the vendored DGX Spark copy that used to hold these notes was removed on 2026-11-01.
 
 ## 11. Disk budget
 
