@@ -2,6 +2,9 @@
 
 Status: benchmark phase consolidated. No global route/backend changed. No active inference owner at consolidation. Not an exhaustive search or a production promotion.
 
+> **Later result on the same box, not comparable:** [Gufo + ISTA IQ1_M, 2026-11-01](gufo-deepseek-v41-iq1m-20261101.md) reaches **24 tok/s decode / 1.2–1.3k tok/s prefill** at 32k–128k. That is a different runtime (`gufo`), a different quantization (IQ1_M instead of Q2) and a different measurement method (native `gufo bench` depth sweep). It does **not** supersede the numbers below and is not an improvement of `ds4`; do not put the two in one table.
+
+
 ## Practical choice
 
 For both small programming jobs and everyday Czech use, the best-supported tested choice is the exact antirez V4.1 Flash Q2, ds4 baseline plus isolated host portability fix 869a09dec445def450bf2d7e6333ced5b9152753, ROCm 7.2.4/gfx1151, SSD streaming, --ssd-streaming-cache-experts 80GB (runtime reports 80 GiB), --ctx 8192, --batched-session 1, default threads, reasoning_effort none for quick answers. Keep reasoning available for harder work; this narrow suite does not prove that none preserves quality on difficult programming. Do not promote as a fully certified Hermes main model: native tool_calls API and successful 128k remain unverified.

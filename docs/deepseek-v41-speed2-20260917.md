@@ -2,6 +2,9 @@
 
 Marker: `DEEPSEEK_V41_SPEED2_20260917`.
 
+> **Later result on the same box, not comparable:** [Gufo + ISTA IQ1_M, 2026-11-01](gufo-deepseek-v41-iq1m-20261101.md) reaches **24 tok/s decode / 1.2–1.3k tok/s prefill** at 32k–128k. That is a different runtime (`gufo`), a different quantization (IQ1_M instead of Q2) and a different measurement method (native `gufo bench` depth sweep). It does **not** supersede the numbers below and is not an improvement of `ds4`; do not put the two in one table.
+
+
 ## Verdict
 
 No replicated useful acceleration was certified. Optimization is closed, not extended to fill the authorized window. The previous overnight cache80 result remains historical evidence, not a safe universal operating recommendation: repeated second-pass arms hit the active pressure guards. Cache24 completed the short extraction, sandbox Python and reviewed Czech tasks and was selected only as a lower-residency fallback for a separately measured model-authored game. It is **not a speed winner**. The game and browser QA are separate gates and are not certified by this report.
