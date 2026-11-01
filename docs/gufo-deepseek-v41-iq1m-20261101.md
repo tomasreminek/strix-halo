@@ -4,7 +4,7 @@ A **671B-class MoE running at 24 tok/s decode and 1.2–1.3k tok/s prefill on a 
 
 This document is the **replication recipe**, not just a result table. Every number here came from a run on the box described in [00 hardware](00-hardware.md); the frozen logs are in [records/benchmarks/gufo-iq1m-20261101](../records/benchmarks/gufo-iq1m-20261101/) and the scripts are in [recipes/deepseek-v41](../recipes/deepseek-v41/).
 
-**Status: research runtime, not production.** Quality gate passed 2 of 3 fixtures — the Czech answer to a geography question came back as "Ne" instead of "Paris". Treat it as a fast worker under supervision, not as an authority. The two-slot server was left running as a test instance on port `:18092`; nothing was switched onto the production port.
+**Status: research runtime, not production.** Quality gate passed 2 of 3 fixtures — the Czech answer to a geography question came back as "Ne" instead of "Paris". **That failure is a harness artefact, not a weight problem:** the gate ran with `--think off`, and V4.1 Flash is a reasoning model. Re-run through the API the same prompt answers `Paříž` with thinking on and `Ne` with `reasoning_effort: none`. Re-run of the fixed gate (thinking on) on 2026-11-01 11:17 gives **`VYSLEDEK: PASS (3/3)` in 70 s**. See §5. Treat it as a fast worker under supervision, not as an authority. The two-slot server was left running as a test instance on port `:18092`; nothing was switched onto the production port.
 
 ## Why this exists
 
@@ -120,7 +120,11 @@ systemd-run --user --scope --quiet --collect -p MemoryMax=infinity \
 
 If you measure from a plain shell, skip the wrapper. If you measure from anything cgroup-managed, **do not skip it** — you will report the cgroup, not the model.
 
-## 5. Quality gate — 2 of 3
+## 5. Quality gate — 2 of 3 with thinking off, 3 of 3 with it on
+
+**Result of the corrected gate, 2026-11-01 11:17: `QUALITY GATE: 0 selhani ze 3` / `VYSLEDEK: PASS (3/3)`, 70 s wall.**
+Raw output kept at [`records/benchmarks/gufo-iq1m-20261101/quality-thinking-on-20261101.txt`](../records/benchmarks/gufo-iq1m-20261101/quality-thinking-on-20261101.txt).
+The original `--think off` run is preserved as `quality.txt`; do not read it as a quantization verdict.
 
 Greedy, seed 42, three fixtures ([`quality.txt`](../records/benchmarks/gufo-iq1m-20261101/quality.txt)):
 
@@ -128,7 +132,7 @@ Greedy, seed 42, three fixtures ([`quality.txt`](../records/benchmarks/gufo-iq1m
 |---|---|---|
 | arithmetic | `391` | **PASS** |
 | code | `s[::-1]` / `reversed` | **PASS** |
-| Czech geography | `Paříž` / `Paris` | **FAIL** — answered "Ne" |
+| Czech geography | `Paříž` / `Paris` | **FAIL with `--think off`** — answered "Ne" · **PASS with thinking on** — answered `Paříž` |
 
 IQ1_M is a 1.6-bit-class quantization; this is the price. The runtime is usable for generation, editing and tool-style work under supervision, and is **not** trustworthy as a factual authority without a check.
 

@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # QA gate: verifies the model generates COHERENT text after the Engram drop-in, not just fast tokens.
 # Greedy decoding (-t 0), fixed seed -> deterministic. Answers are checked with grep.
+#
+# THINKING MUST STAY ON. DeepSeek V4.1 Flash is a reasoning model: with `--think off` it answers
+# the Czech fixture "Ne" instead of "Pariz", which reads as a quantization defect but is not one.
+# Verified 2026-11-01 through the API: `reasoning_effort: none` reproduces "Ne", the default
+# answers "Pariz". Hence `--think on` and a token budget that leaves room for the reasoning block
+# (the model spends ~30-300 tokens thinking before it emits any answer text).
 # Output: ~/gufo-iq1m-results/quality.txt   Exit: 0 = passed, 1 = failed
 set -uo pipefail
 cd "$(dirname "$0")"
@@ -25,7 +31,7 @@ fails=0
 ask() { # nazev prompt n vzor -- kazda odpoved do vlastniho souboru, grepuje se jen odpoved
   local name=$1 p=$2 n=$3 pat=$4 ans="$TMP/$1.ans"
   timeout 900 "${RUNNER[@]}" ./build/gufo prompt -m "$M" --stream-experts \
-      -p "$p" -n "$n" -t 0 -s 42 --think off --no-display-prompt > "$ans" 2>&1
+      -p "$p" -n "$n" -t 0 -s 42 --think on --no-display-prompt > "$ans" 2>&1
   local rc=$? verdict=PASS
   grep -qiE "$pat" "$ans" || verdict=FAIL
   [ "$verdict" = FAIL ] && fails=$((fails+1))
@@ -39,9 +45,9 @@ ask() { # nazev prompt n vzor -- kazda odpoved do vlastniho souboru, grepuje se 
     echo
   } >> "$Q"
 }
-ask "matematika" "What is 17*23? Answer with just the number." 96 '\b391\b'
-ask "kod"        "Write a Python expression that reverses the string s." 96 '\[::-1\]|reversed'
-ask "cestina"    "Jake je hlavni mesto Francie? Odpovez jednim slovem." 48 'Pa[rř][ií][zž]|Paris'
+ask "matematika" "What is 17*23? Answer with just the number." 384 '\b391\b'
+ask "kod"        "Write a Python expression that reverses the string s." 384 '\[::-1\]|reversed'
+ask "cestina"    "Jake je hlavni mesto Francie? Odpovez jednim slovem." 384 'Pa[rř][ií][zž]|Paris'
 
 # Hard threshold: at least 2 of 3 must pass. One flaky prompt must not kill the whole night,
 # but 0-1 of 3 = total nonsense = broken Engram drop-in -> abort.

@@ -1,0 +1,65 @@
+################ matematika  [PASS]
+PROMPT: What is 17*23? Answer with just the number.
+EXPECT: \b391\b   (rc=0)
+---- odpoved ----
+warning: DeepSeek V4.1 GGUF chat template differs from the 1017 release (sha256 4d61d22c90ea0cdf15c7e298f7215f23eeffd20f8eed8fb517fda5fb64693d99); rendering prompts with the built-in deepseek-v4.1-flash-1017-compiled-v1 template
+2026-11-01 11:17:16 [INFO] [ds41] DeepSeek V4.1 Flash: 5 backbone shard(s), 112.00 GiB device-eligible weights; Engram models/ista-iq1m/DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M-00006-of-00006.gguf (150.21 GiB, 210 B rows, read from disk)
+2026-11-01 11:17:16 [WARN] [ds41] 8.88 GiB of the available memory is free CMA (CmaFree in /proc/meminfo), which GPU memory cannot use; the resident model and its sessions need that memory. If it is the kernel's KHO scratch area (Ubuntu 26.04), boot with kho=off
+2026-11-01 11:17:16 [INFO] [ds4] backend initialized on AMD Radeon 8060S Graphics (sm_115)
+2026-11-01 11:17:16 [INFO] [ds4] native MMQ enabled
+2026-11-01 11:17:16 [INFO] [ds41] streaming routed experts: 5.31 GiB dense weights, 102.59 GiB available unified memory
+2026-11-01 11:17:16 [INFO] [ds4] loading model tensors into device cache
+2026-11-01 11:17:17 [INFO] [ds4] ROCm startup model cache prepared 5.31 GiB of tensor spans in 1.080s
+2026-11-01 11:17:36 [INFO] [ds41] expert seed (built-in V4.1 ranking): cached 12090 of 12090 experts (12090 ranked) from 83.83 GiB in 18.60 s
+[Model Load]: 20.0216 s
+We need answer just number. Compute 17*23 = 391. Need final2026-11-01 11:17:37 [INFO] [ds41] expert cache interval: 97.0% route hits, 34.61 MiB read/token (2.3% prefetched), 21.54 ms host wait/token, 86.39 GiB allocated
+ just number.</think>391
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=0 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0 full_blocks=0 anchors=0 verifier_rows=0 lookup_cycles=0 lookup_copied=0 lookup_accepted=0
+2026-11-01 11:17:37 [INFO] [ds41] expert cache total: 97.1% route hits, 32.70 MiB read/token, 22.58 ms host wait/token, 86.39 GiB allocated, 0.05 GiB prefetched (0.00 GiB dropped)
+2026-11-01 11:17:37 [INFO] [ds41] expert reads: 9140 direct, 0 buffered
+-----------------
+
+################ kod  [PASS]
+PROMPT: Write a Python expression that reverses the string s.
+EXPECT: \[::-1\]|reversed   (rc=0)
+---- odpoved ----
+warning: DeepSeek V4.1 GGUF chat template differs from the 1017 release (sha256 4d61d22c90ea0cdf15c7e298f7215f23eeffd20f8eed8fb517fda5fb64693d99); rendering prompts with the built-in deepseek-v4.1-flash-1017-compiled-v1 template
+2026-11-01 11:17:38 [INFO] [ds41] DeepSeek V4.1 Flash: 5 backbone shard(s), 112.00 GiB device-eligible weights; Engram models/ista-iq1m/DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M-00006-of-00006.gguf (150.21 GiB, 210 B rows, read from disk)
+2026-11-01 11:17:38 [WARN] [ds41] 8.78 GiB of the available memory is free CMA (CmaFree in /proc/meminfo), which GPU memory cannot use; the resident model and its sessions need that memory. If it is the kernel's KHO scratch area (Ubuntu 26.04), boot with kho=off
+2026-11-01 11:17:38 [INFO] [ds4] backend initialized on AMD Radeon 8060S Graphics (sm_115)
+2026-11-01 11:17:38 [INFO] [ds4] native MMQ enabled
+2026-11-01 11:17:38 [INFO] [ds41] streaming routed experts: 5.31 GiB dense weights, 102.04 GiB available unified memory
+2026-11-01 11:17:39 [INFO] [ds4] loading model tensors into device cache
+2026-11-01 11:17:39 [INFO] [ds4] ROCm startup model cache prepared 5.31 GiB of tensor spans in 0.986s
+2026-11-01 11:17:58 [INFO] [ds41] expert seed (built-in V4.1 ranking): cached 12069 of 12069 experts (12069 ranked) from 83.69 GiB in 18.40 s
+[Model Load]: 19.7685 s
+We need answer. Need write Python expression reverses string s. Likely s[::-1]. Need concise2026-11-01 11:18:00 [INFO] [ds41] expert cache interval: 97.1% route hits, 34.94 MiB read/token (1.7% prefetched), 23.23 ms host wait/token, 86.27 GiB allocated
+. Maybe mention expression. Ensure no extra.</think>`s[::-1]`
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=0 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0 full_blocks=0 anchors=0 verifier_rows=0 lookup_cycles=0 lookup_copied=0 lookup_accepted=0
+2026-11-01 11:18:00 [INFO] [ds41] expert cache total: 97.5% route hits, 31.40 MiB read/token, 25.92 ms host wait/token, 86.39 GiB allocated, 0.08 GiB prefetched (0.01 GiB dropped)
+2026-11-01 11:18:00 [INFO] [ds41] expert reads: 9262 direct, 0 buffered
+-----------------
+
+################ cestina  [PASS]
+PROMPT: Jake je hlavni mesto Francie? Odpovez jednim slovem.
+EXPECT: Pa[rř][ií][zž]|Paris   (rc=0)
+---- odpoved ----
+warning: DeepSeek V4.1 GGUF chat template differs from the 1017 release (sha256 4d61d22c90ea0cdf15c7e298f7215f23eeffd20f8eed8fb517fda5fb64693d99); rendering prompts with the built-in deepseek-v4.1-flash-1017-compiled-v1 template
+2026-11-01 11:18:01 [INFO] [ds41] DeepSeek V4.1 Flash: 5 backbone shard(s), 112.00 GiB device-eligible weights; Engram models/ista-iq1m/DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M-00006-of-00006.gguf (150.21 GiB, 210 B rows, read from disk)
+2026-11-01 11:18:01 [WARN] [ds41] 8.91 GiB of the available memory is free CMA (CmaFree in /proc/meminfo), which GPU memory cannot use; the resident model and its sessions need that memory. If it is the kernel's KHO scratch area (Ubuntu 26.04), boot with kho=off
+2026-11-01 11:18:01 [INFO] [ds4] backend initialized on AMD Radeon 8060S Graphics (sm_115)
+2026-11-01 11:18:01 [INFO] [ds4] native MMQ enabled
+2026-11-01 11:18:01 [INFO] [ds41] streaming routed experts: 5.31 GiB dense weights, 102.35 GiB available unified memory
+2026-11-01 11:18:02 [INFO] [ds4] loading model tensors into device cache
+2026-11-01 11:18:02 [INFO] [ds4] ROCm startup model cache prepared 5.31 GiB of tensor spans in 0.971s
+2026-11-01 11:18:21 [INFO] [ds41] expert seed (built-in V4.1 ranking): cached 12090 of 12090 experts (12090 ranked) from 83.83 GiB in 18.77 s
+[Model Load]: 20.0999 s
+We need answer in Czech one word. Question: "2026-11-01 11:18:23 [INFO] [ds41] expert cache interval: 92.7% route hits, 56.31 MiB read/token (1.0% prefetched), 24.49 ms host wait/token, 87.85 GiB allocated
+Jake je hlavni mesto Francie?" likely typo "Jaké je hlavní město Francie?" Answer one word: Paříž. Need just one word.</think>Paříž
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=0 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0 full_blocks=0 anchors=0 verifier_rows=0 lookup_cycles=0 lookup_copied=0 lookup_accepted=0
+2026-11-01 11:18:25 [INFO] [ds41] expert cache total: 95.2% route hits, 40.19 MiB read/token, 29.67 ms host wait/token, 88.22 GiB allocated, 0.07 GiB prefetched (0.00 GiB dropped)
+2026-11-01 11:18:25 [INFO] [ds41] expert reads: 9953 direct, 0 buffered
+-----------------
+
+=== QUALITY GATE: 0 selhani ze 3 ===
+VYSLEDEK: PASS (3/3)
