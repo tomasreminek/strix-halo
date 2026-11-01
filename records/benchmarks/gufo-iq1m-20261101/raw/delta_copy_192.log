@@ -1,0 +1,42 @@
+warning: DeepSeek V4.1 GGUF chat template differs from the 1017 release (sha256 4d61d22c90ea0cdf15c7e298f7215f23eeffd20f8eed8fb517fda5fb64693d99); rendering prompts with the built-in deepseek-v4.1-flash-1017-compiled-v1 template
+2026-11-01 08:38:44 [INFO] [ds41] DeepSeek V4.1 Flash: 5 backbone shard(s), 112.00 GiB device-eligible weights; Engram models/ista-iq1m/DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M-00006-of-00006.gguf (150.21 GiB, 210 B rows, read from disk)
+2026-11-01 08:38:44 [WARN] [ds41] 9.01 GiB of the available memory is free CMA (CmaFree in /proc/meminfo), which GPU memory cannot use; the resident model and its sessions need that memory. If it is the kernel's KHO scratch area (Ubuntu 26.04), boot with kho=off
+2026-11-01 08:38:44 [INFO] [ds4] backend initialized on AMD Radeon 8060S Graphics (sm_115)
+2026-11-01 08:38:44 [INFO] [ds4] native MMQ enabled
+2026-11-01 08:38:44 [INFO] [ds41] streaming routed experts: 5.31 GiB dense weights, 101.57 GiB available unified memory
+2026-11-01 08:38:44 [INFO] [ds4] loading model tensors into device cache
+2026-11-01 08:38:45 [INFO] [ds4] ROCm startup model cache prepared 5.31 GiB of tensor spans in 0.962s
+2026-11-01 08:39:04 [INFO] [ds41] expert seed (built-in V4.1 ranking): cached 11923 of 11923 experts (11923 ranked) from 82.68 GiB in 18.14 s
+2026-11-01 08:39:05 [INFO] [ds41] expert cache interval: 97.4% route hits, 8.45 MiB read/token (0.0% prefetched), 3.69 ms host wait/token, 86.27 GiB allocated
+[Model Load]: 19.4447 s
+[server]
+listen = 0.0.0.0:8080
+workers = 16
+timeout_seconds = 120
+keepalive_seconds = 65
+max_request_bytes = 1042026-11-01 08:39:07 [INFO] [ds41] expert cache interval: 99.3% route hits, 16.29 MiB read/token (40.5% prefetched), 19.74 ms host wait/token, 87.00 GiB allocated
+857600
+log_level = info
+log_target = /var/log/service/app.log
+metrics_enabled = true
+metrics_path = /metrics
+tls_enabled = false
+tls_cert = /etc/service/tls/cert.pem
+tls_key = /etc/service/tls/key.pem2026-11-01 08:39:08 [INFO] [ds41] expert cache interval: 99.3% route hits, 17.78 MiB read/token (53.5% prefetched), 14.71 ms host wait/token, 87.61 GiB allocated
+
+shutdown_grace_seconds = 30
+health_path = /healthz
+readiness_path = /readyz
+queue_depth = 4096
+retry_attempts = 3
+retry_backoff_ms = 250
+circuit_breaker_threshold = 50
+circuit_2026-11-01 08:39:09 [INFO] [ds41] expert cache interval: 99.5% route hits, 11.60 MiB read/token (42.6% prefetched), 15.69 ms host wait/token, 88.10 GiB allocated
+breaker_window_seconds = 60
+
+[database]
+host = db.internal
+port = 
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=13 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0.923077 full_blocks=12 anchors=13 verifier_rows=182 lookup_cycles=13 lookup_copied=169 lookup_accepted=162
+2026-11-01 08:39:09 [INFO] [ds41] expert cache total: 98.2% route hits, 10.71 MiB read/token, 8.16 ms host wait/token, 88.10 GiB allocated, 1.34 GiB prefetched (0.07 GiB dropped)
+2026-11-01 08:39:09 [INFO] [ds41] expert reads: 11045 direct, 0 buffered

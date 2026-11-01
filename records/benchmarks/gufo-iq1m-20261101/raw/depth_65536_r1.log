@@ -1,0 +1,20 @@
+2026-11-01 08:49:33 [INFO] [ds41] DeepSeek V4.1 Flash: 5 backbone shard(s), 112.00 GiB device-eligible weights; Engram models/ista-iq1m/DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M-00006-of-00006.gguf (150.21 GiB, 210 B rows, read from disk)
+2026-11-01 08:49:33 [WARN] [ds41] 8.98 GiB of the available memory is free CMA (CmaFree in /proc/meminfo), which GPU memory cannot use; the resident model and its sessions need that memory. If it is the kernel's KHO scratch area (Ubuntu 26.04), boot with kho=off
+2026-11-01 08:49:33 [INFO] [ds4] backend initialized on AMD Radeon 8060S Graphics (sm_115)
+2026-11-01 08:49:33 [INFO] [ds4] native MMQ enabled
+2026-11-01 08:49:33 [INFO] [ds41] streaming routed experts: 5.31 GiB dense weights, 102.32 GiB available unified memory
+2026-11-01 08:49:33 [INFO] [ds4] loading model tensors into device cache
+2026-11-01 08:49:34 [INFO] [ds4] ROCm startup model cache prepared 5.31 GiB of tensor spans in 0.976s
+2026-11-01 08:49:53 [INFO] [ds41] expert seed (built-in V4.1 ranking): cached 12024 of 12024 experts (12024 ranked) from 83.38 GiB in 18.42 s
+2026-11-01 08:50:38 [INFO] [ds41] expert cache interval: 99.7% route hits, 0.32 MiB read/token (20.0% prefetched), 0.66 ms host wait/token, 87.12 GiB allocated
+2026-11-01 08:50:39 [INFO] [ds41] expert cache interval: 100.0% route hits, 0.39 MiB read/token (0.0% prefetched), 0.83 ms host wait/token, 87.49 GiB allocated
+[Model Load]: 19.7148 s
+| model                            |       size | backend    |               test |                   t/s |
+| -------------------------------- | ---------- | ---------- | ------------------ | --------------------- |
+| DeepSeek V4.1 Flash              | 187.53 GiB | ROCm (HIP) |    pp2048 @ d65536 |       1197.86 ± 0.00 |
+2026-11-01 08:50:42 [INFO] [ds41] expert cache interval: 100.0% route hits, 0.11 MiB read/token (0.0% prefetched), 35.97 ms host wait/token, 87.61 GiB allocated
+2026-11-01 08:50:45 [INFO] [ds41] expert cache interval: 100.0% route hits, 0.71 MiB read/token (0.0% prefetched), 36.37 ms host wait/token, 87.73 GiB allocated
+| DeepSeek V4.1 Flash              | 187.53 GiB | ROCm (HIP) |     tg128 @ d65536 |         23.34 ± 0.00 |
+2026-11-01 08:50:45 [INFO] [ds41] expert cache total: 99.7% route hits, 0.32 MiB read/token, 0.73 ms host wait/token, 87.73 GiB allocated, 4.07 GiB prefetched (14.52 GiB dropped)
+2026-11-01 08:50:45 [INFO] [ds41] expert reads: 17568 direct, 0 buffered
+

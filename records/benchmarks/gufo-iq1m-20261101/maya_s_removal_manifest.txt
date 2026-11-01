@@ -1,0 +1,7 @@
+# Maya-S backbone removal (GGUF IQ2_XXS shards 1-4) - 2026-11-01T08:30:49+01:00
+# duvod: gufo nema kernel pro IQ3_S -> backbone nepouzitelny; Maya bezi z Maya-S/maya-ds4 (nativni), ne z techto shardu
+# ZACHOVANO: shard 5 = ISTA engram tabulka vrstvy 1, shard 6 = tabulka vrstvy 14 (v aktivnim pouziti)
+47887697312  /mnt/c/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF/Maya-S/DeepSeek-V4.1-Flash-1017-Maya-S-IQ2_XXS-00001-of-00006.gguf
+47669578400  /mnt/c/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF/Maya-S/DeepSeek-V4.1-Flash-1017-Maya-S-IQ2_XXS-00002-of-00006.gguf
+47103347360  /mnt/c/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF/Maya-S/DeepSeek-V4.1-Flash-1017-Maya-S-IQ2_XXS-00003-of-00006.gguf
+35532532032  /mnt/c/AI-Models/DeepSeek-V4.1-Flash-1017-GGUF/Maya-S/DeepSeek-V4.1-Flash-1017-Maya-S-IQ2_XXS-00004-of-00006.gguf

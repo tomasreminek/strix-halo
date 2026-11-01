@@ -1,0 +1,9 @@
+################ CONCURRENCY 1 ################
+C  requests  request p50/p95 ms  TTFT p50/p95 ms  ITL p50/p95 ms  prefill tok/s  decode tg  whole tok/s  aggregate tok/s  output tok/s  draft accepted  matched
+1         2  6666.71/6757.01        -/-    41.84/42.09         871.11      24.10       195.34           195.30         19.20      0/0         -
+
+################ CONCURRENCY 2 ################
+C  requests  request p50/p95 ms  TTFT p50/p95 ms  ITL p50/p95 ms  prefill tok/s  decode tg  whole tok/s  aggregate tok/s  output tok/s  draft accepted  matched
+2         4  9766.00/9795.33        -/-    53.79/53.93         799.02      18.88       132.71           264.83         26.16      0/0         -
+
+DONE

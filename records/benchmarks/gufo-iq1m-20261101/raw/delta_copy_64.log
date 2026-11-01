@@ -1,0 +1,24 @@
+warning: DeepSeek V4.1 GGUF chat template differs from the 1017 release (sha256 4d61d22c90ea0cdf15c7e298f7215f23eeffd20f8eed8fb517fda5fb64693d99); rendering prompts with the built-in deepseek-v4.1-flash-1017-compiled-v1 template
+2026-11-01 08:38:21 [INFO] [ds41] DeepSeek V4.1 Flash: 5 backbone shard(s), 112.00 GiB device-eligible weights; Engram models/ista-iq1m/DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M-00006-of-00006.gguf (150.21 GiB, 210 B rows, read from disk)
+2026-11-01 08:38:21 [WARN] [ds41] 8.99 GiB of the available memory is free CMA (CmaFree in /proc/meminfo), which GPU memory cannot use; the resident model and its sessions need that memory. If it is the kernel's KHO scratch area (Ubuntu 26.04), boot with kho=off
+2026-11-01 08:38:21 [INFO] [ds4] backend initialized on AMD Radeon 8060S Graphics (sm_115)
+2026-11-01 08:38:21 [INFO] [ds4] native MMQ enabled
+2026-11-01 08:38:21 [INFO] [ds41] streaming routed experts: 5.31 GiB dense weights, 101.78 GiB available unified memory
+2026-11-01 08:38:21 [INFO] [ds4] loading model tensors into device cache
+2026-11-01 08:38:22 [INFO] [ds4] ROCm startup model cache prepared 5.31 GiB of tensor spans in 0.976s
+2026-11-01 08:38:40 [INFO] [ds41] expert seed (built-in V4.1 ranking): cached 11976 of 11976 experts (11976 ranked) from 83.04 GiB in 18.27 s
+2026-11-01 08:38:42 [INFO] [ds41] expert cache interval: 97.5% route hits, 8.27 MiB read/token (0.0% prefetched), 3.65 ms host wait/token, 86.64 GiB allocated
+[Model Load]: 19.6095 s
+[server]
+listen = 0.0.0.0:8080
+workers = 16
+timeout_seconds = 120
+keepalive_seconds = 65
+max_request_bytes = 1042026-11-01 08:38:43 [INFO] [ds41] expert cache interval: 99.3% route hits, 16.17 MiB read/token (40.0% prefetched), 19.52 ms host wait/token, 87.12 GiB allocated
+857600
+log_level = info
+log_target = /var/log/service/app.log
+metrics
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=5 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0.8 full_blocks=4 anchors=5 verifier_rows=54 lookup_cycles=5 lookup_copied=49 lookup_accepted=42
+2026-11-01 08:38:43 [INFO] [ds41] expert cache total: 97.9% route hits, 9.42 MiB read/token, 6.11 ms host wait/token, 87.12 GiB allocated, 0.42 GiB prefetched (0.01 GiB dropped)
+2026-11-01 08:38:43 [INFO] [ds41] expert reads: 10119 direct, 0 buffered

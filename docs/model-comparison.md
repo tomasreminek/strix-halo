@@ -8,6 +8,20 @@
 
 Every number here was measured on **Hilbert** (Ryzen AI MAX+ 395 / Radeon 8060S gfx1151, 124 GiB, one GPU job).
 
+## Gufo + DeepSeek V4.1 Flash 1017 IQ1_M · 2026-11-01
+
+**MEASURED, research runtime.** `franzmoca/gufo` branch `feat/ds41` (commit `7f8d6430` + local Engram patch), HIP `gfx1151`, ROCm 7.14.1. Weights are the ISTA `GSQ-RCO-IQ1_M` backbone (5 shards, 120.72 GB, SHA256-verified) with the two Engram tables taken from the Maya-S quantization as Q6_K (150.21 GiB) instead of downloading the stock 110.6 GB IQ4_NL Engram. Experts are streamed from SSD in every row except the resident attempt, which does not fit.
+
+| Depth | Prefill tok/s | Decode tok/s |
+|---|---|---|
+| 32,768 | 1264 / 1268 | 23.53 / 23.55 |
+| 65,536 | 1198 / 1216 | 23.34 / 23.39 |
+| 131,072 | 1142 / 1127 | 22.85 / 22.75 |
+
+Two repetitions per cell, ±2 %. **Depth is nearly free: 32k → 128k costs 10 % prefill and 3 % decode.** Serving with `-j 2` gives 24.10 tok/s at concurrency 1 and 18.88 tok/s per request at concurrency 2, i.e. **26.16 tok/s aggregate (+36 %)** because expert weights are read once per batch (`plan=batched-w2`). Prompt lookup, which `gufo bench` does not exercise, lifts copy/edit decode from **20.16 to 66.32 tok/s (3.3×)**. Quality gate **2/3** — arithmetic and code pass, a Czech geography fixture answers "Ne" instead of "Paris". Resident is unreachable here: 114.00 GiB needed against 102.21 GiB available.
+
+**Do not mix these rows with the `ds4` Q2 DeepSeek results below** (7.12 tok/s HTTP completion): different runtime, different quantization, different measurement method. [Full replication report](gufo-deepseek-v41-iq1m-20261101.md) · [patch and scripts](../recipes/deepseek-v41/) · [frozen logs](../records/benchmarks/gufo-iq1m-20261101/).
+
 ## Halogen V2 abliterated · flash_serve 0.18.0 · 2026-10-11
 
 **MEASURED.** halogen-flash-server **0.18.0** (`halogen-v2-abliterated.hgn`, 88.7 GiB), 262k ctx, 4 slots, 512k KV pool, MTP depth-2. Sustained decode **~45 tok/s** (found at 60-tok and 12.9k-token prompts, 1 000+-token generation). **MTP accepted arms 65–81 tok/s** at 13k prompts (1 024-tok generation, 3× varied prompts + 3× identical probes at 83.5–83.6 tok/s with bitwise-identical hash). Prefill ~**3 200–3 500 tok/s** across 26k–192k-token prompts. Prompt-cache reuse: first turn 3.86 s, follow-ups 0.30 s (~13× warmer). Long context: 96k-tok prefill 27.6 s, 192k-tok prefill 61.1 s, both answered; exact marker recall at 96k PASS; JSON gate PASS; 17×23 PASS. OpenAI API lives on **port 8731** (`serve_api.py`, second container); engine port 8730 is raw TCP, not HTTP. Tokenizer fix: broken `config.json`/'special_tokens_map.json` in the halogen-v2-tokenizer dir replaced in `/mnt/data/AI-Models/halogen-v2-tok-fixed/`. [Full report + raw arms](halogen-v2-0180-20261011.md).

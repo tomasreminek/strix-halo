@@ -1,0 +1,596 @@
+diff --git a/src/core/gguf_reader.cpp b/src/core/gguf_reader.cpp
+index 6ee7ee65..4b41bc3a 100644
+--- a/src/core/gguf_reader.cpp
++++ b/src/core/gguf_reader.cpp
+@@ -211,14 +211,25 @@ std::unique_ptr<GgufReader> GgufReader::OpenSplitFileSet(
+ 
+   const auto architecture =
+       shards[0]->GetMetadataString("general.architecture");
+-  // Every DeepSeek V4.1 build of one model shares a single Engram table file
+-  // as its last shard, so that shard's own split position is the one of the
+-  // build it was published with; it belongs here when it holds just the
+-  // table and counts the same tensors.
++  // Every DeepSeek V4.1 build of one model ships its Engram table as the last
++  // shard, so that shard keeps the split position of the build it was published
++  // with. ISTA-DASLab puts the whole table in one per_layer_token_embd.weight
++  // tensor; project-maya publishes one shard per Engram layer and names them
++  // blk.<layer>.engram_embd.weight, so its split.tensors.count counts a
++  // different number of tables and can never match this build's.
+   const auto shared_engram = [&](const GgufReader& shard) {
+-    return architecture == "deepseek41" && shard.tensors_.size() == 1 &&
+-           shard.tensors_.front().name == "per_layer_token_embd.weight" &&
+-           shard.GetMetadataUint64("split.tensors.count") == total_tensor_count;
++    if (architecture != "deepseek41" || shard.tensors_.size() != 1) {
++      return false;
++    }
++    const auto& name = shard.tensors_.front().name;
++    if (name == "per_layer_token_embd.weight") {
++      return shard.GetMetadataUint64("split.tensors.count") ==
++             total_tensor_count;
++    }
++    static constexpr char kSuffix[] = ".engram_embd.weight";
++    const std::size_t suffix_len = sizeof(kSuffix) - 1;
++    return name.size() > suffix_len && name.compare(0, 4, "blk.") == 0 &&
++           name.compare(name.size() - suffix_len, suffix_len, kSuffix) == 0;
+   };
+   for (std::uint32_t i = 0; i < split_count; ++i) {
+     const auto shard_no = shards[i]->GetMetadataUint32("split.no");
+diff --git a/src/models/deepseek_v41_flash/runtime/model_data.cpp b/src/models/deepseek_v41_flash/runtime/model_data.cpp
+index 1f626254..c566a013 100644
+--- a/src/models/deepseek_v41_flash/runtime/model_data.cpp
++++ b/src/models/deepseek_v41_flash/runtime/model_data.cpp
+@@ -23,6 +23,7 @@
+ 
+ #include <algorithm>
+ #include <array>
++#include <filesystem>
+ #include <memory>
+ #include <mutex>
+ #include <stdexcept>
+@@ -1065,6 +1066,10 @@ static void tensor_expect(const ds41_tensor* t, uint32_t type, uint32_t ndim,
+     fprintf(stderr, "ds41: tensor %.*s has type %s, expected %s\n",
+             (int)t->name.len, t->name.ptr, ds41_tensor_type_name(t->type),
+             ds41_tensor_type_name(type));
++    /* DS41_TYPE_REPORT=1 enumerates every layout mismatch in one run instead
++     * of aborting on the first one. */
++    if (getenv("DS41_TYPE_REPORT") != nullptr)
++      return;
+     throw std::runtime_error("incompatible or invalid DeepSeek V4.1 artifact");
+   }
+ }
+@@ -1285,6 +1290,15 @@ static void config_validate_model(const ds41_model* m) {
+     const char* key;
+     uint32_t want;
+   };
++  /* project-maya quantizes with its own spelling of the Engram metadata
++   * (deepseek41.engram.*), while this engine reads the llama.cpp-style
++   * deepseek41.ple.* keys. Derive the missing keys so a maya artifact runs
++   * unchanged: primes[i] is the per-head bucket count and the ple offsets are
++   * the running sum of those counts across both Engram layers. */
++  const bool maya_layout =
++      model_find_kv(m, "deepseek41.ple.head_vocab_sizes") == nullptr &&
++      model_find_kv(m, "deepseek41.engram.primes") != nullptr;
++
+   static constexpr U32Key kU32[] = {
+       {"deepseek41.block_count", DS41_N_LAYER},
+       {"deepseek41.embedding_length", DS41_N_EMBD},
+@@ -1321,8 +1335,29 @@ static void config_validate_model(const ds41_model* m) {
+       /* sqrtsoftplus scoring (llama.cpp's LLAMA_EXPERT_GATING_FUNC_TYPE). */
+       {"deepseek41.expert_gating_func", 4},
+   };
+-  for (const U32Key& k : kU32)
++  for (const U32Key& k : kU32) {
++    if (maya_layout) {
++      const std::string key(k.key);
++      const char* from = nullptr;
++      uint32_t value = k.want;
++      if (key == "deepseek41.hash_layer_count") {
++        value = 0;
++      } else if (key == "deepseek41.embedding_length_per_layer_input") {
++        from = "deepseek41.engram.head_dim";
++      } else if (key == "deepseek41.ple.heads_per_ngram") {
++        from = "deepseek41.engram.head_count";
++      } else if (key == "deepseek41.ple.ngram_size") {
++        from = "deepseek41.engram.max_ngram_size";
++      }
++      if (from != nullptr) {
++        uint32_t got = 0;
++        value = model_get_u32(m, from, &got) ? got : k.want;
++      }
++      config_expect_u32(k.key, value, k.want);
++      continue;
++    }
+     config_expect_u32(k.key, required_u32(m, k.key), k.want);
++  }
+   uint32_t groups = 0;
+   model_get_u32(m, "deepseek41.expert_group_count", &groups);
+   config_expect_u32("expert_group_count", groups, 0);
+@@ -1345,8 +1380,10 @@ static void config_validate_model(const ds41_model* m) {
+                           list, DS41_N_INDEX_SOURCE, false);
+   for (uint32_t i = 0; i < DS41_N_ENGRAM_LAYER; i++)
+     list[i] = DS41_ENGRAM_LAYERS[i];
+-  config_expect_int_array(m, "deepseek41.ple.layers", list,
+-                          DS41_N_ENGRAM_LAYER, false);
++  config_expect_int_array(m,
++                          maya_layout ? "deepseek41.engram.layers"
++                                      : "deepseek41.ple.layers",
++                          list, DS41_N_ENGRAM_LAYER, false);
+   config_expect_f32_array(m, "deepseek41.swiglu_clamp_exp",
+                           DS41_SWIGLU_CLAMP_EXP);
+   config_expect_f32_array(m, "deepseek41.swiglu_clamp_shexp",
+@@ -1427,17 +1464,37 @@ static void engram_constants_load(ds41_weights* w, const ds41_model* m) {
+     ds41_die("deepseek41.engram.token_map does not cover the compressed vocabulary");
+ 
+   constexpr uint32_t heads = DS41_N_ENGRAM_LAYER * DS41_ENGRAM_COLS;
+-  required_int_array(m, "deepseek41.ple.head_vocab_sizes", w->engram_head_vocab,
+-                     heads);
+-  required_int_array(m, "deepseek41.ple.head_offsets", w->engram_head_offsets,
+-                     heads);
++  /* maya artifacts carry per-head bucket counts as engram.primes; the ple
++   * arrays are the counts plus their running sum. */
++  const bool maya_layout =
++      model_find_kv(m, "deepseek41.ple.head_vocab_sizes") == nullptr &&
++      model_find_kv(m, "deepseek41.engram.primes") != nullptr;
++  if (maya_layout) {
++    std::vector<int64_t> primes(heads);
++    required_int_array(m, "deepseek41.engram.primes", primes.data(), heads);
++    int64_t row = 0;
++    for (uint32_t i = 0; i < heads; i++) {
++      if (primes[i] <= 0)
++        ds41_die("deepseek41.engram.primes must be positive");
++      w->engram_head_vocab[i] = primes[i];
++      w->engram_head_offsets[i] = row;
++      row += primes[i];
++    }
++  } else {
++    required_int_array(m, "deepseek41.ple.head_vocab_sizes",
++                       w->engram_head_vocab, heads);
++    required_int_array(m, "deepseek41.ple.head_offsets",
++                       w->engram_head_offsets, heads);
++  }
+   int64_t row = 0;
+   for (uint32_t i = 0; i < heads; i++) {
+     if (w->engram_head_vocab[i] <= 0 || w->engram_head_offsets[i] != row)
+       ds41_die("deepseek41.ple.head_offsets do not follow head_vocab_sizes");
+     row += w->engram_head_vocab[i];
+   }
+-  required_int_array(m, "deepseek41.ple.layer_multipliers",
++  required_int_array(m,
++                     maya_layout ? "deepseek41.engram.multipliers"
++                                 : "deepseek41.ple.layer_multipliers",
+                      w->engram_multipliers,
+                      DS41_N_ENGRAM_LAYER * DS41_ENGRAM_MAX_NGRAM);
+   for (int64_t multiplier : w->engram_multipliers)
+@@ -1673,42 +1730,104 @@ static void warn_free_cma(void) {
+  * access pattern is random so read-ahead does not fill memory.
+  */
+ 
++/* Where a tensor's bytes start inside the shard that holds them, and its fd. */
++static void engram_place(const ds41_model* m, const ds41_tensor* t,
++                         uint64_t* base, int* fd) {
++  for (uint32_t i = 0; i < m->n_shards; i++)
++    if (t->abs_offset >= m->shard_offset[i] &&
++        t->abs_offset < m->shard_offset[i] + m->shard_size[i]) {
++      *base = t->abs_offset - m->shard_offset[i];
++      *fd = m->shard_fd[i];
++      return;
++    }
++  *base = t->abs_offset - m->shard_offset[0];
++  *fd = m->shard_fd[0];
++}
++
++/* Row formats the host Engram dequantizer reads. Q6_K is the table format of
++ * project-maya builds; the others come from ISTA-DASLab and unsloth. */
++static bool engram_row_type_ok(uint32_t type) {
++  return type == DS41_TENSOR_IQ4_NL || type == DS41_TENSOR_Q5_K ||
++         type == DS41_TENSOR_Q6_K || type == DS41_TENSOR_Q8_0 ||
++         type == DS41_TENSOR_MXFP8;
++}
++
+ static void engram_open(ds41_engram_tables* e, const ds41_weights* w,
+-                        const ds41_model* backbone, const std::string& path) {
+-  model_open(&e->file, {path});
++                        const ds41_model* backbone,
++                        const std::vector<std::string>& paths) {
++  model_open(&e->file, paths);
+   const ds41_model* m = &e->file;
+-  /* The Engram file has no architecture of its own; it belongs to the build
+-   * through the split bookkeeping and the bucket counts of the hash. */
+-  if (m->n_tensors != 1 ||
+-      required_u32(m, "split.tensors.count") !=
+-          required_u32(backbone, "split.tensors.count")) {
+-    fprintf(stderr, "ds41: %s is not the Engram shard of this build\n",
+-            path.c_str());
+-    throw std::runtime_error("incompatible or invalid DeepSeek V4.1 artifact");
+-  }
+   int64_t rows = 0;
+   for (int64_t n : w->engram_head_vocab)
+     rows += n;
+-  /* A build may link the Engram file another build published (they share
+-   * one table), whose split header names its own position; say so. */
+-  uint32_t engram_no = 0, engram_count = 0;
+-  const uint32_t backbone_count = backbone->n_shards + 1;
+-  if (model_get_u32(m, "split.no", &engram_no) &&
+-      model_get_u32(m, "split.count", &engram_count) &&
+-      (engram_count != backbone_count || engram_no + 1 != backbone_count))
+-    gufo::server::Logger::LogFormatted(
+-        gufo::server::LogLevel::kWarn, "ds41",
+-        "Engram %s is labelled shard %u of %u but serves as shard %u of %u of "
+-        "this build (a table shared with another build)",
+-        path.c_str(), engram_no + 1, engram_count, backbone_count,
+-        backbone_count);
+-  ds41_tensor* t = required_tensor(m, "per_layer_token_embd.weight");
+-  tensor_expect_dims(t, 2, DS41_ENGRAM_HEAD_DIM, (uint64_t)rows, 0);
+-  if (t->type != DS41_TENSOR_IQ4_NL && t->type != DS41_TENSOR_Q5_K &&
+-      t->type != DS41_TENSOR_Q8_0 && t->type != DS41_TENSOR_MXFP8)
+-    tensor_reject(t, "has an unsupported Engram row type");
+-  e->table = t;
+-  e->row_bytes = t->bytes / (uint64_t)rows;
++  const ds41_tensor* single =
++      model_find_tensor(m, "per_layer_token_embd.weight");
++  if (single) {
++    /* ISTA-DASLab layout: one table of every Engram layer's rows. The file has
++     * no architecture of its own; it belongs to the build through the split
++     * bookkeeping and the bucket counts of the hash. */
++    if (required_u32(m, "split.tensors.count") !=
++        required_u32(backbone, "split.tensors.count")) {
++      fprintf(stderr, "ds41: %s is not the Engram shard of this build\n",
++              paths[0].c_str());
++      throw std::runtime_error("incompatible or invalid DeepSeek V4.1 artifact");
++    }
++    tensor_expect_dims(single, 2, DS41_ENGRAM_HEAD_DIM, (uint64_t)rows, 0);
++    if (!engram_row_type_ok(single->type))
++      tensor_reject(single, "has an unsupported Engram row type");
++    /* A build may link the Engram file another build published (they share
++     * one table), whose split header names its own position; say so. */
++    uint32_t engram_no = 0, engram_count = 0;
++    const uint32_t backbone_count = backbone->n_shards + 1;
++    if (model_get_u32(m, "split.no", &engram_no) &&
++        model_get_u32(m, "split.count", &engram_count) &&
++        (engram_count != backbone_count || engram_no + 1 != backbone_count))
++      gufo::server::Logger::LogFormatted(
++          gufo::server::LogLevel::kWarn, "ds41",
++          "Engram %s is labelled shard %u of %u but serves as shard %u of %u of "
++          "this build (a table shared with another build)",
++          paths[0].c_str(), engram_no + 1, engram_count, backbone_count,
++          backbone_count);
++    e->n_tables = 1;
++    e->tables[0] = single;
++    e->table_row_bytes[0] = single->bytes / (uint64_t)rows;
++    engram_place(m, single, &e->table_base[0], &e->table_fd[0]);
++    e->table_row_begin[0] = 0;
++    e->table_row_end[0] = rows;
++  } else {
++    /* project-maya layout: one table per Engram layer, concatenated in layer
++     * order, which is the order of engram_head_vocab. */
++    int64_t begin = 0;
++    for (uint32_t slot = 0; slot < DS41_N_ENGRAM_LAYER; slot++) {
++      int64_t layer_rows = 0;
++      for (uint32_t col = 0; col < DS41_ENGRAM_COLS; col++)
++        layer_rows += w->engram_head_vocab[slot * DS41_ENGRAM_COLS + col];
++      char name[64];
++      snprintf(name, sizeof(name), "blk.%u.engram_embd.weight",
++               DS41_ENGRAM_LAYERS[slot]);
++      const ds41_tensor* t = model_find_tensor(m, name);
++      if (!t) {
++        fprintf(stderr,
++                "ds41: %s has neither per_layer_token_embd.weight nor %s\n",
++                paths[0].c_str(), name);
++        throw std::runtime_error("incompatible or invalid DeepSeek V4.1 artifact");
++      }
++      tensor_expect_dims(t, 2, DS41_ENGRAM_HEAD_DIM, (uint64_t)layer_rows, 0);
++      if (!engram_row_type_ok(t->type))
++        tensor_reject(t, "has an unsupported Engram row type");
++      e->tables[slot] = t;
++      e->table_row_bytes[slot] = t->bytes / (uint64_t)layer_rows;
++      engram_place(m, t, &e->table_base[slot], &e->table_fd[slot]);
++      e->table_row_begin[slot] = begin;
++      e->table_row_end[slot] = begin + layer_rows;
++      begin += layer_rows;
++    }
++    e->n_tables = DS41_N_ENGRAM_LAYER;
++    if (begin != rows)
++      ds41_die("the Engram tables do not cover deepseek41.ple.head_vocab_sizes");
++  }
++  e->table = e->tables[0];
++  e->row_bytes = e->table_row_bytes[0];
+   for (uint32_t i = 0; i < m->n_shards; i++) {
+     (void)posix_fadvise(m->shard_fd[i], 0, 0, POSIX_FADV_RANDOM);
+     (void)madvise((void*)(m->map + m->shard_offset[i]),
+@@ -1857,14 +1976,54 @@ int ds41_engine_open(ds41_engine** out, const ds41_engine_options* opt) {
+     e->weights =
+         static_cast<ds41_weights*>(ds41_xcalloc(1, sizeof(ds41_weights)));
+ 
+-    /* The last shard of a build is the Engram file all builds share. */
++    /* The last shard of a build is the Engram file all builds share, unless
++     * DS41_ENGRAM_SHARDS names the Engram shards explicitly (colon separated):
++     * project-maya publishes its Engram as one shard per Engram layer. */
+     std::vector<std::string> shards = model_shard_paths(opt->model_path);
+-    const std::string engram_path = shards.back();
+-    if (shards.size() > 1)
+-      shards.pop_back();
++    std::vector<std::string> engram_paths;
++    const char* engram_env = getenv("DS41_ENGRAM_SHARDS");
++    if (engram_env && engram_env[0]) {
++      const std::string list(engram_env);
++      size_t at = 0;
++      for (;;) {
++        const size_t sep = list.find(':', at);
++        const std::string one =
++            list.substr(at, sep == std::string::npos ? std::string::npos
++                                                     : sep - at);
++        if (!one.empty())
++          engram_paths.push_back(one);
++        if (sep == std::string::npos)
++          break;
++        at = sep + 1;
++      }
++    } else {
++      engram_paths.push_back(shards.back());
++      if (shards.size() > 1)
++        shards.pop_back();
++    }
++    if (engram_paths.empty())
++      ds41_die("DS41_ENGRAM_SHARDS names no Engram shard");
++    if (engram_env && engram_env[0]) {
++      /* The Engram shards keep the split numbering of the build they were
++       * published with, so drop them from the backbone list by name. */
++      std::vector<std::string> backbone;
++      for (const auto& s : shards) {
++        const std::string name = std::filesystem::path(s).filename().string();
++        bool is_engram = false;
++        for (const auto& e : engram_paths)
++          if (std::filesystem::path(e).filename().string() == name) {
++            is_engram = true;
++            break;
++          }
++        if (!is_engram)
++          backbone.push_back(s);
++      }
++      shards.swap(backbone);
++    }
+     model_open(e->model, shards);
+     require_current_layout(e->model, opt->model_path);
+-    if (shards.size() == 1 && engram_path == shards[0])
++    if (shards.size() == 1 && engram_paths.size() == 1 &&
++        engram_paths[0] == shards[0])
+       ds41_die("the model path must be the first shard of a split build");
+     e->vocab = ds41_vocab_create(e->model);
+     config_validate_model(e->model);
+@@ -1872,14 +2031,14 @@ int ds41_engine_open(ds41_engine** out, const ds41_engine_options* opt) {
+     {
+       e->engram = static_cast<ds41_engram_tables*>(
+           ds41_xcalloc(1, sizeof(ds41_engram_tables)));
+-      engram_open(e->engram, e->weights, e->model, engram_path);
++      engram_open(e->engram, e->weights, e->model, engram_paths);
+       gufo::server::Logger::LogFormatted(
+           gufo::server::LogLevel::kInfo, "ds41",
+           "%s: %u backbone shard(s), %.2f GiB device-eligible weights; Engram %s "
+           "(%.2f GiB, %" PRIu64 " B rows, read from disk)",
+           DS41_MODEL_SHAPE_NAME, e->model->n_shards,
+           (double)model_resident_bytes(e->model) / 1073741824.0,
+-          engram_path.c_str(),
++          engram_paths[0].c_str(),
+           (double)model_resident_bytes(&e->engram->file) / 1073741824.0,
+           e->engram->row_bytes);
+     }
+diff --git a/src/models/deepseek_v41_flash/runtime/model_data_internal.h b/src/models/deepseek_v41_flash/runtime/model_data_internal.h
+index 1c553095..e3d7f1b6 100644
+--- a/src/models/deepseek_v41_flash/runtime/model_data_internal.h
++++ b/src/models/deepseek_v41_flash/runtime/model_data_internal.h
+@@ -177,12 +177,22 @@ struct ds41_weights {
+   int64_t engram_multipliers[DS41_N_ENGRAM_LAYER * DS41_ENGRAM_MAX_NGRAM];
+ };
+ 
+-/* The Engram GGUF, the last shard of a build: one table of every Engram
+- * layer's rows, kept on disk and read row by row. */
++/* The Engram GGUF, the last shard(s) of a build: the rows of every Engram
++ * layer, kept on disk and read row by row. Two layouts exist: ISTA-DASLab
++ * publishes one table (per_layer_token_embd.weight) covering every layer,
++ * project-maya publishes one table per layer (blk.<layer>.engram_embd.weight),
++ * so a table list keeps the row ranges of both apart. */
+ struct ds41_engram_tables {
+   ds41_model file;
+   const ds41_tensor* table;
+   uint64_t row_bytes;
++  uint32_t n_tables;
++  const ds41_tensor* tables[DS41_N_ENGRAM_LAYER];
++  uint64_t table_row_bytes[DS41_N_ENGRAM_LAYER];
++  uint64_t table_base[DS41_N_ENGRAM_LAYER];
++  int table_fd[DS41_N_ENGRAM_LAYER];
++  int64_t table_row_begin[DS41_N_ENGRAM_LAYER];
++  int64_t table_row_end[DS41_N_ENGRAM_LAYER];
+ };
+ 
+ using token_vec = ds41_tokens;
+diff --git a/src/models/deepseek_v41_flash/runtime/v41_decode.cpp b/src/models/deepseek_v41_flash/runtime/v41_decode.cpp
+index 18a44242..476bf811 100644
+--- a/src/models/deepseek_v41_flash/runtime/v41_decode.cpp
++++ b/src/models/deepseek_v41_flash/runtime/v41_decode.cpp
+@@ -473,7 +473,13 @@ bool linear_raw(uint32_t type, const void* p, uint32_t rows, uint32_t k, const f
+ 
+ bool linear(const ds41_decoder* d, const ds41_tensor* w, const float* x, float* out, uint32_t n) {
+   const uint32_t k = (uint32_t)w->dim[0];
+-  return linear_raw(w->type, dev(d, w), (uint32_t)(w->elements / k), k, x, out, n, d->decode_rows);
++  const void* p = dev(d, w);
++  const bool ok = linear_raw(w->type, p, (uint32_t)(w->elements / k), k, x, out, n, d->decode_rows);
++  if (!ok && getenv("DS41_LINEAR_TRACE") != nullptr)
++    fprintf(stderr, "ds41: linear failed %.*s type=%s n=%u rows=%llu k=%u dev=%s\n",
++            (int)w->name.len, w->name.ptr, ds41_tensor_type_name(w->type), n,
++            (unsigned long long)(w->elements / k), k, p ? "mapped" : "NULL");
++  return ok;
+ }
+ 
+ /* out1 = W1 x and out2 = W2 x; batches of one MMQ type quantize x once. */
+@@ -540,21 +546,33 @@ void engram_hash(ds41_decoder* d, int token, int64_t (*rows)[DS41_ENGRAM_COLS])
+  * it can run while the GPU works on earlier layers. */
+ bool engram_read(const ds41_decoder* d, const int64_t* rows, uint32_t n, float* out) {
+   const ds41_engram_tables* e = d->engine->engram;
+-  const ds41_tensor* table = e->table;
+-  const uint64_t base = table->abs_offset - e->file.shard_offset[0];
+   const uint64_t count = (uint64_t)n * DS41_ENGRAM_COLS;
++  /* A row id addresses the concatenation of every Engram table in layer order,
++   * so pick the table that owns it (one table for ISTA-DASLab builds, one per
++   * Engram layer for project-maya builds). */
++  uint64_t max_row_bytes = e->table_row_bytes[0];
++  for (uint32_t t = 1; t < e->n_tables; t++)
++    max_row_bytes = std::max(max_row_bytes, e->table_row_bytes[t]);
+   std::atomic<uint64_t> next{0};
+   std::atomic<bool> ok{true};
+   auto worker = [&] {
+-    std::vector<uint8_t> raw(e->row_bytes);
++    std::vector<uint8_t> raw(max_row_bytes);
+     for (uint64_t i = next++; i < count && ok; i = next++) {
+       if (rows[i] < 0) {
+         std::fill_n(out + i * DS41_ENGRAM_HEAD_DIM, DS41_ENGRAM_HEAD_DIM, 0.0f);
+         continue;
+       }
+-      const off_t at = (off_t)(base + (uint64_t)rows[i] * e->row_bytes);
+-      if (pread(e->file.shard_fd[0], raw.data(), raw.size(), at) != (ssize_t)raw.size() ||
+-          !dequant_row(table->type, raw.data(), out + i * DS41_ENGRAM_HEAD_DIM, DS41_ENGRAM_HEAD_DIM))
++      uint32_t slot = 0;
++      while (slot + 1 < e->n_tables && rows[i] >= e->table_row_end[slot]) slot++;
++      const int64_t local = rows[i] - e->table_row_begin[slot];
++      const uint64_t row_bytes = e->table_row_bytes[slot];
++      if (local < 0 || local >= e->table_row_end[slot] - e->table_row_begin[slot]) {
++        ok = false;
++        break;
++      }
++      const off_t at = (off_t)(e->table_base[slot] + (uint64_t)local * row_bytes);
++      if (pread(e->table_fd[slot], raw.data(), (size_t)row_bytes, at) != (ssize_t)row_bytes ||
++          !dequant_row(e->tables[slot]->type, raw.data(), out + i * DS41_ENGRAM_HEAD_DIM, DS41_ENGRAM_HEAD_DIM))
+         ok = false;
+     }
+   };
+@@ -1028,10 +1046,16 @@ void predict_next_layer(ds41_decoder* d, uint32_t il, uint32_t n, bool misses_no
+ bool moe(ds41_decoder* d, uint32_t il, uint32_t n) {
+   const ds41_layer_weights* l = &d->engine->weights->layer[il];
+   const int used = (int)DS41_N_EXPERT_USED;
+-  if (!router_logits(d, il, n) ||
+-      ds41_v41_route(d->router, f32(d, l->ffn_exp_probs_b), d->route_ids, d->route_w, DS41_N_EXPERT, used,
+-                     DS41_EXPERT_WEIGHT_SCALE, n))
+-    return false;
++  const bool rl_ok = router_logits(d, il, n);
++  const float* probs_b = f32(d, l->ffn_exp_probs_b);
++  const bool route_ok =
++      rl_ok && ds41_v41_route(d->router, probs_b, d->route_ids, d->route_w, DS41_N_EXPERT, used,
++                              DS41_EXPERT_WEIGHT_SCALE, n) == 0;
++  if (getenv("DS41_TRACE") != nullptr && !route_ok)
++    fprintf(stderr, "ds41: trace moe route layer %u router_logits=%d probs_b=%s probs_b_type=%s\n", il,
++            (int)rl_ok, probs_b ? "mapped" : "NULL",
++            ds41_tensor_type_name(l->ffn_exp_probs_b->type));
++  if (!route_ok) return false;
+   /* Image positions select with the image bias (the gate's bias_vl). */
+   for (const auto& [first, end] : d->image_runs) {
+     /* This layer's rows are the positions from d->pos. */
+@@ -1116,18 +1140,29 @@ bool moe(ds41_decoder* d, uint32_t il, uint32_t n) {
+      * the layer. Prefill keeps it in the read overlap, where the gap is
+      * small next to its reads. */
+     if (small && d->routes_ready) {
+-      if (hipEventRecord(d->routes_ready, nullptr) != hipSuccess || !shared_moe(d, l, n, shared_x16)) return false;
++      if (hipEventRecord(d->routes_ready, nullptr) != hipSuccess || !shared_moe(d, l, n, shared_x16)) {
++        if (getenv("DS41_TRACE") != nullptr)
++          fprintf(stderr, "ds41: trace shared_moe failed layer %u\n", il);
++        return false;
++      }
+       work.shared_done = true;
+     }
+     if (!ds41_expert_store_prepare(d->engine->expert_store, il, d->route_ids, n, &gate, &up, &down,
+-                                   streamed_overlap, &work, work.shared_done ? d->routes_ready : nullptr))
++                                   streamed_overlap, &work, work.shared_done ? d->routes_ready : nullptr)) {
++      if (getenv("DS41_TRACE") != nullptr)
++        fprintf(stderr, "ds41: trace expert_store_prepare failed layer %u n=%u\n", il, n);
+       return false;
++    }
+   } else {
+     gate = dev(d, l->ffn_gate_exps);
+     up = dev(d, l->ffn_up_exps);
+     down = dev(d, l->ffn_down_exps);
+   }
+-  if (!gate || !up || !down) return false;
++  if (!gate || !up || !down) {
++    if (getenv("DS41_TRACE") != nullptr)
++      fprintf(stderr, "ds41: trace expert table null layer %u gate=%p up=%p down=%p\n", il, gate, up, down);
++    return false;
++  }
+   /* The streamed tables map each expert index to its device weights; the
+    * resident path passes packed tensor bases instead. */
+   const void* const* gate_table =
+@@ -1349,18 +1384,36 @@ bool block(ds41_decoder* d, uint32_t il, int prev, int next, uint32_t n, const J
+   }
+   if (entered) return false;
+   /* Attention uses the pre-mix of the previous FFN (shifted mHC). */
+-  if (!hc_mix(d, l->hc_attn_fn, l->hc_attn_scale, l->hc_attn_base, d->h, d->pre[next], d->post, d->comb, n) ||
+-      ds41_v41_hc_collapse_norm(d->h, d->pre[prev], f32(d, l->attn_norm), d->xn, kHc, kDim, eps, n) ||
+-      !attention(d, il, n, joint) || !join_mix(d, n) ||
+-      ds41_v41_hc_expand(d->attn_out, d->h, d->post, d->comb, d->h2, kHc, kDim, n))
+-    return false;
++  {
++    const bool a = hc_mix(d, l->hc_attn_fn, l->hc_attn_scale, l->hc_attn_base, d->h,
++                          d->pre[next], d->post, d->comb, n);
++    const bool b = a && ds41_v41_hc_collapse_norm(d->h, d->pre[prev], f32(d, l->attn_norm),
++                                                  d->xn, kHc, kDim, eps, n) == 0;
++    const bool c = b && attention(d, il, n, joint);
++    const bool e = c && join_mix(d, n);
++    const bool f = e && ds41_v41_hc_expand(d->attn_out, d->h, d->post, d->comb, d->h2, kHc, kDim, n) == 0;
++    if (getenv("DS41_TRACE") != nullptr && !f)
++      fprintf(stderr,
++              "ds41: trace attn layer %u hc_mix=%d collapse=%d attention=%d join=%d expand=%d\n",
++              il, (int)a, (int)b, (int)c, (int)e, (int)f);
++    if (!f) return false;
++  }
+   /* The FFN uses this layer's attention pre-mix; its own pre-mix feeds the next attention. */
+-  if (!hc_mix(d, l->hc_ffn_fn, l->hc_ffn_scale, l->hc_ffn_base, d->h2, d->pre[prev], d->ffn_post, d->ffn_comb, n) ||
+-      ds41_v41_hc_collapse_norm(d->h2, d->pre[next], f32(d, l->ffn_norm), d->xn, kHc, kDim, eps, n) ||
+-      !moe(d, il, n) || !join_mix(d, n) ||
+-      ds41_v41_hc_expand_sum(d->down6, d->sd, DS41_N_EXPERT_USED, d->h2, d->ffn_post, d->ffn_comb, d->h, kHc, kDim,
+-                             n))
+-    return false;
++  {
++    const bool a = hc_mix(d, l->hc_ffn_fn, l->hc_ffn_scale, l->hc_ffn_base, d->h2, d->pre[prev],
++                          d->ffn_post, d->ffn_comb, n);
++    const bool b = a && ds41_v41_hc_collapse_norm(d->h2, d->pre[next], f32(d, l->ffn_norm),
++                                                  d->xn, kHc, kDim, eps, n) == 0;
++    const bool c = b && moe(d, il, n);
++    const bool e = c && join_mix(d, n);
++    const bool f = e && ds41_v41_hc_expand_sum(d->down6, d->sd, DS41_N_EXPERT_USED, d->h2, d->ffn_post,
++                                               d->ffn_comb, d->h, kHc, kDim, n) == 0;
++    if (getenv("DS41_TRACE") != nullptr && !f)
++      fprintf(stderr,
++              "ds41: trace ffn layer %u hc_mix=%d collapse=%d moe=%d join=%d expand=%d\n",
++              il, (int)a, (int)b, (int)c, (int)e, (int)f);
++    if (!f) return false;
++  }
+   return true;
+ }
+ 
+@@ -1901,7 +1954,14 @@ int eval_rows(ds41_decoder* d, const int* tokens, uint32_t n, uint32_t keep_from
+       if (!ok || !kept) break;
+     }
+     const int slot = ds41_layer_engram_slot(il);
+-    if (slot >= 0) ok = engram_reads[slot].get() && engram(d, il, d->engram_pinned[slot], n);
++    if (slot >= 0) {
++      const bool read_ok = engram_reads[slot].get();
++      const bool upload_ok = engram(d, il, d->engram_pinned[slot], n);
++      if (getenv("DS41_TRACE") != nullptr && !(read_ok && upload_ok))
++        fprintf(stderr, "ds41: trace engram layer %u read=%d upload=%d\n", il,
++                (int)read_ok, (int)upload_ok);
++      ok = read_ok && upload_ok;
++    }
+     if (d->features) {
+       for (uint32_t f = 0; f < DS41_DSPARK_TARGET_LAYERS && ok; f++)
+         if (il == DS41_DSPARK_TARGET_LAYER[f])
+@@ -1909,7 +1969,12 @@ int eval_rows(ds41_decoder* d, const int* tokens, uint32_t n, uint32_t keep_from
+                                 (uint64_t)DS41_DSPARK_TARGET_LAYERS * kDim, kHc, kDim, feature_rows) == 0;
+     }
+     /* block() leaves this layer's FFN pre-mix in pre[prev]. */
+-    ok = ok && block(d, il, prev, prev ^ 1, rows, nullptr, &mixed, next_layer(d, il, skip != 0));
++    {
++      const bool block_ok = block(d, il, prev, prev ^ 1, rows, nullptr, &mixed, next_layer(d, il, skip != 0));
++      if (getenv("DS41_TRACE") != nullptr && !block_ok)
++        fprintf(stderr, "ds41: trace block failed at layer %u\n", il);
++      ok = ok && block_ok;
++    }
+     if (ok && layer_fn) {
+       ok = hipMemcpy(d->host_h.data(), d->h + (rows - 1) * hd, hd * sizeof(float), hipMemcpyDeviceToHost) ==
+                hipSuccess &&

@@ -38,12 +38,33 @@ Engine `v1.1.26` (`f26d8ba`), HIP build `build-hip/maya-ds4` on ROCm 7.14.1 `gfx
 
 [Full report, configs, memory profile and evidence](docs/deepseek-v41-flash.md) · [Frozen raw logs and summary.json](records/benchmarks/maya-20261024/) · [v1.1.21 baseline and GPU-reset causal analysis](deepseek-v41-flash/MAYA-AMD-RESULTS.md)
 
+## Gufo + DeepSeek V4.1 Flash 1017 IQ1_M · 2026-11-01
+
+A 671B-class MoE at **24 tok/s decode and 1.2–1.3k tok/s prefill on a single Strix Halo**, from a 120.72 GB IQ1_M backbone plus a 150.21 GiB Engram taken from a *different* quantization. `franzmoca/gufo` branch `feat/ds41` (commit `7f8d6430` + a local 4-file patch), HIP `gfx1151`, ROCm 7.14.1, experts streamed from SSD, every run in its own systemd scope.
+
+| Depth | Prefill tok/s | Decode tok/s |
+|---|---|---|
+| 32,768 | 1264 / 1268 | 23.53 / 23.55 |
+| 65,536 | 1198 / 1216 | 23.34 / 23.39 |
+| 131,072 | 1142 / 1127 | 22.85 / 22.75 |
+
+Two repetitions per cell, ±2 %. **Context depth is nearly free** — 32k to a full 128k costs 10 % prefill and 3 % decode, so there is no reason to economise. Practically: ~1.6 s prefill for 2k tokens, ~8 s for 10k, ~115 s for 128k.
+
+**Two request slots work, and they are a throughput win, not a latency trade.** `gufo serve -j 2 -c 65536` preallocates two sessions; concurrency 1 gives **24.10 tok/s** and concurrency 2 gives **18.88 tok/s per request, 26.16 tok/s aggregate (+36 %)** because expert weights are read once per batch (`plan=batched-w2`). That is one slot for chat and one for a coding worker. Prefix cache makes a repeated system prompt nearly free: `ttft_ms` 1.3 against 946 cold. Prompt lookup — which `gufo bench` never exercises — lifts copy/edit decode from **20.16 to 66.32 tok/s (3.3×)**.
+
+**Assessment: research runtime, not production.** The quality gate passed **2 of 3** fixtures: arithmetic (391) and code (`s[::-1]`) pass, a Czech geography question answers "Ne" instead of "Paris". IQ1_M is a 1.6-bit-class quantization and this is the price. Two further paths are closed: the resident configuration needs **114.00 GiB against 102.21 GiB available** (authors' 1228/24.5 tok/s is unreachable here), and Maya-S cannot serve as the backbone at all because `gufo` has no table-indexed kernel for `IQ3_S`. **Not comparable with the earlier `ds4` Q2 DeepSeek rows** — different runtime, different weights, different measurement method. Nothing was switched onto the production port; the two-slot server ran as a test instance on `:18092`.
+
+The 110.6 GB saving is the reusable trick: ISTA ships the Engram as a separate IQ4_NL shard, but the Maya-S quantization of the same model already carries those two tables as Q6_K, and Engram rows are global rather than per-shard. A 4-file patch lets the reader accept the second table, and the stock Engram is never downloaded.
+
+[Full replication report, configs and negative results](docs/gufo-deepseek-v41-iq1m-20261101.md) · [patch and scripts](recipes/deepseek-v41/) · [Frozen CSVs, logs and manifest](records/benchmarks/gufo-iq1m-20261101/)
+
 ## All LLM tests · results and evidence
 
 **Historical Orca measurement (weights removed locally on 2026-10-06): OrcaRouter Qwen3.8 Flash-Next Uncensored IQ3_XXS, Strata server v0.1.40.1 / stock v0.1.40 HIP engine, gfx1151 fast mode, prefill 16384, MTP4 with an 8192-token draft attention window.** Verified real 64k/128k context fixtures and bounded lifecycle; **not yet qualified as the long-term game-coding worker**. Fast mode changes numerics. Historical Halogen results use different weights/quantization and are not a current matched A/B. At the latest runtime readback, Strata and Halogen were stopped; no chat routing or permanent worker replacement was made. Dates below are test dates, not release dates.
 
 | Date tested | Model / tested configuration | Measured result or gate | Outcome and full test |
 |---|---|---|---|
+| **2026-11-01** | **Gufo `feat/ds41` · DeepSeek V4.1 Flash 1017 IQ1_M + Maya-S Q6_K Engram** · `gfx1151`, ROCm 7.14.1, experts streamed, own systemd scope | Depth sweep, 2 rep: **32k 1264/1268 prefill, 23.53/23.55 decode · 64k 1198/1216, 23.34/23.39 · 128k 1142/1127, 22.85/22.75**. Serving `-j 2`: **24.10 tok/s @c=1**, **18.88/request @c=2 = 26.16 aggregate (+36 %)**, prefix-cache TTFT 1.3 ms vs 946 ms. Prompt lookup **20.16 → 66.32 tok/s (3.3×)** | **First usable DeepSeek V4.1 speed on this box**; load 6.46 s, 112.00 GiB backbone + 150.21 GiB Engram. QA gate **2/3** (Czech fixture failed). Resident needs 114.00 vs 102.21 GiB available — unreachable. Research runtime, **not comparable with the `ds4` Q2 rows**. [Report](docs/gufo-deepseek-v41-iq1m-20261101.md) · [logs](records/benchmarks/gufo-iq1m-20261101/) |
 | **2026-10-23/24** | **Project Maya v1.1.26 · Maya-S (IQ2 `339.5 GB`, `ntfs3`) / Maya-XS (`258 GB`, `ntfs-3g`)** · `build-hip/maya-ds4`, ROCm 7.14.1 `gfx1151`, `--mmap-experts on --vram-experts 0.5 --max-context 131072 --tp 1`, DSpark drafter | Maya-S prefill **307.1 / 408.8 / 516.4 / 495.8 tok/s**, decode **9.11 / 11.76 / 12.74 / 15.31 tok/s** at **8,037 / 15,524 / 63,526 / 120,867** filled tokens. Maya-XS decode **11.3 / 13.1 / 15.2 / 17.0 tok/s**, prefill **196 / 222 tok/s** at 64k/120k (8k/15.5k withdrawn — warm KV reuse) | **Both packs passed 120k** on the 131,072 slot. Peak cgroup **56.73 GiB (S) / 44.93 GiB (XS)**, GTT 63.67 / 63.82 GiB, `MemAvailable` floor 46.4 / 46.1 GiB, **no freeze / OOM / failed request**. XS decodes ~11 % faster, S prefills 2.2–2.6× faster — split result, neither beats Strata's 36–49 tok/s. XS pack deleted 2026-10-24. [Report](docs/deepseek-v41-flash.md) · [Frozen logs](records/benchmarks/maya-20261024/) |
 | **2026-10-06** | **Strata server v0.1.40.1 · Orca Uncensored IQ3_XXS · HIP fast · prefill 16384 · MTP4/window8192** | At **30k**, three independent-process medians: **1301 tok/s prefill / 44.33 tok/s decode / 32.65 s request**. At **126k + 420 output**: **1272 / 42.44 tok/s / 109.23 s**; cached decode **43.43 tok/s**. Growing history: 126,450 input, 126,420 cached, 27 output in **1.12 s** | **39/39 context records, 17/17 short checks passed**; server suite 452 tests, 10 skips, no failures. Clean teardown; multi-file game coding and soak pending. [Report](docs/strata-strix-halo.md) · [JSON](records/benchmarks/strata-20261006/strata-v01401-20261006-summary.json) |
 | **2026-10-06** | **Strata v0.1.40 · Orca Qwen3.8 Flash-Next Uncensored IQ3_XXS · HIP gfx1151 + MTP4** | New-prefix decode **43.6 / 41.8 / 41.5 / 38.7 tok/s** at actual **7.6k / 30k / 62k / 126k** prompts; cached **44.0 / 42.4 / 42.4 / 39.4**. New-prefix prefill **324.3 / 312.2 / 297.4 / 287.1 tok/s** | **Historical first run**: inference completed, followed by unclean reboot of unknown cause. Independent retest completed cleanly; NTFS access recovered after Windows chkdsk. Superseded for speed by the tuned row above. [Full report](docs/strata-strix-halo.md) · [machine-readable results](records/benchmarks/strata-20261006/strata-v0140-strix-halo-20261006-summary.json) |
@@ -148,6 +169,8 @@ HIP gfx1151 build of ggml-org + [PR #28136](https://github.com/ggml-org/llama.cp
 - PR #28136 `on-direct` is a **cold-prefill SSD-read** delta on AP-IQ4 (+10.7% here), not a decode winner and not the DGX Spark 2–3× claim.
 - julianmb/haloq38flash **56 t/s** is Flash-Next **MTP @ 8k**, not GLM. At 128k they report 19–27 t/s — slower than 30 t/s here without MTP.
 - GLM **Vulkan 8.57 t/s** is not the Hilbert ceiling. Same GGUF on **ROCm gfx1151** is **14.63 t/s**.
+- DeepSeek V4.1 **24 t/s (gufo, IQ1_M, 2026-11-01)** is a different runtime and a different quantization from the **7.12 t/s `ds4` Q2** rows of 2026-09-17. Do not put them in one table, and do not read 24 t/s as an improvement of `ds4`.
+- The DeepSeek **bench** number (20.16 t/s novel generation) and the **prompt-lookup** number (66.32 t/s on copy/edit) are the same model in two workloads. Quoting only one of them misrepresents it either way.
 - **Nex N2.5 Mini** (HaloFPX Vulkan, 2026-09-09): llama-bench tg64 **81.6 t/s** / pp512 **650**. Quality **reject** (Czech/EN garbage; thinking-on = 0 content). Not a winner. [docs/nex-n25-mini.md](docs/nex-n25-mini.md). Do not mix into Flash 30 t/s.
 
 ## Licence
@@ -162,6 +185,7 @@ Recipes are MIT. Model weights stay under their own Hugging Face licences.
 - [deepseek v41 single strix halo](docs/deepseek-v41-single-strix-halo.md)
 - [deepseek v41 speed2 20260917](docs/deepseek-v41-speed2-20260917.md)
 - [flash next gufo ciru halogen 20260925](docs/flash-next-gufo-ciru-halogen-20260925.md)
+- [gufo deepseek v41 iq1m 20261101](docs/gufo-deepseek-v41-iq1m-20261101.md)
 - [gufo pr91 halogen e2e 20260928](docs/gufo-pr91-halogen-e2e-20260928.md)
 - [glm 53 flash](docs/glm-53-flash.md)
 - [halogen worker 64k](docs/halogen-worker-64k.md)

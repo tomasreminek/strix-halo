@@ -4,7 +4,7 @@ Measured results, acceptance gates, and negative experiments. Start with the [ma
 
 ## Current pair and Flash-Next
 
-- [Strata HIP / Orca IQ3_XXS,4 Oct](strata-strix-halo.md): actual inference, correct arithmetic/Czech and64-token canary; slow in this tested configuration, no64k/128k gate.
+- [Strata HIP / Orca IQ3_XXS,4 Oct](strata-strix-halo.md): actual inference, correct arithmetic/Czech and 64-token canary; slow in this tested configuration, no64k/128k gate.
 
 - [Ornith 1.5 9B Abliterated](ornith-abliterated-20260921.md): loader, Hermes tool loop, 63k and 117.8k retrieval.
 - [Halogen V2 abliterated · flash_serve 0.18.0, 11 Oct](halogen-v2-0180-20261011.md): sustained decode ~45 tok/s, MTP-accepted 65–81 tok/s, prefill 3.2–3.5k tok/s, cache reuse 13×, 96k/192k prefill + exact marker recall PASS. Port 8730 is raw TCP (engine); OpenAI API on 8731.
@@ -16,6 +16,10 @@ Measured results, acceptance gates, and negative experiments. Start with the [ma
 - [Flash-Next llama.cpp / Orca / AP-IQ4](qwen38-flash-next.md): Nathanw versions, MTP, 64k and 126k. [Chat + worker split](qwen-flash-next-chat-and-worker.md).
 - [Signal Flash-Next compatibility](signal-38-flash-next-2026-09-20.md): distinguish loader/schema failures from speed measurements.
 - [Worker-context synthetic proof records](../records/benchmarks/worker-context-proof/summary.json).
+
+## DeepSeek V4.1 Flash (671B-class MoE, single host)
+
+- [Gufo + ISTA IQ1_M backbone + Maya-S Engram drop-in, 1 Nov](gufo-deepseek-v41-iq1m-20261101.md): **24 tok/s decode and 1.2-1.3k tok/s prefill across 32k-128k context** on one Ryzen AI MAX+ 395. 120.72 GB IQ1_M backbone + 150.21 GiB Q6_K Engram borrowed from the Maya-S quantization, so the 110.6 GB stock Engram is never downloaded. Two request slots (`-j 2`) raise aggregate output **+36 %**; prompt lookup is **3.3x** on copy/edit work. QA gate **2/3** (Czech fixture failed). Full replication recipe, [patch and scripts](../recipes/deepseek-v41/), [frozen logs](../records/benchmarks/gufo-iq1m-20261101/). **Research runtime, not production, and not comparable with the `ds4` Q2 rows below** - different runtime, different weights, different measurement method.
 
 ## Other models and negative gates
 

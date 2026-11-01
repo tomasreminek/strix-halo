@@ -1,0 +1,36 @@
+=== Gufo: DeepSeek V4.1 Flash 1017 IQ1_M (ISTA backbone + Maya-S Engram Q6_K) ===
+datum: 2026-11-01 02:13   stroj: Hilbert, Ryzen AI MAX+ 395 / Radeon 8060S (gfx1151), 124 GB
+model: 120,72 GB backbone (5 shardu, SHA256 OK) + 150,21 GiB Engram (2 tabulky, Q6_K, 210 B/radek)
+stream = --stream-experts (experti z SSD), warm = prvni beh zahrati page cache
+
+config         depth   prefill   decode   note
+--------------------------------------------------------
+smoke              0     79.85    12.09   22s
+stream_warm        0   1027.73    23.27   28s
+stream             0    719.64     17.5   32s
+stream          8192   1289.26    24.12   34s
+stream         32768    531.11    19.53   55s
+stream        131072   1074.96    23.03   118s
+cache64G           0    782.25    18.99   25s
+cache32G           0    561.16    12.38   24s
+cache16G           0     478.6     9.77   25s
+resident           0      FAIL     FAIL   rc=1
+
+=== QA brana (greedy, seed 42) ===
+################ matematika  [PASS]
+EXPECT: \b391\b   (rc=0)
+################ kod  [PASS]
+EXPECT: \[::-1\]|reversed   (rc=0)
+################ cestina  [FAIL]
+EXPECT: Pa[rř][ií][zž]|Paris   (rc=0)
+VYSLEDEK: PASS (2/3)
+
+POZNAMKY
+- resident se NEVESEL: potreba 114,00 GiB, k dispozici 102,21 GiB (i po odebrani CMA) -> gufo odmitl
+  spustit. Autorovych 1228/24,5 tok/s je resident config, na tomhle stroji nedostupny.
+- cache64/32/16G: --expert-cache-bytes bere BAJTY (68719476736/34359738368/17179869184),
+  s "64G" gufo spadl na invalid integer.
+- radek stream/32768 (531/19,53) je sum, ne trend: 8192 i 131072 vysly vyssi.
+- tg128 meri 128 tokenu; u 8-tokenoveho smoke je decode neplatny (plni se cache).
+- Hermes gateway bezi v cgroupu MemoryMax=24G -> gufo v nem vidi jen ~4 GiB a cache
+  expertu zustane na nule (5,7 tok/s). Merene bezne scope (systemd-run --scope -p MemoryMax=infinity).

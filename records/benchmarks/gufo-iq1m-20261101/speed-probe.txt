@@ -1,0 +1,9 @@
+[08:35:33] START novel n=128
+[08:36:00] rc=0
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=0 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0 full_blocks=0 anchors=0 verifier_rows=0 lookup_cycles=0 lookup_copied=0 lookup_accepted=0
+----
+[08:36:00] START copy n=128
+[08:36:25] rc=0
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=9 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0.888889 full_blocks=8 anchors=9 verifier_rows=118 lookup_cycles=9 lookup_copied=109 lookup_accepted=102
+----
+[08:36:25] PROBE HOTOV

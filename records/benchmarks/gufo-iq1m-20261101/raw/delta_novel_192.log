@@ -1,0 +1,29 @@
+warning: DeepSeek V4.1 GGUF chat template differs from the 1017 release (sha256 4d61d22c90ea0cdf15c7e298f7215f23eeffd20f8eed8fb517fda5fb64693d99); rendering prompts with the built-in deepseek-v4.1-flash-1017-compiled-v1 template
+2026-11-01 08:37:50 [INFO] [ds41] DeepSeek V4.1 Flash: 5 backbone shard(s), 112.00 GiB device-eligible weights; Engram models/ista-iq1m/DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M-00006-of-00006.gguf (150.21 GiB, 210 B rows, read from disk)
+2026-11-01 08:37:50 [WARN] [ds41] 8.99 GiB of the available memory is free CMA (CmaFree in /proc/meminfo), which GPU memory cannot use; the resident model and its sessions need that memory. If it is the kernel's KHO scratch area (Ubuntu 26.04), boot with kho=off
+2026-11-01 08:37:50 [INFO] [ds4] backend initialized on AMD Radeon 8060S Graphics (sm_115)
+2026-11-01 08:37:50 [INFO] [ds4] native MMQ enabled
+2026-11-01 08:37:50 [INFO] [ds41] streaming routed experts: 5.31 GiB dense weights, 101.65 GiB available unified memory
+2026-11-01 08:37:51 [INFO] [ds4] loading model tensors into device cache
+2026-11-01 08:37:51 [INFO] [ds4] ROCm startup model cache prepared 5.31 GiB of tensor spans in 0.970s
+2026-11-01 08:38:10 [INFO] [ds41] expert seed (built-in V4.1 ranking): cached 11963 of 11963 experts (11963 ranked) from 82.95 GiB in 18.23 s
+[Model Load]: 19.5431 s
+# How a B-tree Index Works in a Relational Database
+
+A2026-11-01 08:38:11 [INFO] [ds41] expert cache interval: 95.7% route hits, 34.37 MiB read/token (1.9% prefetched), 20.03 ms host wait/token, 85.41 GiB allocated
+ B-tree index is a self-balancing, ordered tree structure stored on disk (or in memory) that maps key values to row locations. It supports equality lookups, range scans, and ordered traversal in O(log n) page reads. Below is a detailed breakdown of the mechanics.
+
+---
+
+## 1. Structure and2026-11-01 08:38:14 [INFO] [ds41] expert cache interval: 99.3% route hits, 13.73 MiB read/token (10.2% prefetched), 37.52 ms host wait/token, 86.26 GiB allocated
+ Invariants
+
+A B-tree of order `m` (fanout `m`) has these invariants:
+
+- Every internal node has between `⌈m/2⌉` and `m` children (except the root, which may have fewer).
+- Every leaf is at the same depth — the tree2026-11-01 08:38:17 [INFO] [ds41] expert cache interval: 99.2% route hits, 15.39 MiB read/token (10.9% prefetched), 39.41 ms host wait/token, 87.12 GiB allocated
+ is **height-balanced**.
+- Keys in each node are sorted; for a node with children `c₀…cₖ` and separator keys `k₁…kₖ`, the invariant is `c₀ < k₁ <
+[Speculative]: acceptance=0 drafted=0 accepted=0 verification_steps=0 skipped=0 positional_acceptance=0 positional_accepted=0 full_block_rate=0 full_blocks=0 anchors=0 verifier_rows=0 lookup_cycles=0 lookup_copied=0 lookup_accepted=0
+2026-11-01 08:38:20 [INFO] [ds41] expert cache total: 98.3% route hits, 18.44 MiB read/token, 35.57 ms host wait/token, 87.36 GiB allocated, 0.26 GiB prefetched (0.01 GiB dropped)
+2026-11-01 08:38:20 [INFO] [ds41] expert reads: 10254 direct, 0 buffered
