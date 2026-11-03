@@ -855,7 +855,7 @@ const SCENES = [
     shortTitle: '6. Epilog: Pondělí (2026)',
     intro: {
       speaker: 'Vypravěč',
-      text: 'Po sobotním nadechnutí v lese a nedělním zápisníku přichází pondělí. Dahlia бере čtvrťáky ven na školní dvůr, aby obvod a obsah zažili naživo.',
+      text: 'Po sobotním nadechnutí v lese a nedělním zápisníku přichází pondělí. Dahlia bere čtvrťáky ven na školní dvůr, aby obvod a obsah zažili naživo.',
     },
     hotspots: [
       {
@@ -1499,7 +1499,7 @@ function syncDOM() {
   const scene = SCENES[G.sceneIndex];
   const entry = currentDialogueEntry();
   ui.badge.textContent = (G.sceneIndex + 1) + '/' + SCENES.length;
-  ui.toggle.textContent = 'Dahlia — pixelová pouť · ' + scene.shortTitle + ' ▾';
+  ui.toggle.textContent = 'Dahlia — pixelová pouť ▾';
   ui.live.textContent = entry.speaker + ': ' + entry.text;
   ui.diaryOpen.textContent = `Deník (${G.items.length + G.notes.length})`;
 
