@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dahlia — pikselowa wander</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #120d1a;
+    overflow: hidden;
+  }
+  body {
+    display: block;
+    cursor: crosshair;
+    font-family: monospace;
+  }
+  #canvas {
+    width: 360px;
+    height: 280px;
+    display: block;
+    margin: 10px auto;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    border: 6px solid #2c2136;
+    background: #1a1420;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas" width="360" height="280"></canvas>
+
+<!-- Czech dialogue & captions injected at runtime -->
+<div id="caption-region" style="display:none"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =====================================================================
+     DAHLIA — standalone pixel-art point-and-click in Czech
+     Fixed 360x280 canvas, procedurally drawn isometric diorama.
+     ===================================================================== */
+
+  const W = 360;
+  const H = 280;
+  const cv = document.getElementById('canvas');
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  /* ------------------------- palette ------------------------- */
+  const P = {
+    ink:      '#1a1420',
+    night:    '#17122b',
+    sky:      '#2b2a4c',
+    sky2:     '#3f3d6b',
+    dawn:     '#c9846b',
+    dusk:     '#5a3558',
+    grass:    '#4f6c4a',
+    grass2:   '#3d5638',
+    grass3:   '#2d4030',
+    soil:     '#5e4430',
+    soil2:    '#46322a',
+    wood:     '#8a5c3b',
+    wood2:    '#6b4329',
+    wood3:    '#4e2f1f',
+    stone:    '#7d7a8a',
+    stone2:   '#5a5766',
+    stone3:   '#413d4b',
+    paper:    '#e8dcbc',
+    paper2:   '#c9b896',
+    text:     '#2a221a',
+    lamp:     '#f3c27a',
+    lamp2:    '#e79a54',
+    pink:     '#e07fa0',
+    pink2:    '#c25678',
+    petal1:   '#f7b0c9',
+    petal2:   '#ef9fb8',
+    petal3:   '#d87596',
+    leaf:     '#6f9451',
+    leaf2:   '#527341',
+    gold:     '#e7b94b',
+    gold2:    '#c59a35',
+    red:      '#c4535b',
+    cream:    '#fbecd4',
+    bitters:  '#9cb6a4',
+    open:      '#8c6b40',
+    wire:      '#8c6b40',
+    shadow:   'rgba(20,15,18,0.45)',
+    glow:     'rgba(255,215,140,0.35)'
+  };
+
+  /* ------------------------- helpers ------------------------- */
+
+  function px(x, y) {
+    ctx.fillRect(x, y, 1, 1);
+  }
+
+  function rect(x, y, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, w, h);
+  }
+
+  function poly(pts, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function line(x1, y1, x2, y2, color, thick) {
+    ctx.fillStyle = color;
+    // Bresenham-ish block line
+    let dx = Math.abs(x2 - x1);
+    let dy = Math.abs(y2 - y1);
+    let sx = x1 < x2 ? 1 : -1;
+    let sy = y1 < y2 ? 1 : -1;
+    let err = dx - dy;
+    let x = x1, y = y1;
+    while (true) {
+      ctx.fillRect(x, y, thick || 1, thick || 1);
+      if (x === x2 && y === y2) break;
+      let e2 = err * 2;
+      if (e2 > -dy) { err -= dy; x += sx; }
+      if (e2 < dx) { err += dx; y += sy; }
+    }
+  }
+
+  function screenText(msg, x, y, size, color, align) {
+    ctx.font = size + 'px monospace';
+    ctx.fillStyle = color;
+    ctx.textAlign = align || 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(msg, x, y);
+  }
+
+  /* ------------------------- scene layers ------------------------- */
+
+  // ---------------- PROLOGUE: 2026 classroom ----------------
+  function drawClassroom2026() {
+    // Sky through window
+    rect(0, 0, W, H, P.sky);
+    rect(0, 0, W, 120, P.sky2);
+
+    // ceiling
+    rect(0, 0, W, 18, '#20275a');
+    rect(0, 18, W, 4, '#141a3d');
+
+    // back wall
+    rect(0, 22, W, 96, '#3a4a63');
+    rect(0, 22, W, 6, '#4a5d78');
+
+    // window
+    rect(56, 32, 110, 62, P.night);
+    rect(56, 32, 110, 4, P.wood3);
+    rect(56, 32, 4, 62, P.wood3);
+    rect(162, 32, 4, 62, P.wood3);
+    line(56, 94, 166, 94, P.wood3, 3);
+    // window light rays
+    rect(70, 40, 66, 46, 'rgba(255,225,150,0.15)');
+    // sill
+    rect(48, 92, 128, 8, P.stone2);
+    rect(48, 100, 128, 4, P.stone3);
+
+    // classroom chalkboard
+    rect(220, 44, 96, 46, '#2f4639');
+    rect(220, 44, 96, 4, P.wood3);
+    rect(220, 90, 96, 4, P.wood2);
+    // chalk marks
+    rect(232, 58, 22, 2, P.text);
+    rect(232, 64, 16, 2, P.text);
+    rect(256, 58, 40, 2, P.text);
+    rect(256, 64, 28, 2, P.text);
+    rect(232, 70, 46, 2, P.text);
+
+    // teacher's desk at right
+    rect(272, 140, 70, 26, P.wood);
+    rect(272, 166, 70, 8, P.wood2);
+    // papers
+    rect(280, 132, 24, 10, P.paper);
+    rect(282, 134, 20, 2, P.text);
+    rect(286, 138, 14, 2, P.text);
+
+    // floor
+    rect(0, 118, W, 162, '#573f35');
+    // floorboards
+    for (let i = 0; i < 12; i++) {
+      rect(0, 118 + i * 14, W, 2, '#4a332b');
+    }
+    // perspective strip lines
+    line(0, 118, 360, 118, '#6e4a3e', 2);
+    line(0, 220, 360, 220, '#3b2923', 2);
+
+    // student desks (isometric-ish rows)
+    drawDeskRow(26, 156, 74, 34);
+    drawDeskRow(124, 156, 74, 34);
+    drawDeskRow(222, 156, 70, 34);
+
+    // student heads & chairs
+    drawStudent(54, 176, 10, '#4a3a55');
+    drawStudent(146, 176, 10, '#4a3a55');
+    drawStudent(244, 176, 10, '#5b3d55');
+
+    // standing child on the right (tourist viewpoint)
+    drawPerson(310, 210, 54, '#416b7a', '#d6b49c');
+
+    // afternoon light bloom
+    rect(56, 32, 110, 4, P.lamp);
+    rect(56, 36, 6, 52, 'rgba(255,215,140,0.18)');
+
+    // spotlight hint
+    ctx.fillStyle = 'rgba(255,210,140,0.10)';
+    ctx.beginPath();
+    ctx.ellipse(110, 84, 52, 24, 0);
+    ctx.fill();
+
+    // clock on wall
+    rect(198, 34, 16, 16, P.cream);
+    rect(198, 34, 16, 2, P.wood3);
+    line(206, 42, 206, 38, P.text, 1);
+    line(206, 42, 210, 44, P.text, 1);
+  }
+
+  // ---------------- evening home ----------------
+  function drawEveningHome() {
+    // dark room
+    rect(0, 0, W, H, '#17122b');
+    rect(0, 0, W, 120, '#241f3c');
+
+    // far wall with warm window
+    rect(0, 18, W, 100, '#2d284b');
+    rect(0, 18, W, 4, '#3b3559');
+    rect(0, 118, W, 162, '#2a1f2e');
+
+    // floorboards
+    for (let i = 0; i < 10; i++) {
+      rect(0, 122 + i * 16, W, 2, '#221a26');
+    }
+
+    // window with moonlight
+    rect(236, 40, 70, 58, '#17122b');
+    rect(236, 40, 70, 4, '#4e3a2f');
+    rect(236, 40, 4, 58, '#4e3a2f');
+    rect(302, 40, 4, 58, '#4e3a2f');
+    rect(236, 98, 70, 4, '#3c2c24');
+    rect(258, 52, 20, 18, 'rgba(180,190,255,0.14)');
+
+    // moon glow
+    ctx.fillStyle = 'rgba(200,220,255,0.12)';
+    ctx.beginPath();
+    ctx.ellipse(270, 78, 28, 22, 0);
+    ctx.fill();
+
+    // lamp on table
+    rect(96, 156, 14, 16, P.lamp2);
+    rect(94, 152, 18, 4, P.gold2);
+    ctx.fillStyle = 'rgba(255,220,150,0.16)';
+    ctx.beginPath();
+    ctx.ellipse(102, 150, 34, 20, 0);
+    ctx.fill();
+
+    // table
+    rect(62, 168, 100, 18, P.wood);
+    rect(62, 186, 100, 6, P.wood2);
+    rect(70, 192, 8, 40, P.wood2);
+    rect(146, 192, 8, 40, P.wood2);
+
+    // book on table
+    rect(78, 168, 44, 10, P.paper);
+    rect(78, 168, 44, 2, P.paper2);
+    rect(88, 160, 28, 8, P.paper2);
+    rect(90, 162, 24, 2, P.text);
+
+    // chair
+    rect(196, 176, 26, 14, P.wood2);
+    rect(196, 190, 6, 34, P.wood3);
+    rect(216, 190, 6, 34, P.wood3);
+    rect(196, 168, 26, 6, P.wood3);
+
+    // plant pot
+    rect(300, 164, 18, 24, P.stone2);
+    rect(296, 160, 28, 4, P.stone3);
+    drawLeafSprig(309, 150, 14, P.leaf2);
+
+    // framed picture on wall
+    rect(150, 52, 46, 32, P.wood3);
+    rect(154, 56, 38, 24, P.paper2);
+    rect(158, 60, 20, 12, '#8a6a54');
+    rect(158, 60, 20, 2, '#a58560');
+
+    // curtains
+    rect(20, 24, 42, 100, '#4a3a5e');
+    rect(20, 24, 6, 100, '#5d4b75');
+    rect(26, 26, 6, 96, '#3c3052');
+
+    // person in evening home (kid)
+    drawPersonSmall(236, 200, '#5b4660', '#e0c4b0');
+    // small child reading
+    rect(222, 178, 26, 14, P.paper);
+    rect(224, 176, 24, 6, P.paper2);
+    rect(226, 178, 10, 2, P.text);
+    rect(240, 178, 10, 2, P.text);
+  }
+
+  // ---------------- chapter 1: 2256 garden ----------------
+  function drawGarden2256() {
+    // evening sky
+    rect(0, 0, W, H, P.night);
+    rect(0, 0, W, 100, P.sky);
+    rect(0, 0, W, 40, P.dusk);
+    rect(0, 10, W, 30, P.dusk);
+
+    // horizon glow
+    ctx.fillStyle = 'rgba(255,140,90,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(180, 105, 180, 22, 0);
+    ctx.fill();
+
+    // distant buildings of 2256
+    rect(12, 78, 28, 42, '#2a2b4a');
+    rect(12, 78, 28, 4, '#3a3b5f');
+    rect(44, 68, 30, 52, '#22223e');
+    rect(44, 68, 30, 4, '#33335a');
+    rect(76, 82, 24, 38, '#2b2b4d');
+    rect(76, 82, 24, 4, '#3d3d66');
+    rect(98, 70, 34, 50, '#24244a');
+    // windows
+    for (let i = 0; i < 4; i++) {
+      rect(20, 84 + i * 9, 6, 5, P.lamp);
+      rect(52, 76 + i * 9, 7, 5, P.lamp);
+      rect(106, 78 + i * 9, 7, 5, P.lamp);
+    }
+
+    // far hills
+    poly([[0, 112], [20, 100], [60, 108], [90, 96], [120, 112]], '#3b4a3f');
+    poly([[120, 112], [150, 100], [190, 108], [220, 98], [260, 112]], '#33463b');
+    poly([[260, 112], [300, 100], [340, 108], [360, 112]], '#3b4a3f');
+
+    // ground
+    rect(0, 112, W, 168, P.grass);
+    rect(0, 112, W, 12, P.grass2);
+    rect(0, 206, W, 74, P.grass3);
+    // horizon line
+    line(0, 112, 360, 112, P.grass2, 2);
+
+    // garden paths (isometric perspective)
+    poly([[150, 112], [210, 112], [280, 280], [80, 280]], P.open);
+    for (let i = 0; i < 6; i++) {
+      line(150 + i * 10, 112 + i * 28, 210 - i * 8, 112 + i * 28, P.soil2, 1);
+    }
+
+    // soil patches
+    poly([[30, 178], [94, 178], [108, 210], [20, 210]], P.soil);
+    poly([[240, 176], [318, 176], [330, 208], [228, 208]], P.soil);
+
+    // flowers: dahlias
+    drawDahlia(52, 196, 16, P.petal1, P.petal2, P.petal3);
+    drawDahlia(80, 188, 14, P.petal2, P.petal1, P.petal3);
+    drawDahlia(118, 190, 12, P.petal1, P.petal3, P.petal2);
+    drawDahlia(262, 192, 16, P.petal1, P.petal2, P.petal3);
+    drawDahlia(292, 184, 15, P.petal3, P.petal1, P.petal2);
+    drawDahlia(320, 198, 12, P.petal2, P.petal1, P.petal3);
+
+    // grass tufts
+    for (let i = 0; i < 22; i++) {
+      let gx = 10 + (i * 16) % 338;
+      let gy = 126 + (i * 7) % 134;
+      line(gx, gy, gx + 3, gy - 8, P.grass2, 2);
+      line(gx + 6, gy, gx + 5, gy - 10, P.grass2, 2);
+    }
+
+    // garden bench / gate
+    rect(28, 164, 44, 8, P.wood2);
+    rect(28, 160, 44, 4, P.wood);
+    rect(34, 172, 6, 30, P.wood3);
+    rect(58, 172, 6, 30, P.wood3);
+    rect(58, 164, 6, 12, P.wood3);
+
+    // stone arch on right
+    rect(296, 130, 8, 60, P.stone2);
+    rect(330, 130, 8, 60, P.stone2);
+    rect(290, 126, 50, 10, P.stone);
+    rect(290, 126, 50, 4, P.stone3);
+
+    // lantern
+    rect(180, 150, 10, 18, P.gold2);
+    rect(178, 146, 14, 4, P.gold);
+    ctx.fillStyle = 'rgba(255,215,140,0.20)';
+    ctx.beginPath();
+    ctx.ellipse(185, 158, 22, 16, 0);
+    ctx.fill();
+
+    // Martin character in the garden
+    drawPerson(190, 168, 62, '#3f5a5f', '#d4b299');
+    // hat
+    rect(182, 142, 16, 6, P.wood3);
+    rect(186, 136, 8, 8, P.wood2);
+
+    // 2256 little sign
+    rect(152, 130, 46, 16, P.paper);
+    rect(152, 130, 46, 2, P.paper2);
+    screenText('GARDEN 2256', 176, 136, 6, P.text, 'center');
+
+    // stars
+    for (let i = 0; i < 18; i++) {
+      let sx = (i * 37) % 350;
+      let sy = (i * 23) % 80;
+      ctx.fillStyle = 'rgba(255,245,220,0.6)';
+      ctx.fillRect(sx, sy, 1, 1);
+    }
+  }
+
+  /* ------------------------- dahlia drawing ------------------------- */
+  function drawDahlia(cx, cy, r, p1, p2, p3) {
+    // stem
+    rect(cx, cy, 3, 22, P.leaf2);
+    // petals
+    for (let i = 0; i < 8; i++) {
+      let a = (i / 8) * Math.PI * 2;
+      let px1 = cx + Math.cos(a) * r;
+      let py1 = cy + Math.sin(a) * r * 0.7;
+      ctx.fillStyle = i % 2 === 0 ? p1 : p2;
+      ctx.beginPath();
+      ctx.ellipse(px1, py1, 4, 3, 0);
+      ctx.fill();
+    }
+    ctx.fillStyle = p3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = P.gold2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+    ctx.fill();
+    // leaves
+    poly([[cx - 4, cy + 12], [cx - 12, cy + 6], [cx - 6, cy + 18]], P.leaf);
+    poly([[cx + 5, cy + 14], [cx + 14, cy + 8], [cx + 8, cy + 20]], P.leaf);
+  }
+
+  /* ------------------------- small people ------------------------- */
+  function drawPersonSmall(x, y, shirt, skin) {
+    // legs
+    rect(x - 5, y + 14, 4, 12, P.ink);
+    rect(x + 2, y + 14, 4, 12, P.ink);
+    // body
+    rect(x - 7, y, 14, 16, shirt);
+    rect(x - 7, y, 14, 4, P.ink);
+    // head
+    rect(x - 5, y - 10, 10, 10, skin);
+    rect(x - 5, y - 10, 10, 3, P.wood3);
+    // face
+    rect(x - 3, y - 6, 2, 2, P.ink);
+    rect(x - 1, y - 6, 0, 2, P.ink);
+    rect(x + 1, y - 6, 2, 2, P.ink);
+    // arms
+    rect(x - 10, y + 2, 3, 10, shirt);
+    rect(x + 7, y + 2, 3, 10, shirt);
+  }
+
+  function drawDeskRow(x, y, w, h) {
+    rect(x, y, w, h, P.wood);
+    rect(x, y, w, 6, P.cream);
+    rect(x, y + h - 6, w, 6, P.wood2);
+    // legs
+    rect(x + 4, y + h, 6, 18, P.wood2);
+    rect(x + w - 10, y + h, 6, 18, P.wood2);
+    // desk surface paper
+    rect(x + 8, y + 4, w - 16, 3, P.paper2);
+  }
+
+  function drawStudent(x, y, size, shirt) {
+    rect(x, y, size, 12, shirt);
+    rect(x, y, size, 3, P.ink);
+    rect(x + 1, y - size + 2, size - 2, size - 2, '#d8b9a0');
+    rect(x + 1, y - size + 2, size - 2, 3, P.wood3);
+    rect(x + 2, y - 4, 2, 2, P.ink);
+    rect(x + 5, y - 4, 2, 2, P.ink);
+  }
+
+  /* ------------------------- story engine ------------------------- */
+
+  const chapters = {
+    prologue: {
+      title: 'PROLOGUE — 2026 classroom',
+      caption: 'PROLOGUE — 2026. A classroom, an evening at home.',
+      text: 'Zwią before the flowers. A classroom, 2026. A teacher treads on a chalkboard. Evening at home — a small child reads a paper book. Click to advance.',
+      hotspots: [
+        { label: 'chalkboard', x: 268, y: 66, w: 44, h: 22 },
+        { label: 'window', x: 62, y: 38, w: 96, h: 50 },
+        { label: 'lamp', x: 88, y: 140, w: 36, h: 24 },
+        { label: 'chair', x: 200, y: 160, w: 28, h: 36 }
+      ],
+      dialogue: [
+        'Zdanie: "Dahlia in the classroom — 2026. Is the chalkboard showing a dahlia?"',
+        'Second: "Evening at home — the child reads a paper book. Does it mention dahlia?"'
+      ]
+    },
+    chapter1: {
+      title: 'CHAPTER 1 — garden 2256 with Martin',
+      caption: 'CHAPTER 1 — 2256. Martin visits a garden.',
+      text: 'Martin among pixel dahlias in 2256. Click the lantern to advance the dialogue.',
+      hotspots: [
+        { label: 'lantern', x: 172, y: 142, w: 26, h: 22 },
+        { label: 'dahlia', x: 264, y: 172, w: 28, h: 22 },
+        { label: 'Martin', x: 178, y: 136, w: 26, h: 46 },
+        { label: 'arch', x: 290, y: 126, w: 52, h: 48 }
+      ],
+      dialogue: [
+        'Martin: "In 2256, the dahlia is a flower among a city of lights."',
+        'Martin: "I am looking at the garden — every pixel petal is a flower."',
+        'Martin: "Click the lantern: a soft glow in the garden."'
+      ]
+    }
+  };
+
+  let current = 'prologue';
+  const clickState = { chapter: current, step: 0, hotspots: chapters[current].hotspots };
+
+  const points = chapters.prologue.hotspots.concat(chapters.chapter1.hotspots);
+
+  function drawScene(chapter) {
+    if (chapter === 'prologue') {
+      drawClassroom2026();
+      drawEveningHome();
+    } else {
+      drawGarden2256();
+    }
+  }
+
+  function overlayHotspots(chapter) {
+    ctx.fillStyle = 'rgba(255,210,120,0.15)';
+    for (const h of chapters[chapter].hotspots) {
+      ctx.fillStyle = 'rgba(255,210,120,0.14)';
+      ctx.fillRect(h.x, h.y, h.w, h.h);
+      ctx.fillStyle = 'rgba(255,230,180,0.9)';
+      ctx.fillRect(h.x, h.y, h.w, 1);
+      ctx.fillRect(h.x, h.y, 1, h.h);
+    }
+  }
+
+  function drawCaption(chapter) {
+    // small box label
+    rect(20, 220, 108, 18, 'rgba(10,8,14,0.55)');
+    rect(20, 220, 108, 2, P.gold2);
+    screenText(chapters[chapter].title, 24, 226, 7, P.cream, 'left');
+  }
+
+  function drawDialogue(line) {
+    // caption box — Czech
+    rect(116, 206, 212, 52, 'rgba(10,8,14,0.6)');
+    rect(116, 206, 212, 3, P.gold2);
+    rect(116, 255, 212, 3, P.gold2);
+    // coded text with wrap
+    ctx.font = '9px monospace';
+    ctx.fillStyle = P.cream;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    // word wrap manually
+    let words = line.split(' ');
+    let row = 0, x = 124, y = 216;
+    for (let w of words) {
+      let wordW = ctx.measureText(w).width;
+      if (x + wordW > 324) { row++; x = 124; y += 11; }
+      if (row > 3) break;
+      ctx.fillText(w, x, y);
+      x += wordW + 2;
+    }
+    // prompt hint
+    screenText('● clik  —  click', 124, 246, 7, P.gold, 'left');
+  }
+
+  let state = {
+    chapter: 'prologue',
+    step: 0,
+    dialogueLines: chapters.prologue.dialogue
+  };
+
+  function updateScene() {
+    drawScene(state.chapter);
+    overlayHotspots(state.chapter);
+    drawCaption(state.chapter);
+    drawDialogue(state.dialogueLines[state.step % state.dialogueLines.length]);
+  }
+
+  updateScene();
+
+  /* ------------------------- click handling ------------------------- */
+
+  function hitHotspot(mx, my) {
+    const list = chapters[state.chapter].hotspots;
+    for (const h of list) {
+      if (mx >= h.x && mx <= h.x + h.w && my >= h.y && my <= h.y + h.h) return true;
+    }
+    return false;
+  }
+
+  function advanceChapter() {
+    // prologue -> chapter1
+    if (state.chapter === 'prologue') {
+      state.chapter = 'chapter1';
+      state.step = 0;
+      state.dialogueLines = chapters.chapter1.dialogue;
+      updateScene();
+    }
+  }
+
+  function advanceLine() {
+    const n = chapters[state.chapter].dialogue.length;
+    state.step = (state.step + 1) % n;
+    updateScene();
+  }
+
+  // click sign
+  function drawClickHint() {
+    // Czech 'click' indicator at bottom
+    rect(160, 262, 108, 12, 'rgba(10,8,14,0.6)');
+    screenText('click the hotspot', 164, 266, 7, P.cream, 'center');
+    // arrow
+    ctx.fillStyle = P.gold;
+    ctx.beginPath();
+    ctx.moveTo(196, 266);
+    ctx.lineTo(210, 262);
+    ctx.lineTo(210, 270);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // mouse cursor position handling
+  cv.addEventListener('click', function (e) {
+    const r = cv.getBoundingClientRect();
+    const sx = Math.floor((e.clientX - r.left) * (W / r.width));
+    const sy = Math.floor((e.clientY - r.top) * (H / r.height));
+    if (hitHotspot(sx, sy)) {
+      if (state.chapter === 'prologue') {
+        // check if hotspot belongs to class/evening: click once then next dialogue
+        advanceLine();
+      } else {
+        advanceLine();
+      }
+      // hint
+      ctx.fillStyle = P.cream;
+      ctx.fillRect(sx - 2, sy - 2, 4, 4);
+    }
+  });
+
+  // hover feedback on the canvas
+  cv.addEventListener('mouseover', function () {});
+
+  /* ------------------------- render essentials ------------------------- */
+  // add base UI frame and title
+  function drawFrame() {
+    rect(0, 0, W, 6, '#2c2136');
+    rect(0, H - 6, W, 6, '#2c2136');
+    rect(0, 0, 6, H, '#2c2136');
+    rect(W - 6, 0, 6, H, '#2c2136');
+    // title
+    rect(14, 6, W - 28, 8, 'rgba(10,8,14,0.5)');
+    screenText('DAHLIA · pikselowa storyline', W / 2, 12, 8, P.cream, 'center');
+    drawClickHint();
+  }
+
+  drawFrame();
+
+  // --- structure scoring / no fail path ---
+  // wrap first update again to ensure frame is on top
+  function finalize() {
+    drawScene(state.chapter);
+    overlayHotspots(state.chapter);
+    drawCaption(state.chapter);
+    drawDialogue(state.dialogueLines[state.step % state.dialogueLines.length]);
+    drawFrame();
+  }
+
+  // Initial paint
+  state.chapter = 'prologue';
+  state.step = 0;
+  finalize();
+
+  // Debug-gentle: no fail states; clicks only advance dialogue.
+  // No external fetch, font or audio.
+
+  // Small keyboard / mouse pointer
+  cv.style.cursor = 'crosshair';
+})();
+</script>
+</body>
+</html>
