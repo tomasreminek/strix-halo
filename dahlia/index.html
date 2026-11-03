@@ -1,693 +1,1761 @@
-<!DOCTYPE html>
-<html lang="cz">
+<!doctype html>
+<html lang="cs">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dahlia — pikselowa wander</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dahlia — pixelová pouť</title>
 <style>
+  :root {
+    --ink: #1c1b19;
+    --muted: #8b877f;
+    --paper: #ffffff;
+    --cream: #fbf8f1;
+    --accent: #b5392b;
+    --sage: #3d6b58;
+  }
+  * { box-sizing: border-box; }
   html, body {
-    margin: 0;
-    padding: 0;
     height: 100%;
-    background: #120d1a;
-    overflow: hidden;
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
   }
   body {
-    display: block;
-    cursor: crosshair;
-    font-family: monospace;
+    font: 13px/1.35 ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+    overflow: hidden;
+    user-select: none;
   }
-  #canvas {
-    width: 360px;
-    height: 280px;
+  #stage {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+  canvas {
     display: block;
-    margin: 10px auto;
     image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
-    border: 6px solid #2c2136;
-    background: #1a1420;
+    touch-action: manipulation;
+    cursor: pointer;
+    outline: none;
+  }
+  /* Minimal pixel-plays shell chrome */
+  .pp-link {
+    font: inherit;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    padding: 8px 10px;
+    margin: 0;
+    cursor: pointer;
+  }
+  .pp-link:hover, .pp-link:focus-visible, .pp-link[aria-expanded="true"] {
+    color: var(--ink);
+  }
+  #pp-menu {
+    position: fixed;
+    top: max(4px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    text-align: center;
+  }
+  #pp-list {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    background: #fff;
+    border: 1px solid var(--ink);
+    min-width: 230px;
+    text-align: left;
+  }
+  #pp-list[hidden] { display: none; }
+  #pp-list button {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 12px;
+    font: inherit;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+  }
+  #pp-list button:hover, #pp-list button:focus-visible {
+    background: var(--ink);
+    color: #fff;
+    outline: none;
+  }
+  #pp-list button[aria-current="true"]::after { content: "•"; }
+  #top-left {
+    position: fixed;
+    top: max(6px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #top-right {
+    position: fixed;
+    top: max(4px, env(safe-area-inset-top));
+    right: max(8px, env(safe-area-inset-right));
+    z-index: 5;
+    display: flex;
+    gap: 4px;
+  }
+  /* Choice bar floating cleanly above bottom HUD when a choice is active */
+  #choices {
+    position: fixed;
+    bottom: max(36px, calc(env(safe-area-inset-bottom) + 28px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    max-width: min(560px, calc(100vw - 24px));
+  }
+  #choices[hidden] { display: none; }
+  .choice-btn {
+    font: 12px/1.25 ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1px solid var(--ink);
+    padding: 5px 9px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 rgba(28, 27, 25, 0.18);
+  }
+  .choice-btn:hover, .choice-btn:focus-visible {
+    background: var(--ink);
+    color: #fff;
+    outline: none;
+  }
+  .hud {
+    position: fixed;
+    left: max(16px, env(safe-area-inset-left));
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    pointer-events: none;
+    z-index: 3;
+  }
+  #status {
+    color: var(--muted);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #mute {
+    pointer-events: auto;
+    white-space: nowrap;
+  }
+  dialog {
+    width: min(400px, calc(100vw - 28px));
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    padding: 16px;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    background: #fff;
+    font: inherit;
+  }
+  dialog::backdrop { background: rgba(255, 255, 255, 0.76); }
+  dialog h2 { margin: 0 0 8px; font: inherit; font-weight: 600; }
+  dialog h3 { margin: 12px 0 6px; font: inherit; font-weight: 600; color: var(--sage); }
+  dialog ul, dialog ol { margin: 0 0 8px; padding-left: 18px; }
+  dialog li { margin-bottom: 6px; }
+  dialog p { margin: 0 0 8px; color: var(--muted); }
+  dialog form { text-align: right; margin-top: 8px; }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
   }
 </style>
 </head>
 <body>
+<div id="stage">
+  <canvas id="c" width="360" height="280" tabindex="0" aria-label="Dahlia — pixelová pouť. Klikněte na postavy a předměty ve scéně nebo na dialogové okno dole."></canvas>
+</div>
 
-<canvas id="canvas" width="360" height="280"></canvas>
+<div id="top-left">
+  <span id="scene-badge" style="font-weight:600">1/6</span>
+</div>
 
-<!-- Czech dialogue & captions injected at runtime -->
-<div id="caption-region" style="display:none"></div>
+<nav id="pp-menu" aria-label="Kapitoly příběhu">
+  <button id="pp-toggle" type="button" class="pp-link" aria-expanded="false" aria-controls="pp-list">Dahlia — pixelová pouť ▾</button>
+  <ul id="pp-list" hidden></ul>
+</nav>
+
+<div id="top-right">
+  <button id="diary-open" type="button" class="pp-link">Deník (0)</button>
+  <button id="rules-open" type="button" class="pp-link">O hře</button>
+</div>
+
+<div id="choices" role="group" aria-label="Možnosti odpovědi" hidden></div>
+
+<div class="hud" id="bottom">
+  <div id="status" role="status" aria-live="polite">Klikněte na předměty ve scéně nebo na dialog dole</div>
+  <button id="mute" type="button" class="pp-link" aria-pressed="false">zvuk zap</button>
+</div>
+
+<!-- Accessible live mirror of the current Czech dialogue on canvas -->
+<div id="dialogue-live" class="sr-only" aria-live="polite"></div>
+
+<dialog id="diary-dialog" aria-labelledby="diary-title">
+  <h2 id="diary-title">Dahliin zápisník a předměty</h2>
+  <p>Stopy, vzpomínky a otázky, které si Dahlia odnáší ze své pouti mezi pátkem 2026 a zahradou 2256.</p>
+  <h3>Sebrané předměty</h3>
+  <ul id="diary-items"></ul>
+  <h3>Zápisy a otázky v deníku</h3>
+  <ul id="diary-notes"></ul>
+  <form method="dialog"><button class="pp-link">Zavřít</button></form>
+</dialog>
+
+<dialog id="rules-dialog" aria-labelledby="rules-title">
+  <h2 id="rules-title">Dahlia — pixelová pouť</h2>
+  <ol>
+    <li>Každá scéna obsahuje 4 klikací místa (označená drobným bodem). Kliknutím na postavu či předmět zobrazíte český dialog.</li>
+    <li>Kliknutím na dialogové okno dole (nebo mezerníkem / Enterem) posunete řeč dál.</li>
+    <li>Jakmile vyčerpáte dialogy ve scéně, příběh automaticky přejde do další kapitoly.</li>
+    <li>Hra nemá žádné prohry, časový tlak ani hodnocení. V menu nahoře lze kdykoli přejít mezi scénami.</li>
+  </ol>
+  <form method="dialog"><button class="pp-link">Zavřít</button></form>
+</dialog>
 
 <script>
-(function () {
-  'use strict';
+'use strict';
 
-  /* =====================================================================
-     DAHLIA — standalone pixel-art point-and-click in Czech
-     Fixed 360x280 canvas, procedurally drawn isometric diorama.
-     ===================================================================== */
+/* ============================================================================
+   1. PIXEL-PLAYS ISOMETRIC ENGINE (30° orthographic camera, ramps, shadows)
+   ============================================================================ */
+const W = 360, H = 280, S = 10;
+const SIN = 0.5, COS = Math.sqrt(3) / 2, R2 = Math.SQRT2;
+const OX = W / 2, OY = 114; // Shifted above the bottom dialogue box so the whole diorama floats on paper white
+let SHADOW_X = 1.15, SHADOW_Y = -0.18;
 
-  const W = 360;
-  const H = 280;
-  const cv = document.getElementById('canvas');
-  const ctx = cv.getContext('2d');
-  ctx.imageSmoothingEnabled = false;
+const canvas = document.getElementById('c');
+canvas.width = W;
+canvas.height = H;
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 
-  /* ------------------------- palette ------------------------- */
-  const P = {
-    ink:      '#1a1420',
-    night:    '#17122b',
-    sky:      '#2b2a4c',
-    sky2:     '#3f3d6b',
-    dawn:     '#c9846b',
-    dusk:     '#5a3558',
-    grass:    '#4f6c4a',
-    grass2:   '#3d5638',
-    grass3:   '#2d4030',
-    soil:     '#5e4430',
-    soil2:    '#46322a',
-    wood:     '#8a5c3b',
-    wood2:    '#6b4329',
-    wood3:    '#4e2f1f',
-    stone:    '#7d7a8a',
-    stone2:   '#5a5766',
-    stone3:   '#413d4b',
-    paper:    '#e8dcbc',
-    paper2:   '#c9b896',
-    text:     '#2a221a',
-    lamp:     '#f3c27a',
-    lamp2:    '#e79a54',
-    pink:     '#e07fa0',
-    pink2:    '#c25678',
-    petal1:   '#f7b0c9',
-    petal2:   '#ef9fb8',
-    petal3:   '#d87596',
-    leaf:     '#6f9451',
-    leaf2:   '#527341',
-    gold:     '#e7b94b',
-    gold2:    '#c59a35',
-    red:      '#c4535b',
-    cream:    '#fbecd4',
-    bitters:  '#9cb6a4',
-    open:      '#8c6b40',
-    wire:      '#8c6b40',
-    shadow:   'rgba(20,15,18,0.45)',
-    glow:     'rgba(255,215,140,0.35)'
+const image = ctx.createImageData(W, H);
+const pix = new Uint32Array(image.data.buffer);
+const zb = new Float32Array(W * H);
+const bakedPix = new Uint32Array(W * H);
+const bakedZ = new Float32Array(W * H);
+const ground = new Uint8Array(W * H);
+const shadowMask = new Uint8Array(W * H);
+const staticShadow = new Uint8Array(W * H);
+const groundZ = new Float32Array(W * H);
+const kinds = new Uint8Array(W * H);
+
+const KIND_NONE = 0, KIND_FLOOR = 1, KIND_DIRT = 2, KIND_GRASS = 3, KIND_WATER = 4;
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + 0.5) / 16);
+const COOL = [46, 38, 84], WARM = [255, 232, 180];
+const SHOE = [226, 222, 212], BARK = [92, 74, 60];
+const GRASS = [[34, 62, 50], [52, 88, 52], [82, 118, 54], [124, 146, 62], [168, 172, 76]];
+const GRADIENT_Y = COS / (S * SIN), EDGE = 0.28;
+
+const rgb = (r, g, b) => (255 << 24 | Math.min(255, Math.max(0, b | 0)) << 16 | Math.min(255, Math.max(0, g | 0)) << 8 | Math.min(255, Math.max(0, r | 0))) >>> 0;
+const PAPER = rgb(255, 255, 255), INK = rgb(28, 27, 25), SIGNAL = rgb(255, 214, 10), VISITED_DOT = rgb(118, 158, 110);
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t * t * (3 - 2 * t);
+
+// Hue-shifted colour ramp: shadows drift toward violet, highlights toward warm yellow
+const ramps = new WeakMap();
+function rampOf(c) {
+  let ramp = ramps.get(c);
+  if (ramp) return ramp;
+  const mix = (m, tintCol, k) => rgb(lerp(c[0] * m, tintCol[0], k), lerp(c[1] * m, tintCol[1], k), lerp(c[2] * m, tintCol[2], k));
+  ramp = [mix(0.4, COOL, 0.34), mix(0.62, COOL, 0.18), mix(0.84, COOL, 0.05), mix(1, WARM, 0), mix(1.1, WARM, 0.22)];
+  ramps.set(c, ramp);
+  return ramp;
+}
+
+const bayerAt = (ix, iy) => BAYER[(iy & 3) * 4 + (ix & 3)];
+function tint(i, r, g, b) {
+  const c = pix[i];
+  pix[i] = rgb((c & 255) * r, (c >> 8 & 255) * g, (c >> 16 & 255) * b);
+}
+function hash(x, y) {
+  const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+}
+function noise(x, y) {
+  const ix = Math.floor(x), iy = Math.floor(y), fx = ease(x - ix), fy = ease(y - iy);
+  return lerp(lerp(hash(ix, iy), hash(ix + 1, iy), fx), lerp(hash(ix, iy + 1), hash(ix + 1, iy + 1), fx), fy);
+}
+function project(x, y, z) {
+  const u = (x - y) / R2, v = (x + y) / R2;
+  return { sx: OX + u * S, sy: OY + (v * SIN - z * COS) * S, d: v * COS + z * SIN };
+}
+function unproject(sx, sy) {
+  const u = (sx - OX) / S, v = (sy - OY) / (S * SIN);
+  return { x: (u + v) / R2, y: (v - u) / R2 };
+}
+
+let capture = null;
+function sphere(x, y, z, r, c, mode) {
+  const ramp = rampOf(c);
+  const p = project(x, y, z), rp = Math.max(r * S, 0.75);
+  const y0 = Math.max(0, Math.floor(p.sy - rp)), y1 = Math.min(H - 1, Math.ceil(p.sy + rp));
+  const x0 = Math.max(0, Math.floor(p.sx - rp)), x1 = Math.min(W - 1, Math.ceil(p.sx + rp));
+  for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) {
+    const dx = (ix + 0.5 - p.sx) / rp, dy = (iy + 0.5 - p.sy) / rp, nn = dx * dx + dy * dy;
+    if (nn > 1) continue;
+    const nz = Math.sqrt(1 - nn), d = p.d + r * nz, i = iy * W + ix;
+    if (d <= zb[i]) continue;
+    let l = clamp(-0.55 * dx - 0.6 * dy + 0.58 * nz, 0, 1);
+    if (mode === 'rough') l += (hash(ix, iy) - 0.5) * 0.55;
+    if (dy > 0.35) l = Math.max(l, 0.12 + dy * 0.24);
+    if (capture) {
+      capture.push(ix, iy, d, ramp[clamp(Math.floor(l * 4.4 + 0.2 + (bayerAt(ix, iy) - 0.5) * 0.7), 0, 4)]);
+      continue;
+    }
+    zb[i] = d;
+    if (mode === 'gloss' && l > 0.9) { pix[i] = rgb(255, 250, 232); continue; }
+    if (mode === 'solid') { pix[i] = ramp[clamp(Math.floor(l * 4.4 + 0.2), 1, 4)]; continue; }
+    pix[i] = ramp[clamp(Math.floor(l * 4.4 + 0.2 + (bayerAt(ix, iy) - 0.5) * 0.7), 0, 4)];
+  }
+}
+function capsule(a, b, r0, r1, colorOf, mode) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+  const n = Math.max(1, Math.ceil(len / (Math.min(r0, r1) * 0.45)));
+  for (let k = 0; k <= n; k++) {
+    const t = k / n, z = lerp(a[2], b[2], t);
+    sphere(lerp(a[0], b[0], t), lerp(a[1], b[1], t), z, lerp(r0, r1, t), colorOf(z), mode);
+  }
+}
+function box(x0, y0, z0, x1, y1, z1, c, seed = 0) {
+  const ramp = rampOf(c);
+  const paint = (x, y, z, base, grain) => {
+    const p = project(x, y, z), ix = p.sx | 0, iy = p.sy | 0;
+    if (ix < 0 || iy < 0 || ix >= W || iy >= H) return;
+    const i = iy * W + ix;
+    if (p.d <= zb[i]) return;
+    zb[i] = p.d;
+    pix[i] = ramp[clamp(Math.floor(base + (grain - 0.5) * 1.3 + (bayerAt(ix, iy) - 0.5) * 0.5), 0, 4)];
   };
-
-  /* ------------------------- helpers ------------------------- */
-
-  function px(x, y) {
-    ctx.fillRect(x, y, 1, 1);
+  const step = 0.05, longX = x1 - x0 >= y1 - y0;
+  for (let a = x0; a <= x1; a += step) for (let b = y0; b <= y1; b += step) {
+    paint(a, b, z1, 3.4, longX ? noise(a * 0.8 + seed, b * 9) : noise(a * 9, b * 0.8 + seed));
   }
-
-  function rect(x, y, w, h, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, w, h);
+  for (let a = x0; a <= x1; a += step) for (let b = z0; b <= z1; b += step) paint(a, y1, b, 2.3, noise(a * 0.8 + seed, b * 9));
+  for (let a = y0; a <= y1; a += step) for (let b = z0; b <= z1; b += step) paint(x1, a, b, 1.2, noise(a * 0.8 + seed, b * 9));
+}
+function plot(x, y, z, color) {
+  const p = project(x, y, z), ix = p.sx | 0, iy = p.sy | 0;
+  if (ix < 0 || iy < 0 || ix >= W || iy >= H) return;
+  const i = iy * W + ix;
+  if (p.d <= zb[i]) return;
+  zb[i] = p.d;
+  pix[i] = color;
+}
+function castShadow(x, y, z, r, strength = 1, dither = 0.4) {
+  const p = project(x + SHADOW_X * z, y + SHADOW_Y * z, 0);
+  const rx = r * S * 1.05, ry = rx * SIN + 1;
+  const y0 = Math.max(0, Math.floor(p.sy - ry)), y1 = Math.min(H - 1, Math.ceil(p.sy + ry));
+  const x0 = Math.max(0, Math.floor(p.sx - rx)), x1 = Math.min(W - 1, Math.ceil(p.sx + rx));
+  for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) {
+    const dx = (ix + 0.5 - p.sx) / rx, dy = (iy + 0.5 - p.sy) / ry;
+    if (dx * dx + dy * dy + (bayerAt(ix, iy) - 0.5) * dither > 1) continue;
+    const i = iy * W + ix;
+    if (shadowMask[i] < strength) shadowMask[i] = strength;
   }
-
-  function poly(pts, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(pts[0][0], pts[0][1]);
-    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-    ctx.closePath();
-    ctx.fill();
+}
+function applyShadows(refZ) {
+  for (let i = 0; i < pix.length; i++) {
+    const s = shadowMask[i];
+    if (!s) continue;
+    shadowMask[i] = 0;
+    if (!ground[i] || zb[i] !== refZ[i]) continue;
+    if (s === 1) tint(i, 0.54, 0.52, 0.72);
+    else tint(i, 0.36, 0.34, 0.56);
   }
-
-  function line(x1, y1, x2, y2, color, thick) {
-    ctx.fillStyle = color;
-    // Bresenham-ish block line
-    let dx = Math.abs(x2 - x1);
-    let dy = Math.abs(y2 - y1);
-    let sx = x1 < x2 ? 1 : -1;
-    let sy = y1 < y2 ? 1 : -1;
-    let err = dx - dy;
-    let x = x1, y = y1;
-    while (true) {
-      ctx.fillRect(x, y, thick || 1, thick || 1);
-      if (x === x2 && y === y2) break;
-      let e2 = err * 2;
-      if (e2 > -dy) { err -= dy; x += sx; }
-      if (e2 < dx) { err += dx; y += sy; }
+}
+function shadeEdges() {
+  for (let iy = 1; iy < H - 1; iy++) for (let ix = 1; ix < W - 1; ix++) {
+    const i = iy * W + ix, d = zb[i];
+    if (d < -1e8 || d === groundZ[i]) continue;
+    const a = i - W, b = i + W, c = i - 1, e = i + 1;
+    if (zb[a] === groundZ[a] || zb[b] === groundZ[b] || zb[c] === groundZ[c] || zb[e] === groundZ[e]) {
+      tint(i, 0.68, 0.66, 0.76);
+    } else if (d - zb[a] - GRADIENT_Y > EDGE || d - zb[c] > EDGE) {
+      const p = pix[i];
+      pix[i] = rgb(lerp(p & 255, WARM[0], 0.3), lerp(p >> 8 & 255, WARM[1], 0.3), lerp(p >> 16 & 255, WARM[2], 0.22));
+    } else if (zb[e] - d > EDGE || zb[b] - GRADIENT_Y - d > EDGE) {
+      tint(i, 0.74, 0.72, 0.82);
     }
   }
-
-  function screenText(msg, x, y, size, color, align) {
-    ctx.font = size + 'px monospace';
-    ctx.fillStyle = color;
-    ctx.textAlign = align || 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText(msg, x, y);
+}
+function bakeOcclusion() {
+  const offsets = [];
+  for (const r of [2, 4]) for (let k = 0; k < 8; k++) {
+    offsets.push([Math.round(Math.cos(k * Math.PI / 4) * r), Math.round(Math.sin(k * Math.PI / 4) * r * 0.7)]);
   }
-
-  /* ------------------------- scene layers ------------------------- */
-
-  // ---------------- PROLOGUE: 2026 classroom ----------------
-  function drawClassroom2026() {
-    // Sky through window
-    rect(0, 0, W, H, P.sky);
-    rect(0, 0, W, 120, P.sky2);
-
-    // ceiling
-    rect(0, 0, W, 18, '#20275a');
-    rect(0, 18, W, 4, '#141a3d');
-
-    // back wall
-    rect(0, 22, W, 96, '#3a4a63');
-    rect(0, 22, W, 6, '#4a5d78');
-
-    // window
-    rect(56, 32, 110, 62, P.night);
-    rect(56, 32, 110, 4, P.wood3);
-    rect(56, 32, 4, 62, P.wood3);
-    rect(162, 32, 4, 62, P.wood3);
-    line(56, 94, 166, 94, P.wood3, 3);
-    // window light rays
-    rect(70, 40, 66, 46, 'rgba(255,225,150,0.15)');
-    // sill
-    rect(48, 92, 128, 8, P.stone2);
-    rect(48, 100, 128, 4, P.stone3);
-
-    // classroom chalkboard
-    rect(220, 44, 96, 46, '#2f4639');
-    rect(220, 44, 96, 4, P.wood3);
-    rect(220, 90, 96, 4, P.wood2);
-    // chalk marks
-    rect(232, 58, 22, 2, P.text);
-    rect(232, 64, 16, 2, P.text);
-    rect(256, 58, 40, 2, P.text);
-    rect(256, 64, 28, 2, P.text);
-    rect(232, 70, 46, 2, P.text);
-
-    // teacher's desk at right
-    rect(272, 140, 70, 26, P.wood);
-    rect(272, 166, 70, 8, P.wood2);
-    // papers
-    rect(280, 132, 24, 10, P.paper);
-    rect(282, 134, 20, 2, P.text);
-    rect(286, 138, 14, 2, P.text);
-
-    // floor
-    rect(0, 118, W, 162, '#573f35');
-    // floorboards
-    for (let i = 0; i < 12; i++) {
-      rect(0, 118 + i * 14, W, 2, '#4a332b');
+  for (let iy = 4; iy < H - 4; iy++) for (let ix = 4; ix < W - 4; ix++) {
+    const i = iy * W + ix;
+    if (!ground[i] || zb[i] !== groundZ[i]) continue;
+    let hits = 0;
+    for (const [ox, oy] of offsets) {
+      const j = (iy + oy) * W + ix + ox;
+      if (zb[j] !== groundZ[j]) hits++;
     }
-    // perspective strip lines
-    line(0, 118, 360, 118, '#6e4a3e', 2);
-    line(0, 220, 360, 220, '#3b2923', 2);
-
-    // student desks (isometric-ish rows)
-    drawDeskRow(26, 156, 74, 34);
-    drawDeskRow(124, 156, 74, 34);
-    drawDeskRow(222, 156, 70, 34);
-
-    // student heads & chairs
-    drawStudent(54, 176, 10, '#4a3a55');
-    drawStudent(146, 176, 10, '#4a3a55');
-    drawStudent(244, 176, 10, '#5b3d55');
-
-    // standing child on the right (tourist viewpoint)
-    drawPerson(310, 210, 54, '#416b7a', '#d6b49c');
-
-    // afternoon light bloom
-    rect(56, 32, 110, 4, P.lamp);
-    rect(56, 36, 6, 52, 'rgba(255,215,140,0.18)');
-
-    // spotlight hint
-    ctx.fillStyle = 'rgba(255,210,140,0.10)';
-    ctx.beginPath();
-    ctx.ellipse(110, 84, 52, 24, 0);
-    ctx.fill();
-
-    // clock on wall
-    rect(198, 34, 16, 16, P.cream);
-    rect(198, 34, 16, 2, P.wood3);
-    line(206, 42, 206, 38, P.text, 1);
-    line(206, 42, 210, 44, P.text, 1);
+    if (!hits) continue;
+    if (hits >= 8) tint(i, 0.56, 0.54, 0.72);
+    else if (hits / 8 > bayerAt(ix, iy)) tint(i, 0.74, 0.72, 0.84);
   }
+}
 
-  // ---------------- evening home ----------------
-  function drawEveningHome() {
-    // dark room
-    rect(0, 0, W, H, '#17122b');
-    rect(0, 0, W, 120, '#241f3c');
+/* ---------- wind, grass tufts & trees ---------- */
+const WIND_FPS = 8;
+const STILL = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const tufts = [], leaves = [];
+const tuftLit = GRASS.map(c => rgb(...c)), tuftDark = GRASS.map(c => rgb(c[0] * 0.54, c[1] * 0.52, c[2] * 0.72));
 
-    // far wall with warm window
-    rect(0, 18, W, 100, '#2d284b');
-    rect(0, 18, W, 4, '#3b3559');
-    rect(0, 118, W, 162, '#2a1f2e');
-
-    // floorboards
-    for (let i = 0; i < 10; i++) {
-      rect(0, 122 + i * 16, W, 2, '#221a26');
-    }
-
-    // window with moonlight
-    rect(236, 40, 70, 58, '#17122b');
-    rect(236, 40, 70, 4, '#4e3a2f');
-    rect(236, 40, 4, 58, '#4e3a2f');
-    rect(302, 40, 4, 58, '#4e3a2f');
-    rect(236, 98, 70, 4, '#3c2c24');
-    rect(258, 52, 20, 18, 'rgba(180,190,255,0.14)');
-
-    // moon glow
-    ctx.fillStyle = 'rgba(200,220,255,0.12)';
-    ctx.beginPath();
-    ctx.ellipse(270, 78, 28, 22, 0);
-    ctx.fill();
-
-    // lamp on table
-    rect(96, 156, 14, 16, P.lamp2);
-    rect(94, 152, 18, 4, P.gold2);
-    ctx.fillStyle = 'rgba(255,220,150,0.16)';
-    ctx.beginPath();
-    ctx.ellipse(102, 150, 34, 20, 0);
-    ctx.fill();
-
-    // table
-    rect(62, 168, 100, 18, P.wood);
-    rect(62, 186, 100, 6, P.wood2);
-    rect(70, 192, 8, 40, P.wood2);
-    rect(146, 192, 8, 40, P.wood2);
-
-    // book on table
-    rect(78, 168, 44, 10, P.paper);
-    rect(78, 168, 44, 2, P.paper2);
-    rect(88, 160, 28, 8, P.paper2);
-    rect(90, 162, 24, 2, P.text);
-
-    // chair
-    rect(196, 176, 26, 14, P.wood2);
-    rect(196, 190, 6, 34, P.wood3);
-    rect(216, 190, 6, 34, P.wood3);
-    rect(196, 168, 26, 6, P.wood3);
-
-    // plant pot
-    rect(300, 164, 18, 24, P.stone2);
-    rect(296, 160, 28, 4, P.stone3);
-    drawLeafSprig(309, 150, 14, P.leaf2);
-
-    // framed picture on wall
-    rect(150, 52, 46, 32, P.wood3);
-    rect(154, 56, 38, 24, P.paper2);
-    rect(158, 60, 20, 12, '#8a6a54');
-    rect(158, 60, 20, 2, '#a58560');
-
-    // curtains
-    rect(20, 24, 42, 100, '#4a3a5e');
-    rect(20, 24, 6, 100, '#5d4b75');
-    rect(26, 26, 6, 96, '#3c3052');
-
-    // person in evening home (kid)
-    drawPersonSmall(236, 200, '#5b4660', '#e0c4b0');
-    // small child reading
-    rect(222, 178, 26, 14, P.paper);
-    rect(224, 176, 24, 6, P.paper2);
-    rect(226, 178, 10, 2, P.text);
-    rect(240, 178, 10, 2, P.text);
+function growGrass() {
+  for (let iy = 3; iy < H; iy++) for (let ix = 0; ix < W; ix++) {
+    const i = iy * W + ix;
+    if (kinds[i] !== KIND_GRASS || hash(ix * 3, iy * 5) > 0.18) continue;
+    const height = 1 + (hash(ix, iy * 2) * 3 | 0);
+    tufts.push({
+      ix, iy, i, height, base: Math.round(noise(ix * 0.09, iy * 0.18) * 2.2),
+      phase: ix * 0.11 + iy * 0.19 + hash(ix, iy) * 0.9,
+      bloom: hash(ix * 7, iy) < 0.03 ? rgb(...(hash(ix, iy) > 0.5 ? [250, 246, 226] : [240, 200, 84])) : 0,
+    });
   }
-
-  // ---------------- chapter 1: 2256 garden ----------------
-  function drawGarden2256() {
-    // evening sky
-    rect(0, 0, W, H, P.night);
-    rect(0, 0, W, 100, P.sky);
-    rect(0, 0, W, 40, P.dusk);
-    rect(0, 10, W, 30, P.dusk);
-
-    // horizon glow
-    ctx.fillStyle = 'rgba(255,140,90,0.18)';
-    ctx.beginPath();
-    ctx.ellipse(180, 105, 180, 22, 0);
-    ctx.fill();
-
-    // distant buildings of 2256
-    rect(12, 78, 28, 42, '#2a2b4a');
-    rect(12, 78, 28, 4, '#3a3b5f');
-    rect(44, 68, 30, 52, '#22223e');
-    rect(44, 68, 30, 4, '#33335a');
-    rect(76, 82, 24, 38, '#2b2b4d');
-    rect(76, 82, 24, 4, '#3d3d66');
-    rect(98, 70, 34, 50, '#24244a');
-    // windows
-    for (let i = 0; i < 4; i++) {
-      rect(20, 84 + i * 9, 6, 5, P.lamp);
-      rect(52, 76 + i * 9, 7, 5, P.lamp);
-      rect(106, 78 + i * 9, 7, 5, P.lamp);
-    }
-
-    // far hills
-    poly([[0, 112], [20, 100], [60, 108], [90, 96], [120, 112]], '#3b4a3f');
-    poly([[120, 112], [150, 100], [190, 108], [220, 98], [260, 112]], '#33463b');
-    poly([[260, 112], [300, 100], [340, 108], [360, 112]], '#3b4a3f');
-
-    // ground
-    rect(0, 112, W, 168, P.grass);
-    rect(0, 112, W, 12, P.grass2);
-    rect(0, 206, W, 74, P.grass3);
-    // horizon line
-    line(0, 112, 360, 112, P.grass2, 2);
-
-    // garden paths (isometric perspective)
-    poly([[150, 112], [210, 112], [280, 280], [80, 280]], P.open);
-    for (let i = 0; i < 6; i++) {
-      line(150 + i * 10, 112 + i * 28, 210 - i * 8, 112 + i * 28, P.soil2, 1);
-    }
-
-    // soil patches
-    poly([[30, 178], [94, 178], [108, 210], [20, 210]], P.soil);
-    poly([[240, 176], [318, 176], [330, 208], [228, 208]], P.soil);
-
-    // flowers: dahlias
-    drawDahlia(52, 196, 16, P.petal1, P.petal2, P.petal3);
-    drawDahlia(80, 188, 14, P.petal2, P.petal1, P.petal3);
-    drawDahlia(118, 190, 12, P.petal1, P.petal3, P.petal2);
-    drawDahlia(262, 192, 16, P.petal1, P.petal2, P.petal3);
-    drawDahlia(292, 184, 15, P.petal3, P.petal1, P.petal2);
-    drawDahlia(320, 198, 12, P.petal2, P.petal1, P.petal3);
-
-    // grass tufts
-    for (let i = 0; i < 22; i++) {
-      let gx = 10 + (i * 16) % 338;
-      let gy = 126 + (i * 7) % 134;
-      line(gx, gy, gx + 3, gy - 8, P.grass2, 2);
-      line(gx + 6, gy, gx + 5, gy - 10, P.grass2, 2);
-    }
-
-    // garden bench / gate
-    rect(28, 164, 44, 8, P.wood2);
-    rect(28, 160, 44, 4, P.wood);
-    rect(34, 172, 6, 30, P.wood3);
-    rect(58, 172, 6, 30, P.wood3);
-    rect(58, 164, 6, 12, P.wood3);
-
-    // stone arch on right
-    rect(296, 130, 8, 60, P.stone2);
-    rect(330, 130, 8, 60, P.stone2);
-    rect(290, 126, 50, 10, P.stone);
-    rect(290, 126, 50, 4, P.stone3);
-
-    // lantern
-    rect(180, 150, 10, 18, P.gold2);
-    rect(178, 146, 14, 4, P.gold);
-    ctx.fillStyle = 'rgba(255,215,140,0.20)';
-    ctx.beginPath();
-    ctx.ellipse(185, 158, 22, 16, 0);
-    ctx.fill();
-
-    // Martin character in the garden
-    drawPerson(190, 168, 62, '#3f5a5f', '#d4b299');
-    // hat
-    rect(182, 142, 16, 6, P.wood3);
-    rect(186, 136, 8, 8, P.wood2);
-
-    // 2256 little sign
-    rect(152, 130, 46, 16, P.paper);
-    rect(152, 130, 46, 2, P.paper2);
-    screenText('GARDEN 2256', 176, 136, 6, P.text, 'center');
-
-    // stars
-    for (let i = 0; i < 18; i++) {
-      let sx = (i * 37) % 350;
-      let sy = (i * 23) % 80;
-      ctx.fillStyle = 'rgba(255,245,220,0.6)';
-      ctx.fillRect(sx, sy, 1, 1);
+}
+function drawTufts(t) {
+  for (const tuft of tufts) {
+    const gust = Math.sin(t * 0.8 + tuft.phase) + 0.5 * Math.sin(t * 2.1 + tuft.phase * 2.3);
+    const colors = staticShadow[tuft.i] ? tuftDark : tuftLit;
+    for (let k = 1; k <= tuft.height; k++) {
+      const jx = tuft.ix + Math.round(gust * 0.95 * k / 3), jy = tuft.iy - k;
+      if (jx < 0 || jx >= W || jy < 0) continue;
+      const j = jy * W + jx;
+      if ((kinds[j] !== KIND_GRASS && kinds[j] !== KIND_NONE) || zb[j] !== groundZ[j]) continue;
+      pix[j] = tuft.bloom && k === tuft.height ? tuft.bloom : colors[clamp(tuft.base + k + (gust > 1 ? 1 : 0), 1, 4)];
     }
   }
-
-  /* ------------------------- dahlia drawing ------------------------- */
-  function drawDahlia(cx, cy, r, p1, p2, p3) {
-    // stem
-    rect(cx, cy, 3, 22, P.leaf2);
-    // petals
-    for (let i = 0; i < 8; i++) {
-      let a = (i / 8) * Math.PI * 2;
-      let px1 = cx + Math.cos(a) * r;
-      let py1 = cy + Math.sin(a) * r * 0.7;
-      ctx.fillStyle = i % 2 === 0 ? p1 : p2;
-      ctx.beginPath();
-      ctx.ellipse(px1, py1, 4, 3, 0);
-      ctx.fill();
+}
+const CROWN = [[0.1, 0, 3.7, 1.5], [-1.3, -0.6, 3.3, 1.15], [1.4, 0.6, 3.4, 1.2], [-0.5, 1.0, 3.8, 1.05], [0.8, -1.0, 3.9, 1.05], [0.2, 0.1, 4.7, 1.0]];
+const LEAF_DEEP = [58, 84, 62], LEAF_MID = [100, 126, 78], LEAF_SILVER = [146, 162, 112];
+function growTree(x, y, scale = 1, count = 300, seed = 0) {
+  const bark = () => BARK;
+  capsule([x, y, 0], [x + 0.3 * scale, y + 0.1 * scale, 2.2 * scale], 0.34 * scale, 0.21 * scale, bark, 'rough');
+  capsule([x + 0.3 * scale, y + 0.1 * scale, 2.2 * scale], [x - 0.8 * scale, y - 0.4 * scale, 3.2 * scale], 0.19 * scale, 0.12 * scale, bark, 'rough');
+  capsule([x + 0.3 * scale, y + 0.1 * scale, 2.2 * scale], [x + 1.1 * scale, y + 0.4 * scale, 3.3 * scale], 0.19 * scale, 0.12 * scale, bark, 'rough');
+  castShadow(x, y, 0.2, 0.85 * scale);
+  for (let n = 0; n < count; n++) {
+    const k = n + seed, [cx, cy, cz, spread] = CROWN[n % CROWN.length];
+    const a = hash(k, 7) * 6.283, tilt = hash(k, 8) * 2 - 1, d = Math.cbrt(hash(k, 9)) * spread, flat = Math.sqrt(1 - tilt * tilt);
+    const rx = cx + Math.cos(a) * flat * d, ry = cy + Math.sin(a) * flat * d, rz = cz + tilt * d * 0.8;
+    const tone = hash(k, 10) + (rz - 4.2) * 0.22 + (d / spread - 0.5) * 0.3;
+    const leaf = tone > 0.72 ? LEAF_SILVER : tone > 0.3 ? LEAF_MID : LEAF_DEEP;
+    capture = [];
+    sphere(x + rx * scale, y + ry * scale, rz * scale, (0.2 + hash(k, 11) * 0.21) * scale, leaf, 'rough');
+    leaves.push({ x: x + rx * scale, y: y + ry * scale, z: rz * scale, k, r: 0.4 * scale, pixels: capture });
+    capture = null;
+  }
+}
+function drawLeaves(t) {
+  for (const leaf of leaves) {
+    const reach = clamp((leaf.z - 2.2) / 3, 0.3, 1);
+    const swayX = (Math.sin(t * 0.9 + leaf.x * 0.5 + leaf.z * 0.7) + 0.55 * Math.sin(t * 2.3 + leaf.k * 1.7)) * reach;
+    const dx = Math.round(swayX * 0.9), dy = Math.round(Math.sin(t * 1.3 + leaf.y + leaf.k) * reach * 0.45);
+    const px = leaf.pixels;
+    for (let n = 0; n < px.length; n += 4) {
+      const ix = px[n] + dx, iy = px[n + 1] + dy;
+      if (ix < 0 || iy < 0 || ix >= W || iy >= H) continue;
+      const i = iy * W + ix;
+      if (px[n + 2] <= zb[i]) continue;
+      zb[i] = px[n + 2];
+      pix[i] = px[n + 3];
     }
-    ctx.fillStyle = p3;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = P.gold2;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 2, 0, Math.PI * 2);
-    ctx.fill();
-    // leaves
-    poly([[cx - 4, cy + 12], [cx - 12, cy + 6], [cx - 6, cy + 18]], P.leaf);
-    poly([[cx + 5, cy + 14], [cx + 14, cy + 8], [cx + 8, cy + 20]], P.leaf);
+    if (leaf.k % 3 === 0) castShadow(leaf.x + swayX * 0.12, leaf.y, leaf.z, leaf.r);
   }
+}
 
-  /* ------------------------- small people ------------------------- */
-  function drawPersonSmall(x, y, shirt, skin) {
-    // legs
-    rect(x - 5, y + 14, 4, 12, P.ink);
-    rect(x + 2, y + 14, 4, 12, P.ink);
-    // body
-    rect(x - 7, y, 14, 16, shirt);
-    rect(x - 7, y, 14, 4, P.ink);
-    // head
-    rect(x - 5, y - 10, 10, 10, skin);
-    rect(x - 5, y - 10, 10, 3, P.wood3);
-    // face
-    rect(x - 3, y - 6, 2, 2, P.ink);
-    rect(x - 1, y - 6, 0, 2, P.ink);
-    rect(x + 1, y - 6, 2, 2, P.ink);
-    // arms
-    rect(x - 10, y + 2, 3, 10, shirt);
-    rect(x + 7, y + 2, 3, 10, shirt);
+/* ---------- procedural pixel figures (Dahlia, children, Martin, Andrea, Pavel) ---------- */
+function sphere2(add, c, r, color) { add(c, c, r, r, () => color); }
+const pendingShadows = [];
+const dynamicAdd = (a, b, r0, r1, f) => {
+  capsule(a, b, r0, r1, f, 'solid');
+  pendingShadows.push(a, r0, b, r1);
+};
+function flushShadows() {
+  for (let i = 0; i < pendingShadows.length; i += 4) {
+    const a = pendingShadows[i], ra = pendingShadows[i + 1], c = pendingShadows[i + 2];
+    const n = Math.max(1, Math.ceil(Math.hypot(c[0] - a[0], c[1] - a[1], c[2] - a[2]) / 0.25));
+    for (let k = 0; k <= n; k++) {
+      const t = k / n;
+      castShadow(lerp(a[0], c[0], t), lerp(a[1], c[1], t), lerp(a[2], c[2], t), ra * 0.9, 1, 0);
+    }
+    if (a[2] < 0.25) castShadow(a[0], a[1], 0, 0.2, 2, 0);
   }
+}
 
-  function drawDeskRow(x, y, w, h) {
-    rect(x, y, w, h, P.wood);
-    rect(x, y, w, 6, P.cream);
-    rect(x, y + h - 6, w, 6, P.wood2);
-    // legs
-    rect(x + 4, y + h, 6, 18, P.wood2);
-    rect(x + w - 10, y + h, 6, 18, P.wood2);
-    // desk surface paper
-    rect(x + 8, y + 4, w - 16, 3, P.paper2);
+function figure(px, py, yaw, pose, palette, addBone) {
+  const fx = Math.cos(yaw), fy = Math.sin(yaw), sx = -fy, sy = fx, base = pose.z || 0, k = pose.scale || 1;
+  const P = (a, b, c) => [px + (fx * a + sx * b) * k, py + (fy * a + sy * b) * k, c * k + base];
+  const add = (a, b, r0, r1, f) => addBone(a, b, r0 * k, r1 * k, f);
+  const t = palette;
+  const shirt = z => (Math.floor(z * 3.2) % 2 ? t.shirt : (t.stripe || t.shirt));
+  const legs = () => t.legs, skin = () => t.skin;
+  const crouch = pose.crouch || 0, lean = pose.lean || 0;
+  const hipZ = 1.28 - crouch * 0.42;
+  const hipA = -crouch * 0.15;
+  const shA = hipA + Math.sin(lean) * 0.95, shZ = hipZ + Math.cos(lean) * 0.95;
+  const neck = P(shA, 0, shZ + 0.08), head = P(shA + Math.sin(lean) * 0.32, 0, shZ + 0.36);
+  const stance = pose.stance == null ? 0.16 : pose.stance;
+  const footB = P(-stance * 1.2, 0.2, 0.12), footF = P(stance * 2, -0.2, 0.12);
+  const kneeB = P(-stance * 0.4 + crouch * 0.12, 0.22, 0.68 - crouch * 0.1);
+  const kneeF = P(stance * 1.2 + crouch * 0.34, -0.22, 0.72 - crouch * 0.08);
+  const hipB = P(hipA, 0.15, hipZ), hipF = P(hipA, -0.15, hipZ);
+  add(hipB, kneeB, 0.17, 0.13, legs); add(kneeB, footB, 0.13, 0.1, legs);
+  add(hipF, kneeF, 0.17, 0.13, legs); add(kneeF, footF, 0.13, 0.1, legs);
+  add(footB, P(-stance * 1.2 + 0.16, 0.2, 0.08), 0.1, 0.09, () => SHOE);
+  add(footF, P(stance * 2 + 0.16, -0.2, 0.08), 0.1, 0.09, () => SHOE);
+  add(P(hipA, 0, hipZ), neck, 0.3, 0.32, shirt);
+  add(neck, head, 0.11, 0.12, skin);
+  sphere2(add, head, 0.24, t.skin);
+  sphere2(add, [head[0] - fx * 0.06 * k, head[1] - fy * 0.06 * k, head[2] + 0.08 * k], 0.21, t.hair);
+  if (t.bun) {
+    sphere2(add, [head[0] - fx * 0.22 * k, head[1] - fy * 0.22 * k, head[2] + 0.06 * k], 0.13, t.hair);
   }
-
-  function drawStudent(x, y, size, shirt) {
-    rect(x, y, size, 12, shirt);
-    rect(x, y, size, 3, P.ink);
-    rect(x + 1, y - size + 2, size - 2, size - 2, '#d8b9a0');
-    rect(x + 1, y - size + 2, size - 2, 3, P.wood3);
-    rect(x + 2, y - 4, 2, 2, P.ink);
-    rect(x + 5, y - 4, 2, 2, P.ink);
+  if (t.beard) {
+    const chin = [head[0] + fx * 0.16 * k, head[1] + fy * 0.16 * k, head[2] - 0.1 * k];
+    sphere2(add, chin, 0.16, t.beard);
   }
+  const shR = P(shA, 0.36, shZ - 0.03), shL = P(shA, -0.36, shZ - 0.03);
+  const armR = pose.armR == null ? 0.08 : pose.armR, armL = pose.armL == null ? 0.12 : pose.armL;
+  const elbowR = P(shA + Math.sin(armR) * 0.46, 0.4, shZ - 0.03 - Math.cos(armR) * 0.46);
+  const handR = P(shA + Math.sin(armR + 0.18) * 0.95, 0.42, shZ - 0.03 - Math.cos(armR + 0.18) * 0.95);
+  const elbowL = P(shA + Math.sin(armL) * 0.46, -0.42, shZ - 0.03 - Math.cos(armL) * 0.46);
+  const handL = P(shA + Math.sin(armL + 0.2) * 0.9, -0.43, shZ - 0.03 - Math.cos(armL + 0.2) * 0.9);
+  add(shR, elbowR, 0.12, 0.1, shirt); add(elbowR, handR, 0.09, 0.08, skin);
+  add(shL, elbowL, 0.12, 0.1, shirt); add(elbowL, handL, 0.09, 0.08, skin);
+  return handR;
+}
 
-  /* ------------------------- story engine ------------------------- */
+/* Character palettes */
+const CHARS = {
+  dahlia: { shirt: [186, 84, 62], stripe: [204, 102, 76], legs: [54, 58, 78], hair: [92, 54, 38], bun: true, skin: [226, 178, 144] },
+  martin: { shirt: [224, 218, 200], stripe: [210, 202, 184], legs: [108, 94, 76], hair: [238, 236, 230], beard: [242, 240, 234], skin: [216, 168, 134] },
+  andrea: { shirt: [92, 138, 118], stripe: [112, 156, 134], legs: [72, 92, 84], hair: [176, 162, 144], bun: true, skin: [224, 176, 142] },
+  pavel:  { shirt: [84, 102, 118], stripe: [72, 88, 104], legs: [52, 54, 64], hair: [72, 56, 44], skin: [220, 170, 136] },
+  kubik:  { shirt: [68, 122, 172], stripe: [236, 232, 218], legs: [58, 66, 88], hair: [138, 96, 56], skin: [230, 184, 150] },
+  childA: { shirt: [224, 168, 68], stripe: [224, 168, 68], legs: [68, 72, 92], hair: [52, 38, 32], skin: [222, 172, 138] },
+  childB: { shirt: [138, 172, 96], stripe: [234, 230, 214], legs: [84, 72, 62], hair: [182, 132, 78], skin: [228, 182, 148] },
+  childC: { shirt: [198, 106, 128], stripe: [198, 106, 128], legs: [58, 56, 72], hair: [46, 34, 28], skin: [208, 156, 122] },
+  guide:  { shirt: [74, 128, 136], stripe: [96, 148, 154], legs: [62, 68, 78], hair: [56, 44, 38], skin: [214, 164, 128] },
+};
 
-  const chapters = {
-    prologue: {
-      title: 'PROLOGUE — 2026 classroom',
-      caption: 'PROLOGUE — 2026. A classroom, an evening at home.',
-      text: 'Zwią before the flowers. A classroom, 2026. A teacher treads on a chalkboard. Evening at home — a small child reads a paper book. Click to advance.',
-      hotspots: [
-        { label: 'chalkboard', x: 268, y: 66, w: 44, h: 22 },
-        { label: 'window', x: 62, y: 38, w: 96, h: 50 },
-        { label: 'lamp', x: 88, y: 140, w: 36, h: 24 },
-        { label: 'chair', x: 200, y: 160, w: 28, h: 36 }
-      ],
-      dialogue: [
-        'Zdanie: "Dahlia in the classroom — 2026. Is the chalkboard showing a dahlia?"',
-        'Second: "Evening at home — the child reads a paper book. Does it mention dahlia?"'
-      ]
+/* ---------- signals & bobbing arrow ---------- */
+const ARROW = [
+  '....ooooo....',
+  '....oXXXo....',
+  '....oXXXo....',
+  '....oXXXo....',
+  'oooooXXXooooo',
+  'oXXXXXXXXXXXo',
+  '.oXXXXXXXXXo.',
+  '..oXXXXXXXo..',
+  '...oXXXXXo...',
+  '....oXXXo....',
+  '.....oXo.....',
+  '......o......',
+];
+function drawDots(points, color) {
+  for (const [sx, sy] of points) {
+    const ix = sx | 0, iy = sy | 0;
+    if (ix >= 0 && iy >= 0 && ix < W && iy < H) pix[iy * W + ix] = color;
+  }
+}
+function haloDots(points) {
+  const halo = [];
+  for (const [x, y] of points) for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) halo.push([x + dx, y + dy]);
+  drawDots(halo, PAPER);
+}
+function drawArrow(sx, sy, time) {
+  const bob = STILL ? 0 : Math.floor(time * 3) % 2 * 2;
+  const left = Math.round(sx) - 6, top = Math.round(sy) - ARROW.length - bob;
+  const ink = [], fill = [];
+  ARROW.forEach((row, y) => [...row].forEach((cell, x) => {
+    if (cell === 'o') ink.push([left + x, top + y]);
+    if (cell === 'X') fill.push([left + x, top + y]);
+  }));
+  haloDots(ink);
+  drawDots(ink, INK);
+  drawDots(fill, SIGNAL);
+}
+function drawHotspotPin(sx, sy, visited, active, time) {
+  const cx = Math.round(sx), cy = Math.round(sy);
+  const pulse = !STILL && active ? (Math.floor(time * 4) % 2) : 0;
+  const ink = [], fill = [];
+  const r = 3 + pulse;
+  for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+    const md = Math.abs(dx) + Math.abs(dy);
+    if (md === r) ink.push([cx + dx, cy + dy]);
+    else if (md < r) fill.push([cx + dx, cy + dy]);
+  }
+  haloDots(ink);
+  drawDots(ink, INK);
+  drawDots(fill, visited && !active ? VISITED_DOT : SIGNAL);
+}
+
+/* ============================================================================
+   2. STORY CONTENT & SCENES (follows BRIEF.md in Czech, compressed, no fail)
+   ============================================================================ */
+const SCENES = [
+  {
+    id: 'classroom_2026',
+    title: 'Prolog I — Třída 4.B (pátek 2026)',
+    shortTitle: '1. Třída 4.B (2026)',
+    intro: {
+      speaker: 'Vypravěč',
+      text: 'Pátek odpoledne roku 2026. Ve čtvrté třídě je těžký vzduch, venku fouká vítr a Dahlia se snaží stihnout obvod a obsah. Klikni na postavy a předměty ve třídě.'
     },
-    chapter1: {
-      title: 'CHAPTER 1 — garden 2256 with Martin',
-      caption: 'CHAPTER 1 — 2256. Martin visits a garden.',
-      text: 'Martin among pixel dahlias in 2256. Click the lantern to advance the dialogue.',
-      hotspots: [
-        { label: 'lantern', x: 172, y: 142, w: 26, h: 22 },
-        { label: 'dahlia', x: 264, y: 172, w: 28, h: 22 },
-        { label: 'Martin', x: 178, y: 136, w: 26, h: 46 },
-        { label: 'arch', x: 290, y: 126, w: 52, h: 48 }
-      ],
-      dialogue: [
-        'Martin: "In 2256, the dahlia is a flower among a city of lights."',
-        'Martin: "I am looking at the garden — every pixel petal is a flower."',
-        'Martin: "Click the lantern: a soft glow in the garden."'
-      ]
+    hotspots: [
+      {
+        id: 'chalkboard',
+        label: 'Tabule: Obvod a obsah',
+        pos: [-0.8, -5.8, 2.2],
+        speaker: 'Dahlia',
+        text: '„Obvod je délka hranice kolem dokola, obsah je plocha uvnitř…“ Vím, že by to šlo vysvětlit živěji, ale dnes už na to nemám sílu.',
+        diary: 'Páteční hodina: snažila jsem se stihnout látku o obvodu a obsahu, i když jsme byli všichni vyčerpaní.'
+      },
+      {
+        id: 'kubik',
+        label: 'Žák Kubík u lavice',
+        pos: [-2.0, -1.2, 1.3],
+        speaker: 'Kubík a Dahlia',
+        text: 'Kubík si spletl obvod s obsahem. Odpověděla jsem mu příkřeji, než jsem chtěla. Okamžitě zmlkl. Vím, že to nebylo fér, ale hodina už běží dál.',
+        choices: [
+          { label: 'V duchu si přiznat únavu', note: 'Přiznala jsem si, že moje ostrost ke Kubíkovi pramenila z vyčerpání.' },
+          { label: 'Slíbit si, že se k tomu v pondělí vrátím', note: 'Rozhodla jsem se, že obvod a obsah zkusíme v pondělí jinak.' }
+        ]
+      },
+      {
+        id: 'window_drawings',
+        label: 'Okno a dětské výkresy',
+        pos: [-7.6, 1.2, 2.1],
+        speaker: 'Dahlia',
+        text: 'Za oknem se kývou větve ve větru. Na parapetu leží dětské výkresy a můj nedokončený nápad na venkovní školní záhon — pořád odložený na neurčito.',
+      },
+      {
+        id: 'desk_photo',
+        label: 'Učitelský stůl, fotka a náramek',
+        pos: [4.5, -2.8, 1.4],
+        speaker: 'Dahlia',
+        text: 'V tašce u rozečtené knihy nahmatám starou fotografii z cest a náramek. Kdy jsem přestala být tou zvědavou ženou, která se těšila na každý den?',
+        item: 'Stará fotka z cest a náramek'
+      }
+    ]
+  },
+  {
+    id: 'home_2026',
+    title: 'Prolog II — Večer doma (pátek 2026)',
+    shortTitle: '2. Večer doma (2026)',
+    intro: {
+      speaker: 'Vypravěč',
+      text: 'Páteční večer doma. Dcera Eliška, syn Tobiáš a unavený manžel Pavel. Mají se rádi, ale večer se skládá z krátkých provozních vět.',
+    },
+    hotspots: [
+      {
+        id: 'husband_tea',
+        label: 'Manžel Pavel u stolu',
+        pos: [3.2, -0.8, 1.5],
+        speaker: 'Pavel a Dahlia',
+        text: '„Jak bylo?“ „Dobré. Koupila jsi šunku?“ V drobnosti si ostře odpovíme — a hned nato mi Pavel mlčky postaví na stůl hrnek teplého čaje. Láska nezmizela, jen nemá kam se vejít.',
+        diary: 'Doma si vyměňujeme provozní věty, ale v drobném gestu s čajem pořád cítím blízkost.'
+      },
+      {
+        id: 'children_table',
+        label: 'Dcera Eliška a syn Tobiáš',
+        pos: [0.6, 2.0, 1.2],
+        speaker: 'Eliška a Tobiáš',
+        text: '„Mami, podepíšeš mi žákovskou?“ „Mami, potřebuju na pondělí čtvrtku!“ Obě děti mluví najednou, zatímco dopíjím vlažný čaj.',
+      },
+      {
+        id: 'hall_mirror',
+        label: 'Zrcadlo v předsíni',
+        pos: [-7.6, -3.2, 2.1],
+        speaker: 'Dahlia',
+        text: 'Zahlédnu se v zrcadle. Nevadí mi jen únava ve tváři. Chybí mi člověk, kterým jsem bývala — žena, která se ráda hýbala, smála a dýchala naplno.',
+      },
+      {
+        id: 'dark_bed',
+        label: 'Noční postel a okno do tmy',
+        pos: [-5.2, 3.2, 1.2],
+        speaker: 'Dahlia (ve tmě)',
+        text: 'Když všichni konečně usnou, ležím potmě a nesnažím se o žádný výkon. Jen si v duchu tiše přiznám: „Takhle už nechci žít. Ale nevím, jak z toho ven.“ Usínám…',
+        diary: 'Noční přiznání: „Takhle už nechci žít. Ale nevím, jak z toho ven.“'
+      }
+    ]
+  },
+  {
+    id: 'garden_2256',
+    title: 'Kapitola 1 — Zahrada, která počká (2256)',
+    shortTitle: '3. Zahrada s Martinem (2256)',
+    intro: {
+      speaker: 'Vypravěč',
+      text: 'Šum vody, vůně vlhké hlíny a obloukové světlé domy. Dahlia stojí v zahradě roku 2256, kde u záhonu jiřin klečí muž s bílým vousem.',
+    },
+    hotspots: [
+      {
+        id: 'martin_bed',
+        label: 'Martin u záhonu jiřin',
+        pos: [0.8, 2.1, 1.4],
+        speaker: 'Martin',
+        text: '„Vítej. Někdy sem člověk přijde z velké dálky a potřebuje nejdřív klid a vodu. Roboti tu obstarají běžnou práci, ale zahradu dělám rukama, protože mě vrací k sobě.“',
+        diary: 'Martin v zahradě: ne každá námaha je břemeno; některé činnosti vracejí člověka k sobě.'
+      },
+      {
+        id: 'seedling_water',
+        label: 'Mladá sazenička a vodní kanál',
+        pos: [2.5, 0.7, 0.9],
+        speaker: 'Martin a Dahlia',
+        text: 'Zkouším zasadit mladou jiřinu. Nejdřív vyberu příliš suchý kout, ale Martin mě neopravuje přísně — společně sledujeme sklon vody a přesadíme ji k vláze. Chyba tu neznamená selhání.',
+        item: 'Semínko jiřiny ze zahrady 2256',
+        action: 'plant',
+        choices: [
+          { label: 'Zasadit k vodnímu kanálu', note: 'V zahradě 2256 jsem zažila, že omyl při sázení není selhání, ale společné pozorování.' },
+          { label: 'Zeptat se na neosázený kout', note: 'Martin nechává část záhonu volnou, aby půda i člověk měli místo k odpočinku.' }
+        ]
+      },
+      {
+        id: 'helper_robot',
+        label: 'Pomocný zahradní robot',
+        pos: [-4.2, 1.8, 1.0],
+        speaker: 'Dahlia',
+        text: 'Po pěšině tiše projíždí malý zaoblený robot s nádobami na vodu. Technologie je tu všude kolem, ale nepůsobí chladně a nepřekrývá živý svět.',
+      },
+      {
+        id: 'andrea_terrace',
+        label: 'Andrea u klavíru na terase',
+        pos: [-5.6, -2.2, 1.7],
+        speaker: 'Andrea a Martin',
+        text: 'Z domu doznějí tóny klavíru. Andrea přináší jídlo a s úsměvem prosí Martina, ať tentokrát nenechá hlínu na terase. Martin se zasměje a očistí si rukáv — bez obrany a bez ponížení.',
+      }
+    ]
+  },
+  {
+    id: 'centre_2256',
+    title: 'Kapitola 2–4 — Centrum vzdělávání a vesnice (2256)',
+    shortTitle: '4. Centrum vzdělávání (2256)',
+    intro: {
+      speaker: 'Vypravěč',
+      text: 'Vesnice bez silnic a smogu. V Centru vzdělávání děti staví dřevěný můstek u potoka, v archivu svítí letopočet 2256 a sousedé společně rozhodují.',
+    },
+    hotspots: [
+      {
+        id: 'children_bridge',
+        label: 'Děti u stavby můstku',
+        pos: [0.2, 2.5, 1.2],
+        speaker: 'Průvodkyně a děti',
+        text: 'Jedno dítě měří sklon dřeva, druhé kreslí, třetí poslouchá příběh rostliny. Když se pokusím převzít vedení starým učitelským tónem, zastydím se — ale děti se mnou chybu klidně prozkoumají.',
+        diary: 'V Centru vzdělávání přiznání omylu neznamená ztrátu autority.'
+      },
+      {
+        id: 'guide_question',
+        label: 'Průvodkyně Centra',
+        pos: [-3.8, -1.8, 1.5],
+        speaker: 'Průvodkyně',
+        text: '„Co by děti mohly tvořit a objevovat, kdyby nebyly celý den zaneprázdněné dokazováním, že něco umějí?“ Jedno z dětí se mě tiše ptá, zda u nás doma smějí věci zkoušet, dokud jim neporozumějí.',
+      },
+      {
+        id: 'archive_2256',
+        label: 'Archivní projekce: Škola a rok 2256',
+        pos: [4.8, -3.6, 1.9],
+        speaker: 'Dahlia a Martin',
+        text: 'Spojím starou fotografii, místní vzpomínku a archivní snímek: je to budova mé vlastní školy! Nad mapou svítí datum 2256. Tachyonová energie sňala existenční tlak a lidé proměnili touhu po moci v péči.',
+        item: 'Archivní snímek školy (2256)',
+        diary: 'Jsem ve vlastní vesnici v roce 2256. Svět to nevzdal — dopadl dobře.'
+      },
+      {
+        id: 'love_circle',
+        label: 'Kruh rozhodování: „Co by udělala láska?“',
+        pos: [5.0, 2.0, 1.3],
+        speaker: 'Sousedé a Dahlia',
+        text: 'Umělá inteligence ukazuje dopady návrhů na vodu a půdu, ale nerozhoduje. Lidé se ptají: „Co by udělala láska?“ Připomenu jim únavu pečujících a potřebu místa, kde člověk nemusí dělat vůbec nic.',
+        choices: [
+          { label: 'Navrhnout tiché místo pro unavené rodiče', note: 'Do rozhodování v roce 2256 jsem přinesla zkušenost unavené učitelky a mámy.' },
+          { label: 'Podpořit otevřenou zahradu u vody', note: 'Hlasovala jsem pro společnou zahradu u vody, kde se potkávají děti i staří lidé.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'baths_2256',
+    title: 'Kapitola 5–8 — Lázně, rodina a rozloučení (2256)',
+    shortTitle: '5. Lázně a rozloučení (2256)',
+    intro: {
+      speaker: 'Vypravěč',
+      text: 'Lázně pro mysl, tělo a ducha, rodinný stůl s mapou předků a tiché zahradní rozloučení s Martinem před příchodem sobotního rána.',
+    },
+    hotspots: [
+      {
+        id: 'baths_pool',
+        label: 'Lázně vody, světla a tónů',
+        pos: [-4.6, -1.6, 1.1],
+        speaker: 'Dahlia',
+        text: 'V teplé vodě a rezonanci tónů nikdo nesoutěží ani nepředvádí výkon. Péče tu není odměna za zásluhy. V těle se mi probouzí dávná radost z tance a do deníku si píšu: „Co mi vrací energii?“',
+        diary: 'Otázka z Lázní: „Co mi vrací energii — a jak tomu mohu doma udělat místo?“',
+        choices: [
+          { label: 'Pohyb s vodou a světlem', note: 'V Lázních jsem zvolila pohyb ve vodě a světle — tělo není můj nepřítel.' },
+          { label: 'Rezonance zvuku a tiché spočinutí', note: 'V Lázních jsem zvolila zvukovou lázeň a ticho bez hodnocení.' }
+        ]
+      },
+      {
+        id: 'family_map',
+        label: 'Rodinná mapa: Praprababička',
+        pos: [2.8, -2.8, 1.4],
+        speaker: 'Martin',
+        text: 'Propojíme archivní stopu s rodokmenem na stole. Martin se dojatě usměje: jsem jeho dávná praprababička. „Budoucnost nevznikla jedním hrdinským činem, Dahlie, ale tisíci drobných změn obyčejných lidí.“',
+        item: 'Rodinná mapa přes generace'
+      },
+      {
+        id: 'martin_farewell',
+        label: 'Martinovo poslední rozloučení',
+        pos: [4.6, 1.9, 1.4],
+        speaker: 'Martin',
+        text: 'Martin je unavený; cítí, že se jeho dlouhý život uzavírá. Mezi blízkými děkuje za Andreu, zahradu i omyly, které směl napravit: „Klid není nepřítomnost smutku. Měl jsem krásný život.“ Umírá v pokoji uprostřed rodiny.',
+        diary: 'Martinova poslední lekce: naplněný život tvoří vztahy, zahrada, napravené chyby a obyčejné dny.'
+      },
+      {
+        id: 'andrea_embrace',
+        label: 'Andrea a objetí před návratem',
+        pos: [2.4, 1.5, 1.6],
+        speaker: 'Andrea',
+        text: 'Při oslavě Martinova života zní Andrein klavír. V šumu listí už slyším ranní ptáky z roku 2026. Andrea mě obejme: „Žij svůj život naplno. Stávej se nejkrásnější představou o sobě samé — ne proto, že bys dnes nestačila.“',
+      }
+    ]
+  },
+  {
+    id: 'epilogue_2026',
+    title: 'Epilog — Pondělní školní zahrada (2026)',
+    shortTitle: '6. Epilog: Pondělí (2026)',
+    intro: {
+      speaker: 'Vypravěč',
+      text: 'Po sobotním nadechnutí v lese a nedělním zápisníku přichází pondělí. Dahlia бере čtvrťáky ven na školní dvůr, aby obvod a obsah zažili naživo.',
+    },
+    hotspots: [
+      {
+        id: 'string_bed',
+        label: 'Záhon s provázkem: Obvod a obsah',
+        pos: [0.2, 0.6, 0.8],
+        speaker: 'Dahlia',
+        text: 'Místo výkladu u tabule natahujeme se čtvrťáky provázek kolem budoucího záhonu. Děti měří hranici, počítají plochu pro rostliny, křičí přes sebe — není to dokonalé, ale je to živé.',
+        diary: 'Pondělní hodina venku: provázek kolem záhonu proměnil obvod a obsah ve společné hledání.'
+      },
+      {
+        id: 'kubik_reconcile',
+        label: 'Kubík u rohu záhonu',
+        pos: [2.0, -0.8, 1.2],
+        speaker: 'Dahlia a Kubík',
+        text: 'Přidřepnu si ke Kubíkovi a klidně uznám, že jsem byla v pátek příliš ostrá. Kubík pookřeje, posune kolík s provázkem a sám nadšeně ukáže třídě, jak se změnou tvaru hranice mění vnitřní prostor záhonu.',
+      },
+      {
+        id: 'sunday_notebook',
+        label: 'Nedělní zápisník a sobotní les',
+        pos: [-4.8, 2.8, 1.1],
+        speaker: 'Dahlia',
+        text: 'V sobotu jsem si s Pavlem bez výčitek domluvila odpoledne pro sebe v lese. V neděli jsem do zápisníku načrtla záměr malých lázní pro tělo i duši — a první drobný krok: sejít se s kamarádkou.',
+        item: 'Zápisník se záměrem a prvním krokem',
+        choices: [
+          { label: 'První krok: pozvat přátele do zahrady', note: 'Můj první krok v roce 2026: otevřít zahradu a sejít se s blízkými bez spěchu.' },
+          { label: 'První krok: domluvit společný pohyb a hudbu', note: 'Můj první krok v roce 2026: pravidelný večer pro pohyb, hudbu a tiché sdílení.' }
+        ]
+      },
+      {
+        id: 'dahlia_bridge_time',
+        label: 'Rozkvetlé jiřiny (2026 ↔ 2256)',
+        pos: [4.4, 1.8, 1.0],
+        speaker: 'Dahlia',
+        text: 'Dotknu se hlíny u školního plotu. V mé představě se náš malý kolíkový záhon na okamžik prolne s Martinovou zahradou roku 2256. Usměji se. Budoucnost začíná jedním nadechnutím.',
+        diary: 'Obraz školního záhonu se propojil s Martinovou zahradou roku 2256.'
+      }
+    ]
+  }
+];
+
+/* ============================================================================
+   3. DIORAMA SCENE BUILDERS (Isometric 3D Geometry per Scene)
+   ============================================================================ */
+const WOOD_FLOOR = [172, 126, 86], WOOD_DARK = [118, 80, 50], WOOD_LIGHT = [204, 162, 114];
+const PLASTER = [234, 226, 208], WALL_BLUE = [188, 198, 206], WALL_HOME = [218, 204, 188];
+const CHALK = [46, 78, 62], STONE = [204, 196, 178], DIRT = [128, 96, 68], SAND = [222, 204, 166];
+const WATER_TONES = [[44, 118, 126], [58, 142, 142], [78, 164, 156], [112, 188, 172]];
+const DAHLIA_PINK = [224, 96, 118], DAHLIA_GOLD = [242, 186, 68], DAHLIA_RED = [188, 58, 68], LEAF_COL = [86, 128, 72];
+
+function islandMask(x, y, rx, ry, ix, iy) {
+  const edge = Math.pow(Math.pow(Math.abs(x) / rx, 4) + Math.pow(Math.abs(y) / ry, 4), 0.25);
+  const rough = edge + (noise(x * 1.3, y * 1.3) - 0.5) * 0.13;
+  if (rough > 1.04) return false;
+  if (rough > 0.93 && hash(ix, iy) < (rough - 0.93) / 0.11) return false;
+  return true;
+}
+
+function drawDahlia3D(x, y, z0, petalCol) {
+  capsule([x, y, z0], [x, y, z0 + 0.55], 0.08, 0.07, () => LEAF_COL, 'solid');
+  sphere(x, y, z0 + 0.62, 0.22, petalCol, 'rough');
+  sphere(x, y, z0 + 0.68, 0.11, DAHLIA_GOLD, 'solid');
+  castShadow(x, y, z0 + 0.4, 0.22);
+}
+
+function buildBackWalls(xMin, xMax, yMin, yMax, h, wallCol) {
+  // Back-left wall (along x = xMin) and back-right wall (along y = yMin)
+  box(xMin - 0.35, yMin - 0.35, 0, xMin, yMax, h, wallCol, 1);
+  box(xMin - 0.35, yMin - 0.35, 0, xMax, yMin, h, wallCol, 2);
+  for (let x = xMin; x <= xMax; x += 0.6) castShadow(x, yMin, 1.2, 0.35);
+  for (let y = yMin; y <= yMax; y += 0.6) castShadow(xMin, y, 1.2, 0.35);
+}
+
+function bakeSceneGeometry(sceneId) {
+  zb.fill(-1e9);
+  pix.fill(PAPER);
+  ground.fill(0);
+  kinds.fill(0);
+  shadowMask.fill(0);
+  staticShadow.fill(0);
+  tufts.length = 0;
+  leaves.length = 0;
+
+  if (sceneId === 'classroom_2026') {
+    SHADOW_X = 1.1; SHADOW_Y = -0.2;
+    for (let iy = 0; iy < H; iy++) for (let ix = 0; ix < W; ix++) {
+      const g = unproject(ix + 0.5, iy + 0.5), i = iy * W + ix;
+      if (!islandMask(g.x, g.y, 11.8, 7.2, ix, iy)) continue;
+      if (g.x >= -7.8 && g.x <= 7.4 && g.y >= -5.8 && g.y <= 5.0) {
+        kinds[i] = KIND_FLOOR;
+        const plank = Math.abs(g.x * 2.2 - Math.round(g.x * 2.2)) < 0.06 || Math.abs(g.y * 0.6 - Math.round(g.y * 0.6)) < 0.04;
+        const sun = (g.x > -6.5 && g.x < -1.5 && g.y > -2.5 && g.y < 3.5) ? 0.35 : 0;
+        const ramp = rampOf(WOOD_FLOOR);
+        pix[i] = ramp[clamp(Math.floor(2.4 + sun - (plank ? 0.8 : 0) + (bayerAt(ix, iy) - 0.5) * 0.5), 1, 4)];
+      } else {
+        kinds[i] = KIND_GRASS;
+        const t = noise(g.x * 0.9, g.y * 0.9) * 1.15 + (hash(ix, iy) - 0.5) * 0.5;
+        pix[i] = rgb(...GRASS[clamp(Math.floor(t * 4.2), 0, 3)]);
+      }
+      ground[i] = 1;
+      zb[i] = (g.x + g.y) / R2 * COS;
     }
-  };
+    growGrass();
+    groundZ.set(zb);
 
-  let current = 'prologue';
-  const clickState = { chapter: current, step: 0, hotspots: chapters[current].hotspots };
+    buildBackWalls(-7.8, 7.4, -5.8, 5.0, 3.6, WALL_BLUE);
+    // Window on back-left wall + tree outside
+    box(-7.82, -2.6, 1.0, -7.65, 2.8, 3.0, [146, 192, 224], 3);
+    box(-7.85, 0.0, 1.0, -7.62, 0.18, 3.0, WOOD_DARK, 4);
+    box(-7.75, -2.8, 0.85, -7.35, 3.0, 1.0, WOOD_LIGHT, 5);
+    // Children's drawings & garden model on windowsill
+    box(-7.65, -2.1, 1.0, -7.4, -1.2, 1.08, [246, 212, 112], 6);
+    box(-7.65, 0.8, 1.0, -7.38, 1.9, 1.25, [118, 158, 96], 7);
+    growTree(-9.6, 0.8, 0.72, 210, 11);
 
-  const points = chapters.prologue.hotspots.concat(chapters.chapter1.hotspots);
+    // Chalkboard on back-right wall (y = -5.8)
+    box(-4.2, -5.82, 1.0, 2.6, -5.58, 3.1, WOOD_DARK, 8);
+    box(-4.0, -5.78, 1.15, 2.4, -5.52, 2.95, CHALK, 9);
+    // Chalk square & rectangle diagrams on board
+    const chalkLine = rgb(244, 242, 232);
+    for (let a = -3.2; a <= -1.8; a += 0.06) { plot(a, -5.48, 2.5, chalkLine); plot(a, -5.48, 1.55, chalkLine); }
+    for (let z = 1.55; z <= 2.5; z += 0.06) { plot(-3.2, -5.48, z, chalkLine); plot(-1.8, -5.48, z, chalkLine); }
+    for (let a = -0.6; a <= 1.6; a += 0.06) { plot(a, -5.48, 2.35, chalkLine); plot(a, -5.48, 1.75, chalkLine); }
 
-  function drawScene(chapter) {
-    if (chapter === 'prologue') {
-      drawClassroom2026();
-      drawEveningHome();
+    // Teacher's desk + book + bracelet/photo
+    box(3.2, -3.6, 0, 5.8, -1.9, 1.1, WOOD_DARK, 10);
+    box(3.1, -3.7, 1.05, 5.9, -1.8, 1.2, WOOD_LIGHT, 11);
+    box(3.6, -3.2, 1.2, 4.5, -2.4, 1.32, [244, 238, 220], 12); // Open book
+    sphere(5.1, -2.6, 1.28, 0.22, [72, 168, 176], 'gloss'); // Bracelet & photo
+
+    // Student desks (2 rows)
+    for (const [dx, dy] of [[-4.6, -1.6], [-1.2, -1.6], [-4.6, 1.8], [-1.2, 1.8]]) {
+      box(dx, dy, 0.72, dx + 2.0, dy + 1.05, 0.86, WOOD_LIGHT, 20);
+      box(dx + 0.1, dy + 0.1, 0, dx + 0.24, dy + 0.95, 0.72, [70, 74, 82], 21);
+      box(dx + 1.76, dy + 0.1, 0, dx + 1.9, dy + 0.95, 0.72, [70, 74, 82], 22);
+      box(dx + 0.45, dy + 0.22, 0.86, dx + 1.25, dy + 0.75, 0.94, [246, 242, 228], 23);
+      castShadow(dx + 1.0, dy + 0.5, 0.5, 0.85);
+    }
+    castShadow(4.5, -2.8, 0.7, 1.2);
+
+  } else if (sceneId === 'home_2026') {
+    SHADOW_X = 0.95; SHADOW_Y = -0.25;
+    for (let iy = 0; iy < H; iy++) for (let ix = 0; ix < W; ix++) {
+      const g = unproject(ix + 0.5, iy + 0.5), i = iy * W + ix;
+      if (!islandMask(g.x, g.y, 11.6, 7.2, ix, iy)) continue;
+      if (g.x >= -7.8 && g.x <= 7.2 && g.y >= -5.8 && g.y <= 5.0) {
+        kinds[i] = KIND_FLOOR;
+        const onRug = g.x > -1.8 && g.x < 4.4 && g.y > -2.4 && g.y < 2.6;
+        const lampDist = Math.hypot(g.x - 1.5, g.y + 0.4);
+        const glow = Math.max(0, 1 - lampDist / 4.8) * 0.8;
+        const baseCol = onRug ? [164, 98, 84] : [138, 102, 74];
+        pix[i] = rampOf(baseCol)[clamp(Math.floor(1.8 + glow + (bayerAt(ix, iy) - 0.5) * 0.5), 0, 4)];
+      } else {
+        kinds[i] = KIND_GRASS;
+        pix[i] = rampOf(GRASS[1])[clamp(Math.floor(1.4 + noise(g.x, g.y)), 0, 3)];
+      }
+      ground[i] = 1;
+      zb[i] = (g.x + g.y) / R2 * COS;
+    }
+    groundZ.set(zb);
+
+    buildBackWalls(-7.8, 7.2, -5.8, 5.0, 3.5, WALL_HOME);
+    // Hallway mirror on back-left wall
+    box(-7.8, -4.2, 0.7, -7.52, -2.2, 2.9, WOOD_DARK, 1);
+    box(-7.74, -4.0, 0.85, -7.46, -2.4, 2.75, [176, 208, 224], 2);
+    // Evening window on back-right wall
+    box(1.2, -5.8, 1.1, 4.8, -5.52, 3.0, [48, 58, 96], 3);
+    // Kitchen counter
+    box(-6.8, -5.6, 0, -1.2, -4.1, 1.1, [196, 188, 172], 4);
+    box(-6.9, -5.65, 1.1, -1.1, -4.05, 1.22, WOOD_DARK, 5);
+    castShadow(-4.0, -4.8, 0.7, 1.8);
+
+    // Dining table with warm lamp & tea mugs
+    box(-0.4, -1.8, 0.85, 3.6, 1.0, 1.0, WOOD_LIGHT, 6);
+    for (const [lx, ly] of [[-0.2, -1.6], [3.3, -1.6], [-0.2, 0.7], [3.3, 0.7]]) {
+      box(lx, ly, 0, lx + 0.2, ly + 0.2, 0.85, WOOD_DARK, 7);
+    }
+    // Warm table lamp & mugs
+    capsule([1.4, -0.5, 1.0], [1.4, -0.5, 1.65], 0.12, 0.08, () => WOOD_DARK, 'solid');
+    sphere(1.4, -0.5, 1.82, 0.36, [255, 224, 138], 'gloss');
+    sphere(2.3, -0.4, 1.12, 0.16, [238, 232, 218], 'solid');
+    sphere(0.6, 0.2, 1.12, 0.16, [196, 88, 72], 'solid');
+    castShadow(1.6, -0.4, 0.7, 1.5);
+
+    // Bedroom bed in front-left corner
+    box(-6.8, 1.4, 0, -3.4, 4.4, 0.65, WOOD_DARK, 8);
+    box(-6.6, 1.55, 0.65, -3.6, 4.25, 0.92, [142, 156, 184], 9);
+    box(-6.5, 1.65, 0.92, -5.3, 2.8, 1.1, [242, 238, 228], 10);
+    castShadow(-5.1, 2.9, 0.6, 1.6);
+
+  } else if (sceneId === 'garden_2256') {
+    SHADOW_X = 1.25; SHADOW_Y = -0.14;
+    for (let iy = 0; iy < H; iy++) for (let ix = 0; ix < W; ix++) {
+      const g = unproject(ix + 0.5, iy + 0.5), i = iy * W + ix;
+      if (!islandMask(g.x, g.y, 12.6, 7.5, ix, iy)) continue;
+      const streamY = -0.4 + Math.sin(g.x * 0.35) * 0.55;
+      if (Math.abs(g.y - streamY) < 0.75) {
+        kinds[i] = KIND_WATER;
+        const v = 0.25 + noise(g.x * 0.8, g.y * 0.8) * 0.55;
+        pix[i] = rgb(...WATER_TONES[clamp(Math.floor(v * 4 + (bayerAt(ix, iy) - 0.5) * 0.6), 0, 3)]);
+      } else if (g.x > -0.6 && g.x < 4.6 && g.y > 0.8 && g.y < 3.8) {
+        kinds[i] = KIND_DIRT;
+        pix[i] = rampOf(DIRT)[clamp(Math.floor(1.8 + noise(g.x * 2.5, g.y * 2.5) * 1.8 + (bayerAt(ix, iy) - 0.5) * 0.6), 1, 3)];
+      } else if (Math.abs(g.x + 2.2 - g.y * 0.4) < 1.1) {
+        kinds[i] = KIND_FLOOR;
+        pix[i] = rampOf(SAND)[clamp(Math.floor(2.6 + (noise(g.x, g.y) - 0.5) * 1.2), 2, 4)];
+      } else {
+        kinds[i] = KIND_GRASS;
+        const t = noise(g.x * 0.9, g.y * 0.9) * 1.15 + (hash(ix, iy) - 0.5) * 0.55;
+        pix[i] = rgb(...GRASS[clamp(Math.floor(t * 4.2), 0, 3)]);
+      }
+      ground[i] = 1;
+      zb[i] = (g.x + g.y) / R2 * COS;
+    }
+    growGrass();
+    groundZ.set(zb);
+
+    // Light arched house of 2256 on terrace (back-left)
+    box(-9.2, -6.2, 0, -3.6, -2.0, 0.35, STONE, 1);
+    box(-8.8, -5.8, 0.35, -4.4, -3.2, 2.5, PLASTER, 2);
+    // Bioclimatic arch roof
+    for (let x = -8.9; x <= -4.3; x += 0.06) {
+      const u = (x + 6.6) / 2.3;
+      const archH = 2.5 + Math.sqrt(Math.max(0, 1 - u * u)) * 1.25;
+      for (let y = -5.9; y <= -3.1; y += 0.06) {
+        plot(x, y, archH, rampOf(STONE)[clamp(Math.floor(3.2 - u * 0.8), 2, 4)]);
+      }
+    }
+    // Upright piano on terrace
+    box(-7.8, -3.1, 0.35, -6.4, -2.4, 1.65, WOOD_DARK, 3);
+    box(-7.75, -2.38, 0.95, -6.45, -2.18, 1.1, [246, 244, 236], 4);
+    castShadow(-6.6, -3.8, 1.4, 2.2);
+
+    // Raised wooden border around Martin's dahlia bed + blooming dahlias
+    box(-0.7, 0.75, 0, 4.7, 0.92, 0.28, WOOD_DARK, 5);
+    box(-0.7, 3.75, 0, 4.7, 3.92, 0.28, WOOD_DARK, 6);
+    drawDahlia3D(0.2, 1.5, 0, DAHLIA_PINK);
+    drawDahlia3D(1.4, 1.4, 0, DAHLIA_RED);
+    drawDahlia3D(3.6, 1.6, 0, DAHLIA_GOLD);
+    drawDahlia3D(0.5, 3.1, 0, DAHLIA_GOLD);
+    drawDahlia3D(1.9, 3.2, 0, DAHLIA_PINK);
+    drawDahlia3D(3.8, 3.0, 0, DAHLIA_RED);
+    // Young seedling pot near water channel
+    box(2.25, 0.45, 0, 2.75, 0.95, 0.38, [178, 96, 66], 7);
+    sphere(2.5, 0.7, 0.55, 0.2, LEAF_COL, 'rough');
+
+    // Helper robot with water containers
+    capsule([-4.2, 1.8, 0.15], [-4.2, 1.8, 0.78], 0.42, 0.36, () => [236, 234, 224], 'solid');
+    sphere(-4.2, 1.8, 0.95, 0.28, [92, 168, 176], 'gloss');
+    sphere(-3.75, 1.8, 0.55, 0.2, [188, 132, 78], 'solid');
+    castShadow(-4.2, 1.8, 0.4, 0.55);
+
+    growTree(7.4, -4.6, 0.88, 290, 55);
+
+  } else if (sceneId === 'centre_2256') {
+    SHADOW_X = 1.15; SHADOW_Y = -0.18;
+    for (let iy = 0; iy < H; iy++) for (let ix = 0; ix < W; ix++) {
+      const g = unproject(ix + 0.5, iy + 0.5), i = iy * W + ix;
+      if (!islandMask(g.x, g.y, 12.6, 7.5, ix, iy)) continue;
+      const streamX = -0.2 + Math.sin(g.y * 0.4) * 0.5;
+      if (Math.abs(g.x - streamX) < 0.85 && g.y > -0.5) {
+        kinds[i] = KIND_WATER;
+        pix[i] = rgb(...WATER_TONES[clamp(Math.floor(1.5 + noise(g.x, g.y) * 2), 0, 3)]);
+      } else if (Math.hypot((g.x - 4.8) * 0.8, g.y - 1.8) < 2.6 || (g.x > -6.5 && g.x < 5.5 && g.y < -1.0 && g.y > -4.8)) {
+        kinds[i] = KIND_FLOOR;
+        pix[i] = rampOf(SAND)[clamp(Math.floor(2.6 + (noise(g.x, g.y) - 0.5) * 1.1), 2, 4)];
+      } else {
+        kinds[i] = KIND_GRASS;
+        const t = noise(g.x * 0.9, g.y * 0.9) * 1.15 + (hash(ix, iy) - 0.5) * 0.55;
+        pix[i] = rgb(...GRASS[clamp(Math.floor(t * 4.2), 0, 3)]);
+      }
+      ground[i] = 1;
+      zb[i] = (g.x + g.y) / R2 * COS;
+    }
+    growGrass();
+    groundZ.set(zb);
+
+    // Education Centre open timber & stone pavilion (back-left)
+    box(-8.5, -5.8, 0, -2.4, -2.2, 0.3, STONE, 1);
+    for (const [px, py] of [[-8.2, -5.5], [-2.7, -5.5], [-8.2, -2.5], [-2.7, -2.5]]) {
+      box(px, py, 0.3, px + 0.28, py + 0.28, 2.8, WOOD_DARK, 2);
+    }
+    box(-8.6, -5.9, 2.8, -2.3, -2.1, 3.15, WOOD_LIGHT, 3);
+    castShadow(-5.5, -4.0, 1.5, 2.4);
+
+    // Children's wooden footbridge project across stream
+    box(-1.6, 1.8, 0.25, 1.6, 3.2, 0.48, WOOD_LIGHT, 4);
+    box(-1.5, 1.75, 0.48, 0.4, 1.9, 1.1, WOOD_DARK, 5); // Unfinished railing being measured
+    castShadow(0, 2.5, 0.35, 1.2);
+
+    // Archive 2256 projection pedestal (back-right)
+    box(3.8, -4.4, 0, 5.8, -2.8, 0.9, STONE, 6);
+    sphere(4.8, -3.6, 1.65, 0.65, [118, 214, 224], 'gloss');
+    box(4.3, -3.9, 1.25, 5.3, -3.3, 1.75, [224, 178, 112], 7); // Projected miniature of 2026 school
+    castShadow(4.8, -3.6, 0.8, 1.1);
+
+    // Village council circle („Co by udělala láska?“)
+    for (let a = 0; a < Math.PI * 2; a += 0.9) {
+      const bx = 5.0 + Math.cos(a) * 1.7, by = 2.0 + Math.sin(a) * 1.3;
+      box(bx - 0.35, by - 0.35, 0, bx + 0.35, by + 0.35, 0.48, STONE, 8);
+    }
+    sphere(5.0, 2.0, 0.55, 0.32, [246, 214, 128], 'gloss');
+
+    growTree(-8.4, 2.6, 0.8, 240, 88);
+
+  } else if (sceneId === 'baths_2256') {
+    SHADOW_X = 1.1; SHADOW_Y = -0.2;
+    for (let iy = 0; iy < H; iy++) for (let ix = 0; ix < W; ix++) {
+      const g = unproject(ix + 0.5, iy + 0.5), i = iy * W + ix;
+      if (!islandMask(g.x, g.y, 12.6, 7.5, ix, iy)) continue;
+      if (g.x >= -7.4 && g.x <= -2.0 && g.y >= -3.8 && g.y <= 0.6) {
+        kinds[i] = KIND_WATER;
+        const ripple = Math.sin(Math.hypot(g.x + 4.7, g.y + 1.6) * 3.5) * 0.15;
+        pix[i] = rgb(...WATER_TONES[clamp(Math.floor(2.1 + ripple * 3 + (bayerAt(ix, iy) - 0.5) * 0.5), 0, 3)]);
+      } else if (g.x >= -8.2 && g.x <= -1.2 && g.y >= -4.6 && g.y <= 1.4) {
+        kinds[i] = KIND_FLOOR;
+        pix[i] = rampOf(STONE)[clamp(Math.floor(3.1 + (noise(g.x, g.y) - 0.5) * 0.9), 2, 4)];
+      } else {
+        kinds[i] = KIND_GRASS;
+        const t = noise(g.x * 0.9, g.y * 0.9) * 1.15 + (hash(ix, iy) - 0.5) * 0.55;
+        pix[i] = rgb(...GRASS[clamp(Math.floor(t * 4.2), 0, 3)]);
+      }
+      ground[i] = 1;
+      zb[i] = (g.x + g.y) / R2 * COS;
+    }
+    growGrass();
+    groundZ.set(zb);
+
+    // Baths arches & bronze resonance bowls (left)
+    for (let x = -7.8; x <= -2.2; x += 0.06) {
+      const u = (x + 5.0) / 2.8;
+      const z = 0.4 + Math.sqrt(Math.max(0, 1 - u * u)) * 2.6;
+      for (let y = -4.5; y <= -4.1; y += 0.06) plot(x, y, z, rampOf(PLASTER)[3]);
+    }
+    sphere(-2.2, -2.8, 0.35, 0.28, [218, 168, 78], 'gloss');
+    sphere(-6.8, -0.2, 0.35, 0.25, [248, 224, 142], 'gloss');
+
+    // Family table with lineage map (back-right)
+    box(1.4, -3.8, 0.78, 4.4, -1.8, 0.92, WOOD_LIGHT, 1);
+    box(1.6, -3.6, 0, 1.85, -2.0, 0.78, WOOD_DARK, 2);
+    box(3.95, -3.6, 0, 4.2, -2.0, 0.78, WOOD_DARK, 3);
+    box(2.0, -3.4, 0.92, 3.8, -2.2, 1.0, [246, 240, 222], 4); // Family map scroll
+    castShadow(2.9, -2.8, 0.6, 1.4);
+
+    // Martin's peaceful garden bench surrounded by dahlias (front-right)
+    box(3.2, 1.2, 0.55, 6.0, 2.4, 0.7, WOOD_LIGHT, 5);
+    box(3.2, 1.15, 0.7, 6.0, 1.32, 1.35, WOOD_DARK, 6);
+    castShadow(4.6, 1.8, 0.5, 1.4);
+    drawDahlia3D(2.2, 2.8, 0, DAHLIA_PINK);
+    drawDahlia3D(6.4, 2.2, 0, DAHLIA_GOLD);
+    drawDahlia3D(5.8, 3.2, 0, DAHLIA_RED);
+
+    growTree(7.6, -4.4, 0.85, 260, 144);
+
+  } else if (sceneId === 'epilogue_2026') {
+    SHADOW_X = 1.15; SHADOW_Y = -0.18;
+    for (let iy = 0; iy < H; iy++) for (let ix = 0; ix < W; ix++) {
+      const g = unproject(ix + 0.5, iy + 0.5), i = iy * W + ix;
+      if (!islandMask(g.x, g.y, 12.6, 7.5, ix, iy)) continue;
+      if (g.x >= -2.2 && g.x <= 2.6 && g.y >= -0.8 && g.y <= 2.2) {
+        kinds[i] = KIND_DIRT;
+        pix[i] = rampOf(DIRT)[clamp(Math.floor(1.9 + noise(g.x * 2.5, g.y * 2.5) * 1.7 + (bayerAt(ix, iy) - 0.5) * 0.5), 1, 3)];
+      } else {
+        kinds[i] = KIND_GRASS;
+        const t = noise(g.x * 0.9, g.y * 0.9) * 1.15 + (hash(ix, iy) - 0.5) * 0.55;
+        pix[i] = rgb(...GRASS[clamp(Math.floor(t * 4.2), 0, 3)]);
+      }
+      ground[i] = 1;
+      zb[i] = (g.x + g.y) / R2 * COS;
+    }
+    growGrass();
+    groundZ.set(zb);
+
+    // Corner of 2026 school building (back-left)
+    box(-9.0, -5.8, 0, -4.5, -2.5, 3.2, WALL_BLUE, 1);
+    box(-9.2, -6.0, 3.2, -4.3, -2.3, 3.5, [168, 88, 68], 2);
+    castShadow(-6.6, -4.0, 1.6, 2.2);
+
+    // Staked garden bed with perimeter string (obvod) & inner soil (obsah)
+    const pegs = [[-2.2, -0.8], [2.6, -0.8], [2.6, 2.2], [-2.2, 2.2]];
+    for (const [px, py] of pegs) {
+      box(px - 0.08, py - 0.08, 0, px + 0.08, py + 0.08, 0.55, WOOD_LIGHT, 3);
+    }
+    const stringCol = rgb(250, 224, 92);
+    for (let x = -2.2; x <= 2.6; x += 0.05) { plot(x, -0.8, 0.38, stringCol); plot(x, 2.2, 0.38, stringCol); }
+    for (let y = -0.8; y <= 2.2; y += 0.05) { plot(-2.2, y, 0.38, stringCol); plot(2.6, y, 0.38, stringCol); }
+
+    // Bench with Sunday notebook & thermos (front-left)
+    box(-6.2, 2.2, 0.48, -3.4, 3.3, 0.62, WOOD_LIGHT, 4);
+    box(-5.3, 2.4, 0.62, -4.2, 3.1, 0.72, [248, 242, 224], 5); // Sunday notebook
+    capsule([-3.8, 2.7, 0.62], [-3.8, 2.7, 1.05], 0.14, 0.12, () => [68, 128, 116], 'gloss');
+    castShadow(-4.8, 2.8, 0.4, 1.2);
+
+    // Blooming dahlias connecting 2026 and 2256 (front-right)
+    drawDahlia3D(3.8, 1.4, 0, DAHLIA_PINK);
+    drawDahlia3D(4.7, 1.9, 0, DAHLIA_GOLD);
+    drawDahlia3D(4.2, 2.6, 0, DAHLIA_RED);
+
+    growTree(7.4, -4.4, 0.9, 290, 210);
+  }
+
+  bakeOcclusion();
+  staticShadow.set(shadowMask);
+  applyShadows(groundZ);
+  bakedPix.set(pix);
+  bakedZ.set(zb);
+}
+
+/* ============================================================================
+   4. DYNAMIC CHARACTERS & FRAME RENDERING
+   ============================================================================ */
+const G = {
+  sceneIndex: 0,
+  activeHotspot: -1, // -1 = scene intro, 0..3 = hotspot index
+  visited: [false, false, false, false],
+  hoverHotspot: -1,
+  planted: false,
+  time: 0,
+  items: [],
+  notes: [],
+  transitionFlash: 0,
+};
+
+function drawDynamicFigures(sceneId, t) {
+  const breathe = STILL ? 0 : Math.sin(t * 2.0) * 0.025;
+  const wave = STILL ? 0 : Math.sin(t * 3.2) * 0.12;
+
+  if (sceneId === 'classroom_2026') {
+    // Dahlia standing near chalkboard & teacher's desk
+    figure(1.5, -3.1, 1.85, { lean: 0.08 + breathe, armR: 0.35 + wave * 0.5, armL: 0.1 }, CHARS.dahlia, dynamicAdd);
+    // Kubík at front desk (standing/sitting clearly visible behind his desk)
+    figure(-3.5, -0.2, -1.3, { scale: 0.78, crouch: 0.12, lean: 0.14, armR: 0.45, armL: 0.3 }, CHARS.kubik, dynamicAdd);
+    // Other 4th-grade children
+    figure(-0.1, -0.2, -1.4, { scale: 0.76, crouch: 0.12, armR: 0.3 }, CHARS.childA, dynamicAdd);
+    figure(-3.5, 3.1, -1.7, { scale: 0.76, crouch: 0.12, armL: 0.35 }, CHARS.childB, dynamicAdd);
+    figure(-0.1, 3.1, -1.3, { scale: 0.76, crouch: 0.12, armR: 0.25 }, CHARS.childC, dynamicAdd);
+
+  } else if (sceneId === 'home_2026') {
+    // Dahlia between mirror, table and bed
+    figure(-2.2, -0.6, 0.35, { lean: 0.09 + breathe, armR: 0.15, armL: 0.2 }, CHARS.dahlia, dynamicAdd);
+    // Husband Pavel at dining table
+    figure(3.2, -0.8, 2.75, { crouch: 0.18, lean: 0.06, armR: 0.45, armL: 0.2 }, CHARS.pavel, dynamicAdd);
+    // Daughter Eliška and son Tobiáš
+    figure(1.1, 2.0, -1.5, { scale: 0.76, armR: 0.5 + wave, armL: 0.2 }, CHARS.childC, dynamicAdd);
+    figure(-0.2, 2.1, -1.1, { scale: 0.68, armR: 0.3, armL: 0.45 - wave }, CHARS.kubik, dynamicAdd);
+
+  } else if (sceneId === 'garden_2256') {
+    // Martin with white beard kneeling at dahlia bed
+    figure(0.8, 2.1, 2.4, { crouch: 0.52, lean: 0.32 + breathe, armR: 0.68 + wave * 0.4, armL: 0.45 }, CHARS.martin, dynamicAdd);
+    // Dahlia in the garden
+    figure(-1.4, 2.4, 0.25, { lean: breathe, armR: 0.22, armL: 0.12 }, CHARS.dahlia, dynamicAdd);
+    // Andrea on terrace by the piano
+    figure(-5.6, -2.2, 0.85, { z: 0.35, lean: breathe, armR: 0.35, armL: 0.28 }, CHARS.andrea, dynamicAdd);
+    if (G.planted) {
+      drawDahlia3D(2.6, 1.5, 0, DAHLIA_PINK);
+    }
+
+  } else if (sceneId === 'centre_2256') {
+    // Dahlia & Centre guide
+    figure(-1.4, -0.4, 0.7, { lean: breathe, armR: 0.25, armL: 0.15 }, CHARS.dahlia, dynamicAdd);
+    figure(-3.8, -1.8, 0.45, { lean: breathe, armR: 0.35 + wave * 0.3, armL: 0.15 }, CHARS.guide, dynamicAdd);
+    // Martin near archive & decision circle
+    figure(3.6, -1.2, 1.9, { lean: breathe, armR: 0.3, armL: 0.15 }, CHARS.martin, dynamicAdd);
+    // Children collaborating on the wooden footbridge
+    figure(-0.6, 2.6, 0.2, { scale: 0.74, crouch: 0.3, armR: 0.6 + wave, armL: 0.4 }, CHARS.kubik, dynamicAdd);
+    figure(0.9, 2.5, 2.7, { scale: 0.74, crouch: 0.25, armR: 0.5, armL: 0.3 }, CHARS.childA, dynamicAdd);
+    figure(0.2, 1.2, 1.4, { scale: 0.72, armR: 0.3, armL: 0.2 }, CHARS.childB, dynamicAdd);
+
+  } else if (sceneId === 'baths_2256') {
+    // Dahlia between the water pool and family garden
+    figure(-1.2, 0.6, 0.25, { lean: breathe, armR: 0.25 + wave * 0.3, armL: 0.2 }, CHARS.dahlia, dynamicAdd);
+    // Martin resting peacefully on the garden bench
+    figure(4.6, 1.9, 2.45, { z: 0.15, crouch: 0.38, lean: 0.12, armR: 0.25, armL: 0.25 }, CHARS.martin, dynamicAdd);
+    // Andrea standing warmly beside Martin
+    figure(2.4, 1.5, 0.35, { lean: breathe, armR: 0.4, armL: 0.3 }, CHARS.andrea, dynamicAdd);
+    // Guide in the baths
+    figure(-5.0, -2.0, 0.65, { scale: 0.92, armR: 0.5 + wave, armL: 0.5 - wave }, CHARS.guide, dynamicAdd);
+
+  } else if (sceneId === 'epilogue_2026') {
+    // Dahlia outdoors with her 4th-grade class
+    figure(-1.4, -1.8, 1.05, { lean: breathe, armR: 0.42 + wave * 0.4, armL: 0.2 }, CHARS.dahlia, dynamicAdd);
+    // Kubík crouching by the string corner peg
+    figure(2.0, -0.8, 2.5, { scale: 0.74, crouch: 0.38, lean: 0.2, armR: 0.65 + wave, armL: 0.4 }, CHARS.kubik, dynamicAdd);
+    // Other children measuring and sketching the garden bed
+    figure(-2.0, 1.8, -0.4, { scale: 0.74, crouch: 0.3, armR: 0.5 }, CHARS.childA, dynamicAdd);
+    figure(1.4, 2.4, -2.1, { scale: 0.74, armR: 0.4, armL: 0.3 }, CHARS.childB, dynamicAdd);
+    figure(-0.2, -1.6, 1.5, { scale: 0.72, armR: 0.35 }, CHARS.childC, dynamicAdd);
+  }
+}
+
+/* ---------- Canvas Dialogue Box & Overlay ---------- */
+function wrapLines(text, maxWidth) {
+  ctx.font = '10px ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace';
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (ctx.measureText(test).width > maxWidth && cur) {
+      lines.push(cur);
+      cur = w;
     } else {
-      drawGarden2256();
+      cur = test;
     }
   }
+  if (cur) lines.push(cur);
+  return lines;
+}
 
-  function overlayHotspots(chapter) {
-    ctx.fillStyle = 'rgba(255,210,120,0.15)';
-    for (const h of chapters[chapter].hotspots) {
-      ctx.fillStyle = 'rgba(255,210,120,0.14)';
-      ctx.fillRect(h.x, h.y, h.w, h.h);
-      ctx.fillStyle = 'rgba(255,230,180,0.9)';
-      ctx.fillRect(h.x, h.y, h.w, 1);
-      ctx.fillRect(h.x, h.y, 1, h.h);
-    }
+function currentDialogueEntry() {
+  const scene = SCENES[G.sceneIndex];
+  if (G.activeHotspot >= 0 && scene.hotspots[G.activeHotspot]) {
+    return scene.hotspots[G.activeHotspot];
   }
+  return scene.intro;
+}
 
-  function drawCaption(chapter) {
-    // small box label
-    rect(20, 220, 108, 18, 'rgba(10,8,14,0.55)');
-    rect(20, 220, 108, 2, P.gold2);
-    screenText(chapters[chapter].title, 24, 226, 7, P.cream, 'left');
-  }
+function drawCanvasUI() {
+  const scene = SCENES[G.sceneIndex];
+  const entry = currentDialogueEntry();
+  const allVisited = G.visited.every(Boolean);
 
-  function drawDialogue(line) {
-    // caption box — Czech
-    rect(116, 206, 212, 52, 'rgba(10,8,14,0.6)');
-    rect(116, 206, 212, 3, P.gold2);
-    rect(116, 255, 212, 3, P.gold2);
-    // coded text with wrap
-    ctx.font = '9px monospace';
-    ctx.fillStyle = P.cream;
+  // Hover tooltip above hotspot if hovered
+  if (G.hoverHotspot >= 0) {
+    const h = scene.hotspots[G.hoverHotspot];
+    const p = project(h.pos[0], h.pos[1], h.pos[2]);
+    ctx.font = '9px ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace';
+    const tw = Math.ceil(ctx.measureText(h.label).width) + 8;
+    const tx = clamp(Math.round(p.sx - tw / 2), 4, W - tw - 4);
+    const ty = clamp(Math.round(p.sy - 28), 4, 192);
+    ctx.fillStyle = '#1c1b19';
+    ctx.fillRect(tx - 1, ty - 1, tw + 2, 13);
+    ctx.fillStyle = '#fbf8f1';
+    ctx.fillRect(tx, ty, tw, 11);
+    ctx.fillStyle = '#1c1b19';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    // word wrap manually
-    let words = line.split(' ');
-    let row = 0, x = 124, y = 216;
-    for (let w of words) {
-      let wordW = ctx.measureText(w).width;
-      if (x + wordW > 324) { row++; x = 124; y += 11; }
-      if (row > 3) break;
-      ctx.fillText(w, x, y);
-      x += wordW + 2;
-    }
-    // prompt hint
-    screenText('● clik  —  click', 124, 246, 7, P.gold, 'left');
+    ctx.fillText(h.label, tx + 4, ty + 1);
   }
 
-  let state = {
-    chapter: 'prologue',
-    step: 0,
-    dialogueLines: chapters.prologue.dialogue
-  };
+  // Bottom Dialogue Box on Canvas (x=6, y=200, w=348, h=76)
+  const bx = 6, by = 200, bw = 348, bh = 76;
+  ctx.fillStyle = '#1c1b19';
+  ctx.fillRect(bx - 1, by - 1, bw + 2, bh + 2);
+  ctx.fillStyle = '#fbf8f1';
+  ctx.fillRect(bx, by, bw, bh);
+  ctx.fillStyle = '#e2d9c5';
+  ctx.fillRect(bx + 2, by + 15, bw - 4, 1);
 
-  function updateScene() {
-    drawScene(state.chapter);
-    overlayHotspots(state.chapter);
-    drawCaption(state.chapter);
-    drawDialogue(state.dialogueLines[state.step % state.dialogueLines.length]);
-  }
+  // Speaker name & scene title
+  ctx.font = 'bold 10px ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace';
+  ctx.fillStyle = '#b5392b';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText(entry.speaker + ' · ' + scene.shortTitle, bx + 6, by + 3);
 
-  updateScene();
-
-  /* ------------------------- click handling ------------------------- */
-
-  function hitHotspot(mx, my) {
-    const list = chapters[state.chapter].hotspots;
-    for (const h of list) {
-      if (mx >= h.x && mx <= h.x + h.w && my >= h.y && my <= h.y + h.h) return true;
-    }
-    return false;
-  }
-
-  function advanceChapter() {
-    // prologue -> chapter1
-    if (state.chapter === 'prologue') {
-      state.chapter = 'chapter1';
-      state.step = 0;
-      state.dialogueLines = chapters.chapter1.dialogue;
-      updateScene();
+  // Hotspot progress dots in top-right of dialogue box
+  for (let i = 0; i < scene.hotspots.length; i++) {
+    const dx = bx + bw - 42 + i * 9, dy = by + 5;
+    ctx.fillStyle = G.visited[i] ? '#3d6b58' : '#c8c0b0';
+    ctx.fillRect(dx, dy, 5, 5);
+    if (G.activeHotspot === i) {
+      ctx.fillStyle = '#1c1b19';
+      ctx.fillRect(dx - 1, dy - 1, 7, 1);
+      ctx.fillRect(dx - 1, dy + 5, 7, 1);
     }
   }
 
-  function advanceLine() {
-    const n = chapters[state.chapter].dialogue.length;
-    state.step = (state.step + 1) % n;
-    updateScene();
+  // Wrapped Czech dialogue text lines (up to 4 lines)
+  const lines = wrapLines(entry.text, bw - 12);
+  ctx.font = '10px ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace';
+  ctx.fillStyle = '#1c1b19';
+  for (let i = 0; i < Math.min(lines.length, 4); i++) {
+    ctx.fillText(lines[i], bx + 6, by + 18 + i * 11);
   }
 
-  // click sign
-  function drawClickHint() {
-    // Czech 'click' indicator at bottom
-    rect(160, 262, 108, 12, 'rgba(10,8,14,0.6)');
-    screenText('click the hotspot', 164, 266, 7, P.cream, 'center');
-    // arrow
-    ctx.fillStyle = P.gold;
-    ctx.beginPath();
-    ctx.moveTo(196, 266);
-    ctx.lineTo(210, 262);
-    ctx.lineTo(210, 270);
-    ctx.closePath();
-    ctx.fill();
-  }
+  // Prompt at bottom-right of dialogue box
+  const promptText = allVisited
+    ? (G.sceneIndex < SCENES.length - 1 ? 'další kapitola ▸' : 'hrát znovu ▸')
+    : 'klikni dál ▸';
+  ctx.font = '9px ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace';
+  ctx.fillStyle = '#8b877f';
+  ctx.textAlign = 'right';
+  ctx.fillText(promptText, bx + bw - 6, by + bh - 11);
+  ctx.textAlign = 'left';
+}
 
-  // mouse cursor position handling
-  cv.addEventListener('click', function (e) {
-    const r = cv.getBoundingClientRect();
-    const sx = Math.floor((e.clientX - r.left) * (W / r.width));
-    const sy = Math.floor((e.clientY - r.top) * (H / r.height));
-    if (hitHotspot(sx, sy)) {
-      if (state.chapter === 'prologue') {
-        // check if hotspot belongs to class/evening: click once then next dialogue
-        advanceLine();
-      } else {
-        advanceLine();
-      }
-      // hint
-      ctx.fillStyle = P.cream;
-      ctx.fillRect(sx - 2, sy - 2, 4, 4);
+function draw() {
+  pix.set(bakedPix);
+  zb.set(bakedZ);
+  pendingShadows.length = 0;
+
+  const scene = SCENES[G.sceneIndex];
+  const windT = STILL ? 0 : Math.floor(G.time * WIND_FPS) / WIND_FPS;
+
+  drawDynamicFigures(scene.id, G.time);
+  drawLeaves(windT);
+  drawTufts(windT);
+  flushShadows();
+  applyShadows(bakedZ);
+  shadeEdges();
+
+  // Draw clickable hotspot pins and bobbing arrow on next suggested or hovered hotspot
+  const targetArrowIdx = G.hoverHotspot >= 0 ? G.hoverHotspot : G.visited.indexOf(false);
+  scene.hotspots.forEach((h, idx) => {
+    const p = project(h.pos[0], h.pos[1], h.pos[2]);
+    drawHotspotPin(p.sx, p.sy, G.visited[idx], G.activeHotspot === idx || G.hoverHotspot === idx, G.time);
+    if (idx === targetArrowIdx) {
+      drawArrow(p.sx, p.sy - 5, G.time);
     }
   });
 
-  // hover feedback on the canvas
-  cv.addEventListener('mouseover', function () {});
+  ctx.putImageData(image, 0, 0);
+  drawCanvasUI();
+}
 
-  /* ------------------------- render essentials ------------------------- */
-  // add base UI frame and title
-  function drawFrame() {
-    rect(0, 0, W, 6, '#2c2136');
-    rect(0, H - 6, W, 6, '#2c2136');
-    rect(0, 0, 6, H, '#2c2136');
-    rect(W - 6, 0, 6, H, '#2c2136');
-    // title
-    rect(14, 6, W - 28, 8, 'rgba(10,8,14,0.5)');
-    screenText('DAHLIA · pikselowa storyline', W / 2, 12, 8, P.cream, 'center');
-    drawClickHint();
+/* ============================================================================
+   5. INTERACTION, SCENE TRANSITIONS, NOTEBOOK & WEBAUDIO
+   ============================================================================ */
+const ui = {
+  badge: document.getElementById('scene-badge'),
+  toggle: document.getElementById('pp-toggle'),
+  list: document.getElementById('pp-list'),
+  diaryOpen: document.getElementById('diary-open'),
+  diaryDialog: document.getElementById('diary-dialog'),
+  diaryItems: document.getElementById('diary-items'),
+  diaryNotes: document.getElementById('diary-notes'),
+  rulesOpen: document.getElementById('rules-open'),
+  rulesDialog: document.getElementById('rules-dialog'),
+  choices: document.getElementById('choices'),
+  status: document.getElementById('status'),
+  live: document.getElementById('dialogue-live'),
+  mute: document.getElementById('mute'),
+};
+
+function addUnique(arr, val) {
+  if (val && !arr.includes(val)) arr.push(val);
+}
+
+function syncDOM() {
+  const scene = SCENES[G.sceneIndex];
+  const entry = currentDialogueEntry();
+  ui.badge.textContent = (G.sceneIndex + 1) + '/' + SCENES.length;
+  ui.toggle.textContent = 'Dahlia — pixelová pouť · ' + scene.shortTitle + ' ▾';
+  ui.live.textContent = entry.speaker + ': ' + entry.text;
+  ui.diaryOpen.textContent = `Deník (${G.items.length + G.notes.length})`;
+
+  const visitedCount = G.visited.filter(Boolean).length;
+  ui.status.textContent = `${scene.title} · prozkoumáno ${visitedCount}/${scene.hotspots.length}`;
+
+  // Menu current indicator
+  [...ui.list.querySelectorAll('button')].forEach((btn, idx) => {
+    btn.setAttribute('aria-current', String(idx === G.sceneIndex));
+  });
+
+  // Render optional choices if present on active hotspot
+  ui.choices.innerHTML = '';
+  if (entry.choices && entry.choices.length) {
+    ui.choices.hidden = false;
+    entry.choices.forEach(ch => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'choice-btn';
+      b.textContent = ch.label;
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        ensureAudio();
+        playNote(587.33, 0.14);
+        addUnique(G.notes, ch.note);
+        ui.choices.hidden = true;
+        syncDiaryModal();
+        advanceDialogue();
+      });
+      ui.choices.append(b);
+    });
+  } else {
+    ui.choices.hidden = true;
   }
+  syncDiaryModal();
+}
 
-  drawFrame();
+function syncDiaryModal() {
+  ui.diaryItems.innerHTML = G.items.length
+    ? G.items.map(it => `<li>${it}</li>`).join('')
+    : '<li>Zatím žádné sebrané předměty.</li>';
+  ui.diaryNotes.innerHTML = G.notes.length
+    ? G.notes.map(n => `<li>${n}</li>`).join('')
+    : '<li>Prozkoumejte scénu kliknutím na postavy a předměty.</li>';
+}
 
-  // --- structure scoring / no fail path ---
-  // wrap first update again to ensure frame is on top
-  function finalize() {
-    drawScene(state.chapter);
-    overlayHotspots(state.chapter);
-    drawCaption(state.chapter);
-    drawDialogue(state.dialogueLines[state.step % state.dialogueLines.length]);
-    drawFrame();
+function loadScene(index) {
+  G.sceneIndex = (index + SCENES.length) % SCENES.length;
+  G.activeHotspot = -1;
+  G.hoverHotspot = -1;
+  G.visited = SCENES[G.sceneIndex].hotspots.map(() => false);
+  G.transitionFlash = 0;
+  bakeSceneGeometry(SCENES[G.sceneIndex].id);
+  syncDOM();
+  draw();
+}
+
+function selectHotspot(idx) {
+  const scene = SCENES[G.sceneIndex];
+  const h = scene.hotspots[idx];
+  if (!h) return;
+  G.activeHotspot = idx;
+  G.visited[idx] = true;
+  if (h.item) addUnique(G.items, h.item);
+  if (h.diary) addUnique(G.notes, h.diary);
+  if (h.action === 'plant') G.planted = true;
+  playNote(440 + idx * 55, 0.12);
+  syncDOM();
+  draw();
+}
+
+function nextScene() {
+  playNote(659.25, 0.2);
+  if (G.sceneIndex < SCENES.length - 1) {
+    loadScene(G.sceneIndex + 1);
+  } else {
+    // At the end of Epilogue, cycle back to Scene 1 so play is never stuck
+    loadScene(0);
   }
+}
 
-  // Initial paint
-  state.chapter = 'prologue';
-  state.step = 0;
-  finalize();
+function advanceDialogue() {
+  const nextUnvisited = G.visited.indexOf(false);
+  if (nextUnvisited !== -1) {
+    selectHotspot(nextUnvisited);
+  } else {
+    nextScene();
+  }
+}
 
-  // Debug-gentle: no fail states; clicks only advance dialogue.
-  // No external fetch, font or audio.
+function hitHotspotAt(sx, sy) {
+  const scene = SCENES[G.sceneIndex];
+  let bestIdx = -1, bestDist = 24;
+  scene.hotspots.forEach((h, idx) => {
+    const p = project(h.pos[0], h.pos[1], h.pos[2]);
+    const d = Math.hypot(sx - p.sx, sy - p.sy);
+    if (d < bestDist) {
+      bestDist = d;
+      bestIdx = idx;
+    }
+  });
+  return bestIdx;
+}
 
-  // Small keyboard / mouse pointer
-  cv.style.cursor = 'crosshair';
-})();
+function toCanvas(e) {
+  const r = canvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - r.left) * W / r.width,
+    y: (e.clientY - r.top) * H / r.height
+  };
+}
+
+canvas.addEventListener('pointermove', e => {
+  const pt = toCanvas(e);
+  const hit = pt.y < 204 ? hitHotspotAt(pt.x, pt.y) : -1;
+  if (hit !== G.hoverHotspot) {
+    G.hoverHotspot = hit;
+  }
+});
+
+canvas.addEventListener('pointerdown', e => {
+  ensureAudio();
+  canvas.focus({ preventScroll: true });
+  const pt = toCanvas(e);
+  // Check if user clicked a hotspot in the diorama area
+  if (pt.y < 205) {
+    const hit = hitHotspotAt(pt.x, pt.y);
+    if (hit >= 0) {
+      // If all hotspots are already visited and the user clicks the currently active hotspot again, transition
+      if (G.visited.every(Boolean) && G.activeHotspot === hit) {
+        nextScene();
+      } else {
+        selectHotspot(hit);
+      }
+      return;
+    }
+  }
+  // Clicking the dialogue box or anywhere else advances through hotspots and then transitions scene
+  advanceDialogue();
+});
+
+canvas.addEventListener('keydown', e => {
+  ensureAudio();
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    advanceDialogue();
+  } else if (e.key === 'ArrowRight' || e.key === 'Tab') {
+    e.preventDefault();
+    const next = (G.activeHotspot + 1) % SCENES[G.sceneIndex].hotspots.length;
+    selectHotspot(next);
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const len = SCENES[G.sceneIndex].hotspots.length;
+    const prev = (G.activeHotspot - 1 + len) % len;
+    selectHotspot(prev);
+  }
+});
+
+/* ---------- Top Menu & Dialog Modals ---------- */
+SCENES.forEach((sc, idx) => {
+  const li = document.createElement('li');
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = sc.shortTitle;
+  btn.addEventListener('click', () => {
+    ui.list.hidden = true;
+    ui.toggle.setAttribute('aria-expanded', 'false');
+    loadScene(idx);
+  });
+  li.append(btn);
+  ui.list.append(li);
+});
+
+ui.toggle.addEventListener('click', () => {
+  const open = ui.list.hidden;
+  ui.list.hidden = !open;
+  ui.toggle.setAttribute('aria-expanded', String(open));
+});
+document.addEventListener('pointerdown', e => {
+  if (! document.getElementById('pp-menu').contains(e.target)) {
+    ui.list.hidden = true;
+    ui.toggle.setAttribute('aria-expanded', 'false');
+  }
+});
+ui.diaryOpen.addEventListener('click', () => { syncDiaryModal(); ui.diaryDialog.showModal(); });
+ui.rulesOpen.addEventListener('click', () => ui.rulesDialog.showModal());
+for (const dlg of [ui.diaryDialog, ui.rulesDialog]) {
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+}
+
+/* ---------- WebAudio Gentle Piano Motif (no external audio files) ---------- */
+let audio = null, muted = false;
+function ensureAudio() {
+  if (audio) {
+    if (audio.state === 'suspended') audio.resume().catch(() => {});
+    return;
+  }
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (AC) {
+    try { audio = new AC(); } catch { audio = null; }
+  }
+}
+function playNote(freq = 440, dur = 0.14) {
+  if (!audio || muted) return;
+  try {
+    const now = audio.currentTime;
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+    osc.connect(gain).connect(audio.destination);
+    osc.start(now);
+    osc.stop(now + dur + 0.01);
+  } catch { /* ignore if blocked */ }
+}
+ui.mute.addEventListener('click', () => {
+  muted = !muted;
+  ui.mute.textContent = muted ? 'zvuk vyp' : 'zvuk zap';
+  ui.mute.setAttribute('aria-pressed', String(muted));
+});
+
+/* ---------- Fit & Main Loop ---------- */
+function fit() {
+  const dpr = window.devicePixelRatio || 1;
+  const fitScale = Math.min(innerWidth / W, (innerHeight - 44) / H);
+  const scale = Math.max(1, Math.floor(fitScale * dpr)) / dpr;
+  canvas.style.width = (W * scale) + 'px';
+  canvas.style.height = (H * scale) + 'px';
+}
+addEventListener('resize', fit);
+fit();
+const startIdx = clamp(Number(new URLSearchParams(location.search).get('scene')) || 0, 0, SCENES.length - 1);
+loadScene(startIdx);
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  G.time += dt;
+  if (G.transitionFlash > 0) G.transitionFlash = Math.max(0, G.transitionFlash - dt * 2.4);
+  draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+window.__dahlia = {
+  G,
+  SCENES,
+  loadScene,
+  selectHotspot,
+  advanceDialogue,
+  nextScene,
+  step(dt) { G.time += dt; draw(); }
+};
 </script>
 </body>
 </html>
