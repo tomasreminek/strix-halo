@@ -30,11 +30,13 @@
     inset: 0;
     display: grid;
     place-items: center;
+    background: #fbf8f1;
   }
   canvas {
     display: block;
+    /* Only `pixelated`: a later `crisp-edges` declaration overrides it in some
+       browsers and makes scaled text shimmer. */
     image-rendering: pixelated;
-    image-rendering: crisp-edges;
     touch-action: manipulation;
     cursor: pointer;
     outline: none;
@@ -1726,8 +1728,12 @@ ui.mute.addEventListener('click', () => {
 /* ---------- Fit & Main Loop ---------- */
 function fit() {
   const dpr = window.devicePixelRatio || 1;
-  const fitScale = Math.min(innerWidth / W, (innerHeight - 44) / H);
-  const scale = Math.max(1, Math.floor(fitScale * dpr)) / dpr;
+  const fitScale = Math.min(innerWidth / W, (innerHeight - 40) / H);
+  // Fill the window. Use whole device pixels when the fit is close to an
+  // integer (crispest possible), otherwise take the full fractional scale so
+  // the scene actually grows instead of staying at 360x280.
+  const whole = Math.floor(fitScale * dpr) / dpr;
+  const scale = whole >= fitScale * 0.86 ? whole : fitScale;
   canvas.style.width = (W * scale) + 'px';
   canvas.style.height = (H * scale) + 'px';
 }
