@@ -244,9 +244,9 @@
 /* ============================================================================
    1. PIXEL-PLAYS ISOMETRIC ENGINE (30° orthographic camera, ramps, shadows)
    ============================================================================ */
-const W = 360, H = 280, S = 10;
+const W = 800, H = 360, S = 18;
 const SIN = 0.5, COS = Math.sqrt(3) / 2, R2 = Math.SQRT2;
-const OX = W / 2, OY = 114; // Shifted above the bottom dialogue box so the whole diorama floats on paper white
+const OX = W / 2, OY = 157; // Shifted above the bottom dialogue box so the whole diorama floats on paper white
 let SHADOW_X = 1.15, SHADOW_Y = -0.18;
 
 const canvas = document.getElementById('c');
@@ -1399,7 +1399,7 @@ function drawCanvasUI() {
   }
 
   // Bottom Dialogue Box on Canvas (x=6, y=200, w=348, h=76)
-  const bx = 6, by = 200, bw = 348, bh = 76;
+  const bx = 8, by = H - 84, bw = W - 16, bh = 76;
   ctx.fillStyle = '#1c1b19';
   ctx.fillRect(bx - 1, by - 1, bw + 2, bh + 2);
   ctx.fillStyle = '#fbf8f1';
