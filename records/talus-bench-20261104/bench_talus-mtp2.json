@@ -1,0 +1,23 @@
+{
+ "label": "talus-mtp2",
+ "url": "http://127.0.0.1:18087",
+ "time": "2026-11-04 08:41:10",
+ "runs": [
+  {
+   "depth": 8007,
+   "pp_tps": 1341.9,
+   "tg_tps": 53.49,
+   "tg_n": 256,
+   "prefill_s": 5.97,
+   "warm_ttft_ms": 125
+  },
+  {
+   "depth": 65714,
+   "pp_tps": 1345.9,
+   "tg_tps": 68.48,
+   "tg_n": 256,
+   "prefill_s": 48.82,
+   "warm_ttft_ms": 172
+  }
+ ]
+}

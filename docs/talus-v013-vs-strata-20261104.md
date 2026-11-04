@@ -44,6 +44,43 @@ Feed rate is flat across depth for Talus (1 050 → 1 363 tok/s) while Strata de
 
 Decode is effectively a tie (0.99–1.16×, inside single-sample noise; the 56–61 tok/s cells reflect longer accepted draft runs, not a different engine speed class).
 
+
+## MTP head — built and measured (added after the A/B above)
+
+Neither arm above had an MTP head. Talus can take one, so it was built from the BF16 checkpoint:
+
+```bash
+G=/path/to/llama.cpp/gguf-py          # needs GGMLQuantizationType.Q2_0 (recent gguf-py)
+export PYTHONPATH="<rocm-sdk>:$G" STRATA_GGUF_PY=$G
+python3 tools/mtp_fetch.py inventory --out ~/Projekty/Strata-data/mtp-bf16
+python3 tools/mtp_fetch.py fetch     --out ~/Projekty/Strata-data/mtp-bf16   # 31 mtp.* tensors, 4.9 GB
+python3 tools/mtp_pack.py --src ~/Projekty/Strata-data/mtp-bf16 --experts q2_0 \
+        --out ~/Projekty/Strata-data/mtp-bf16/mtp-q2_0.gguf                  # 0.889 GB
+python3 tools/mtp_rt.py   --gguf ~/Projekty/Strata-data/mtp-bf16/mtp-q2_0.gguf \
+        --out ~/Projekty/Strata-data/mtp-bf16/rt                            # dense.bin + experts.bin 804 MB
+```
+
+Then add to the engine args: `--mtp <rt dir> --mtp-window 8192 --mtp-draft-vocab <release>/data/draft_vocab_en.bin`.
+The engine logs `talus mtp: draft layer loaded, 807 MiB of VRAM`, `draft head over 40525 tokens`,
+`probabilistic draft acceptance on (STRATA_SPEC_PROB)` and the ready line reports **`spec=16 mtp_max=4`**.
+
+| depth | prefill | decode without MTP | decode **with MTP** | gain |
+|---|---:|---:|---:|---:|
+| ~2 000 | 1 036 tok/s | 37.3 | **42.0** | +13 % |
+| ~8 000 | 1 342 tok/s | 40.0 | **53.5** | +34 % |
+| ~31 800 | 1 384 tok/s | 36.8 | **52.2** | **+42 %** |
+| ~65 700 | 1 346 tok/s | 60.6 | **68.5** | +13 % |
+
+Prefill is unchanged (the draft head rides the decode path). MTP turns the decode comparison from a tie into a
+**win against Strata's non-MTP 32–56 tok/s** as well: 42–68 tok/s sustained on this box.
+
+Note the prefill cells at 8k and 66k moved slightly (1 342 / 1 346 against the earlier 1 372 / 1 363) — that is
+run-to-run spread of a single sample, not a regression; prefill is a separate path from the MTP head.
+
+Caveat: this MTP head is built from the **stock Qwen BF16 checkpoint**, while the served weights are the
+Huihui-abliterated Unsloth UD-IQ4_XS. Draft acceptance is therefore approximate — the numbers above are measured,
+the head is not perfectly matched to the abliterated weights.
+
 ## Verdict
 
 **Talus is deployed** as `talus-qwen.service` (user unit, port 18087, `--batch 2`, 131072 ctx). Strata stays installed and is a one-command rollback (`systemctl --user start strata-qwen.service` after stopping talus).
@@ -53,7 +90,7 @@ This is a **prefill win, not a decode win** — it makes long-context agent turn
 ## Known gaps in the Talus release (measured, not guessed)
 
 - **Vision / OCR does not work through `talus-server`.** The engine accepts `--vision` and speaks the `GENI` image protocol, but the 0.1.3 server binary has no `mmproj`/vision code path and rejects image parts with `image input is not supported by this model`. A `vision` block in the run config is ignored. Workaround under test: keep Strata's Python `serve.server` (which implements the mmproj → `strata-vision` → `GENI` path) as the HTTP front-end and point it at `talus-cli --serve` as the engine.
-- **No MTP head yet.** Neither arm had one, so the comparison is fair, but Talus can take one (`tools/mtp_fetch.py` + `mtp_pack.py` + `mtp_rt.py`, ~5 GB of `mtp.*` tensors from the Qwen BF16 checkpoint). Untested here.
+- **MTP: built and measured** — see the MTP section above; decode 42–68 tok/s, `spec=16 mtp_max=4`.
 - **`talus-cli` CLI traps:** the engine is started with `--serve`, *not* `--engine-protocol` (that name is only an alias in the help text and is rejected on the command line), and `--prefill <auto|N>` is mandatory in serve mode — without it the engine exits with `talus serve: needs --spec T and --prefill CHUNK`.
 
 ## Reproduction
