@@ -31,22 +31,35 @@ Two models are worth running here. Everything else is in the test table below, m
 
 ### Qwen 3.8 Flash-Next — best measured
 
-Three configurations win on three different criteria. Pick by workload, not by the biggest number.
+**Talus `0.1.3` + Strata vision front-end is the top configuration on this box.** It wins both criteria at once — no trade-off, pick it unless you need Halogen's aligned quality overlay.
 
 | Configuration | Prefill tok/s | Decode tok/s | Why pick it |
 |---|---:|---:|---|
-| **Native Halogen `0.11.0`** + aligned quality overlay, MTP, 131k slot | — | **44.66** short · 41.37 @32k · 40.08 @64k · 38.03 @126k | highest decode measured here, best quality/API gate |
-| **Strata `v0.1.40.1` + Unsloth UD-IQ4_XS**, MTP4 / window 8192 / lookup 3 | 1189 @7.6k · 1171 @62k · **1294 @126k** | 43.88 @7.6k · 42.13 @62k · **42.71 @126k** | newest run, flattest decode curve; provisional pick for iterative coding |
-| **Halogen `0.16.3` + Unsloth UD-IQ4_XS**, native MTP head | **1411 @7.6k · 1674 @62k · 1702 @126k** | 33.84 · 34.40 · 34.98 | highest prefill: a 126k + 420-output request takes **86.22 s** versus Strata **107.46 s** |
+| **Talus `0.1.3`** + Strata vision front-end + MTP head, 131k slot, KV int8, `--batch 2` | **1058 @2k · 1346 @8k · 1385 @32k · 1350 @66k · 1271 @126.6k** | **49.8 @2k · 56.4 @8k · 48.3 @32k · 61.5 @66k · 42.9 @126.6k** | **best prefill *and* best decode measured here**; full 128k window verified; vision (OCR) in the same process, no second model in RAM |
+| **Native Halogen `0.11.0`** + aligned quality overlay, MTP, 131k slot | — | 44.66 short · 41.37 @32k · 40.08 @64k · 38.03 @126k | highest decode before Talus, best quality/API gate |
+| **Strata `v0.1.40.1` + Unsloth UD-IQ4_XS**, MTP4 / window 8192 / lookup 3 | 1189 @7.6k · 1171 @62k · 1294 @126k | 43.88 @7.6k · 42.13 @62k · 42.71 @126k | flattest decode curve of the pre-Talus engines; superseded for speed |
+| **Halogen `0.16.3` + Unsloth UD-IQ4_XS**, native MTP head | 1411 @7.6k · 1674 @62k · 1702 @126k | 33.84 · 34.40 · 34.98 | highest prefill of the Halogen line, but decode is 30 % below Talus |
 
-Exact configuration behind the decode winner:
+Exact configuration behind the Talus winner:
+
+- Engine `talus-cli 0.1.3` (`gfx1151` build) driven through the **Strata `0.1.56` Python `serve.server` front-end** — Talus' own `talus-server` cannot take image input (`HTTP 400 unsupported_content`), the Strata front-end can, and it forwards every text request to the Talus engine unchanged. Text path costs nothing: 1058–1385 tok/s prefill versus 1049–1400 for bare Talus.
+- Weights `qwen3.8-flash-next-unsloth-ud-iq4_xs` (uncensored/abliterated), `--ctx 131072`, `--batch 2` (chat slot + worker slot), KV cache int8.
+- MTP: `--mtp ~/Projekty/Strata-data/mtp-bf16/rt --mtp-window 8192 --mtp-draft-vocab ./data/draft_vocab_en.bin` → `spec=16 mtp_max=4`, draft layer 807 MiB VRAM. Head built from the stock BF16 checkpoint (`mtp_fetch` 31 tensors 4.9 GB → `mtp_pack --experts q2_0` 0.889 GB → `mtp_rt` 804 MB), so acceptance against the abliterated served weights is approximate, not byte-exact.
+- Vision: `strata-vision-hip` over the mmproj, GENI path inside the same process. **OCR requires thinking off** (`chat_template_kwargs {"enable_thinking": false}`) or the model spends the whole `max_tokens` in `reasoning_content` and returns an empty `content`. Reasoning/chat turns run with thinking on.
+- Cold start ~48 s under systemd (`Restart=on-failure`, `MemoryMax=110G`). See [production recipe](docs/talus-vision-production-20261104.md) and [A/B + MTP report](docs/talus-v013-vs-strata-20261104.md).
+
+
+#### Halogen reference configuration (kept for comparison)
 
 - Engine `ghcr.io/peonist-ai/halogen-flash-server:0.11.0`, measured image ID `sha256:7f4036110c6b316d72c3bc534bd5cd88af3078ca1d59fe710f3e342a534d3598` (a registry tag can move — if the ID differs it is a new runtime revision, not this result).
 - Weights `qwen38-flash-next-w4b.hgn` + `qwen38-flash-next-w4b.overlay.hgn` + `qwen38-flash-next-vision.hgn`, revision `b8dbb46d03f5d1d0e63b432c2ca763db7e8e0aa4`, SHA256 pinned in the report.
 - `HALOGEN_CTX=131072`, `HALOGEN_KV_POOL_POSITIONS=131072`, `HALOGEN_KV_SLOTS=1`, `HALOGEN_MAX_TOK=32768`, `HALOGEN_PROMPT_CACHE=2`, `HALOGEN_VISION_TOWER=1`, `--ipc=host --ulimit memlock=-1:-1`, `/dev/kfd` + `/dev/dri`.
 - Practical gate passed: Czech with diacritics, Python parsed and executed, OpenAI tool call, strict JSON schema, Responses API, vision OCR (`ORBIT 4729`).
 
-**Caveat that stays published:** the serial-versus-MTP byte-identity gate failed in every completed serving regime, so the honest status is `COMPLETE_PERFORMANCE_GATE_PASSED_IDENTITY_REVIEW_REQUIRED`. Speed is the selection criterion here, so it is listed as the winner — not reclassified as a pass.
+**Caveat that stays published:** the Halogen serial-versus-MTP byte-identity gate failed in every completed serving regime, so Halogen's honest status is `COMPLETE_PERFORMANCE_GATE_PASSED_IDENTITY_REVIEW_REQUIRED`. It is kept here as the quality/API reference, not as the speed pick — Talus took that.
+
+**Talus caveat, equally published:** the MTP head was built from the **stock BF16 checkpoint** while the served weights are abliterated, so MTP acceptance is measured against a near-match, not a byte-exact draft. The speed numbers are real; the pairing is approximate. Talus' own `talus-server` also cannot accept image input, which is why the Strata front-end sits in front of it.
+
 
 **Uncensored, if that matters more than the last 25 %:** Halogen Abliterated HGN `0.11.0` + patched experts + overlay with MTP gives **32.91 / 36.96 @9.6k · 31.41 / 34.64 @62k · 30.54 / 33.25 @127.5k**, and the OrcaRouter route on Nathanw `v0.7.6` Vulkan reaches **35.26 varied · 27.69 @64k · 25.89 @126k**. Halogen plus OrcaRouter IQ4_XS is loader-blocked: its dense trunk contains `Q5_K` and Halogen requires dense `Q8_0`.
 
@@ -85,6 +98,7 @@ Exact configuration:
 
 | Date tested | Model / tested configuration | Measured result or gate | Outcome and full test |
 |---|---|---|---|
+| **2026-11-04** | **Talus `0.1.3` + Strata `0.1.56` vision front-end · Qwen3.8 Flash-Next Unsloth UD-IQ4_XS · MTP head · `gfx1151` · 131,072 ctx · KV int8 · `--batch 2`** | Depth sweep: **2k 1058 prefill / 49.8 decode · 8k 1346 / 56.4 · 32k 1385 / 48.3 · 66k 1350 / 61.5 · 126.6k 1271 / 42.9** (full window: 99.62 s prefill, 171 ms warm TTFT). Bare Talus without MTP: 1049–1400 prefill, 37.3–40.0 decode. **Vision OCR on a real cadastral scan: 1066 → 571 prompt/completion tokens in 10.8 s** (thinking off) | **Top configuration on this box — wins prefill *and* decode**, and serves vision in the same process, so chat and worker slots share one engine. MTP adds +13 % to +42 % decode over bare Talus. The 128k point needs the coding worker stopped: a run with it active reported 1.45 tok/s (GPU contention, not the engine). [Production recipe](docs/talus-vision-production-20261104.md) · [128k record](docs/talus-128k-context-20261104.md) · [A/B and MTP report](docs/talus-v013-vs-strata-20261104.md) · [records](records/talus-vision-20261104/) |
 | **2026-11-01** | **Gufo `feat/ds41` · DeepSeek V4.1 Flash 1017 IQ1_M + Maya-S Q6_K Engram** · `gfx1151`, ROCm 7.14.1, experts streamed, own systemd scope | Depth sweep, 2 rep: **32k 1264/1268 prefill, 23.53/23.55 decode · 64k 1198/1216, 23.34/23.39 · 128k 1142/1127, 22.85/22.75**. Serving `-j 2`: **24.10 tok/s @c=1**, **18.88/request @c=2 = 26.16 aggregate (+36 %)**, prefix-cache TTFT 1.3 ms vs 946 ms. Prompt lookup **20.16 → 66.32 tok/s (3.3×)** | **First usable DeepSeek V4.1 speed on this box**; load 6.46 s, 112.00 GiB backbone + 150.21 GiB Engram. QA gate **2/3** (Czech fixture failed). Resident needs 114.00 vs 102.21 GiB available — unreachable. Research runtime, **not comparable with the `ds4` Q2 rows**. [Report](docs/gufo-deepseek-v41-iq1m-20261101.md) · [logs](records/benchmarks/gufo-iq1m-20261101/) |
 | **2026-10-23/24** | **Project Maya v1.1.26 · Maya-S (IQ2 `339.5 GB`, `ntfs3`) / Maya-XS (`258 GB`, `ntfs-3g`)** · `build-hip/maya-ds4`, ROCm 7.14.1 `gfx1151`, `--mmap-experts on --vram-experts 0.5 --max-context 131072 --tp 1`, DSpark drafter | Maya-S prefill **307.1 / 408.8 / 516.4 / 495.8 tok/s**, decode **9.11 / 11.76 / 12.74 / 15.31 tok/s** at **8,037 / 15,524 / 63,526 / 120,867** filled tokens. Maya-XS decode **11.3 / 13.1 / 15.2 / 17.0 tok/s**, prefill **196 / 222 tok/s** at 64k/120k (8k/15.5k withdrawn — warm KV reuse) | **Both packs passed 120k** on the 131,072 slot. Peak cgroup **56.73 GiB (S) / 44.93 GiB (XS)**, GTT 63.67 / 63.82 GiB, `MemAvailable` floor 46.4 / 46.1 GiB, **no freeze / OOM / failed request**. XS decodes ~11 % faster, S prefills 2.2–2.6× faster — split result, neither beats Strata's 36–49 tok/s. XS pack deleted 2026-10-24. [Report](docs/maya-v1126-20261024.md) · [Frozen logs](records/benchmarks/maya-20261024/) |
 | **2026-10-06** | **Strata server v0.1.40.1 · Orca Uncensored IQ3_XXS · HIP fast · prefill 16384 · MTP4/window8192** | At **30k**, three independent-process medians: **1301 tok/s prefill / 44.33 tok/s decode / 32.65 s request**. At **126k + 420 output**: **1272 / 42.44 tok/s / 109.23 s**; cached decode **43.43 tok/s**. Growing history: 126,450 input, 126,420 cached, 27 output in **1.12 s** | **39/39 context records, 17/17 short checks passed**; server suite 452 tests, 10 skips, no failures. Clean teardown; multi-file game coding and soak pending. [Report](docs/strata-strix-halo.md) · [JSON](records/benchmarks/strata-20261006/strata-v01401-20261006-summary.json) |

@@ -129,6 +129,13 @@ the prefix cache and prefill looks ~100× faster than reality), then 256 warm de
 | ~8 000 | 1 346 | 56.4 |
 | ~31 800 | 1 385 | 48.3 |
 | ~65 700 | 1 350 | 61.5 |
+| ~126 600 | 1 271 | 42.9 |
+
+The 128k point needs the coding worker stopped. Two concurrent slots on one GPU make decode
+meaningless — a run with the worker active reported 1.45 tok/s, which is contention, not the
+engine. With the worker down and only slot 0 busy: **1 270.8 tok/s prefill (99.62 s for 126 600
+tokens) and 42.86 tok/s decode over 256 tokens, warm TTFT 171 ms**. Full record and method in
+`docs/talus-128k-context-20261104.md`.
 
 For comparison on the same weights and the same box:
 

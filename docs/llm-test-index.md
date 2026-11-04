@@ -4,6 +4,7 @@ Measured results, acceptance gates, and negative experiments. Start with the [ma
 
 ## Current pair and Flash-Next
 
+- **[Talus 0.1.3 + Strata vision front-end, 4 Nov](talus-vision-production-20261104.md)**: the configuration actually serving — abliterated `qwen3.8-flash-next-unsloth-ud-iq4_xs`, MTP head, 131,072 ctx, two slots (chat + worker), OCR in the same process. **1058–1385 tok/s prefill, 48.3–61.5 tok/s decode** from 2k to 66k, and at full window **1 270.8 tok/s prefill / 42.86 decode at 126 600 tokens** ([128k record](talus-128k-context-20261104.md)). [A/B against Strata with identical weights](talus-v013-vs-strata-20261104.md) (1.76–1.91× prefill) and [raw records](../records/talus-vision-20261104/).
 - [Strata HIP / Orca IQ3_XXS,4 Oct](strata-strix-halo.md): actual inference, correct arithmetic/Czech and 64-token canary; slow in this tested configuration, no64k/128k gate.
 
 - [Ornith 1.5 9B Abliterated](ornith-abliterated-20260921.md): loader, Hermes tool loop, 63k and 117.8k retrieval.
