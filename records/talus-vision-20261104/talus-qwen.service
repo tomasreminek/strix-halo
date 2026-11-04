@@ -1,0 +1,19 @@
+[Unit]
+Description=Talus engine (Qwen3.8-Flash-Next, 2 slots, MTP) behind Strata serve.server — vision/OCR on :18087
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/talus-vision-server.sh
+Restart=on-failure
+RestartSec=20
+TimeoutStartSec=infinity
+MemoryMax=110G
+# serve.server spawns the engine as a child; keep it in this cgroup so stop takes both down
+KillMode=control-group
+KillSignal=SIGTERM
+TimeoutStopSec=45
+
+[Install]
+WantedBy=default.target

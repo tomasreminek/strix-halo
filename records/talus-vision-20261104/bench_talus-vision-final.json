@@ -1,0 +1,39 @@
+{
+ "label": "talus-vision-final",
+ "url": "http://127.0.0.1:18087",
+ "time": "2026-11-04 09:02:04",
+ "runs": [
+  {
+   "depth": 1992,
+   "pp_tps": 1057.5,
+   "tg_tps": 49.79,
+   "tg_n": 256,
+   "prefill_s": 1.88,
+   "warm_ttft_ms": 119
+  },
+  {
+   "depth": 8003,
+   "pp_tps": 1346.0,
+   "tg_tps": 56.37,
+   "tg_n": 256,
+   "prefill_s": 5.95,
+   "warm_ttft_ms": 121
+  },
+  {
+   "depth": 31756,
+   "pp_tps": 1384.6,
+   "tg_tps": 48.33,
+   "tg_n": 256,
+   "prefill_s": 22.94,
+   "warm_ttft_ms": 123
+  },
+  {
+   "depth": 65713,
+   "pp_tps": 1349.5,
+   "tg_tps": 61.5,
+   "tg_n": 256,
+   "prefill_s": 48.7,
+   "warm_ttft_ms": 131
+  }
+ ]
+}
