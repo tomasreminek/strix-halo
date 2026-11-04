@@ -1,0 +1,39 @@
+{
+ "label": "strata2",
+ "url": "http://127.0.0.1:18087",
+ "time": "2026-11-03 23:39:36",
+ "runs": [
+  {
+   "depth": 1991,
+   "pp_tps": 564.2,
+   "tg_tps": 32.15,
+   "tg_n": 256,
+   "prefill_s": 3.53,
+   "warm_ttft_ms": 135
+  },
+  {
+   "depth": 8003,
+   "pp_tps": 781.1,
+   "tg_tps": 36.86,
+   "tg_n": 256,
+   "prefill_s": 10.25,
+   "warm_ttft_ms": 161
+  },
+  {
+   "depth": 31752,
+   "pp_tps": 749.5,
+   "tg_tps": 37.15,
+   "tg_n": 256,
+   "prefill_s": 42.36,
+   "warm_ttft_ms": 240
+  },
+  {
+   "depth": 65713,
+   "pp_tps": 713.6,
+   "tg_tps": 56.49,
+   "tg_n": 256,
+   "prefill_s": 92.09,
+   "warm_ttft_ms": 361
+  }
+ ]
+}

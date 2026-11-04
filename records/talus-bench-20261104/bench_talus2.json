@@ -1,0 +1,39 @@
+{
+ "label": "talus2",
+ "url": "http://127.0.0.1:18087",
+ "time": "2026-11-03 23:33:46",
+ "runs": [
+  {
+   "depth": 1990,
+   "pp_tps": 1048.9,
+   "tg_tps": 37.32,
+   "tg_n": 256,
+   "prefill_s": 1.9,
+   "warm_ttft_ms": 122
+  },
+  {
+   "depth": 8007,
+   "pp_tps": 1371.9,
+   "tg_tps": 39.99,
+   "tg_n": 256,
+   "prefill_s": 5.84,
+   "warm_ttft_ms": 129
+  },
+  {
+   "depth": 31753,
+   "pp_tps": 1400.2,
+   "tg_tps": 36.75,
+   "tg_n": 256,
+   "prefill_s": 22.68,
+   "warm_ttft_ms": 146
+  },
+  {
+   "depth": 65715,
+   "pp_tps": 1363.3,
+   "tg_tps": 60.6,
+   "tg_n": 256,
+   "prefill_s": 48.2,
+   "warm_ttft_ms": 215
+  }
+ ]
+}
